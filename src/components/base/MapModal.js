@@ -152,18 +152,7 @@ export default function MapModal({ onSubmitDestination, dammamZoneCoords }) {
                     onLoad={onLoad}
                     onClick={onMapClick}
                   >
-                    {/* Polygon for the selected area */}
-                    <Polygon
-                      paths={convertedCoords}
-                      options={{
-                        fillColor: "#FFFFFF",
-                        fillOpacity: 0,
-                        strokeColor: "#4463F0",
-                        strokeOpacity: 1,
-                        strokeWeight: 2,
-                      }}
-                    />
-                    {/* Polygon for the rest of the area */}
+                    {/* Overlay Polygon for the darkened area */}
                     <Polygon
                       paths={[
                         { lat: 90, lng: -180 },
@@ -175,9 +164,21 @@ export default function MapModal({ onSubmitDestination, dammamZoneCoords }) {
                         fillColor: "#000000",
                         fillOpacity: 0.5,
                         strokeColor: "#000000",
-                        strokeOpacity: 0.5,
-                        strokeWeight: 1,
+                        strokeOpacity: 0,
+                        strokeWeight: 0,
                         zIndex: 1,
+                      }}
+                    />
+                    {/* Polygon for the selected area */}
+                    <Polygon
+                      paths={convertedCoords}
+                      options={{
+                        fillColor: "#FFFFFF",
+                        fillOpacity: 0,
+                        strokeColor: "#4463F0",
+                        strokeOpacity: 1,
+                        strokeWeight: 2,
+                        zIndex: 2,
                       }}
                     />
 
@@ -207,12 +208,12 @@ export default function MapModal({ onSubmitDestination, dammamZoneCoords }) {
                           left: "50%",
                           marginLeft: "-120px",
                           top: "10px",
+                          zIndex: 3,
                         }}
                       />
                     </StandaloneSearchBox>
                   </GoogleMap>
                 </LoadScript>
-
               </div>
               {error && <div className="p-4 text-text_warning">{error}</div>}
               <div className="flex items-center p-4 md:p-5 space-x-3 rtl:space-x-reverse border-gray-200 rounded-b dark:border-gray-600">
