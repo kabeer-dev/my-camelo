@@ -152,13 +152,14 @@ export default function MapModal({ onSubmitDestination, dammamZoneCoords }) {
                     onLoad={onLoad}
                     onClick={onMapClick}
                   >
-                    {/* Overlay Polygon for the darkened area */}
+                    {/* Outer polygon covering the whole map */}
                     <Polygon
                       paths={[
                         { lat: 90, lng: -180 },
-                        { lat: -90, lng: -180 },
-                        { lat: -90, lng: 180 },
                         { lat: 90, lng: 180 },
+                        { lat: -90, lng: 180 },
+                        { lat: -90, lng: -180 },
+                        { lat: 90, lng: -180 },
                       ]}
                       options={{
                         fillColor: "#000000",
@@ -166,19 +167,17 @@ export default function MapModal({ onSubmitDestination, dammamZoneCoords }) {
                         strokeColor: "#000000",
                         strokeOpacity: 0,
                         strokeWeight: 0,
-                        zIndex: 1,
                       }}
                     />
-                    {/* Polygon for the selected area */}
+                    {/* Inner polygon for the selected area */}
                     <Polygon
                       paths={convertedCoords}
                       options={{
                         fillColor: "#FFFFFF",
-                        fillOpacity: 0,
+                        fillOpacity: 1,
                         strokeColor: "#4463F0",
                         strokeOpacity: 1,
                         strokeWeight: 2,
-                        zIndex: 2,
                       }}
                     />
 
