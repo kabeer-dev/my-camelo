@@ -171,10 +171,10 @@ export default function MapModal({ onSubmitDestination, dammamZoneCoords }) {
                         { lat: 90, lng: 180 },
                       ]}
                       options={{
-                        fillColor: "#000000",
-                        fillOpacity: 0.5,
+                        fillColor: "#4463F0",
+                        fillOpacity: 0.3,
                         strokeColor: "#355E3B",
-                        strokeOpacity: 0.5,
+                        strokeOpacity: 1,
                         strokeWeight: 1,
                       }}
                     />
