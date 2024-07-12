@@ -1,0 +1,507 @@
+.solutionpage-first-slider-setting {
+  padding: 52px 0px 0px 0px !important;
+}
+
+.solutionpage-first-slider > .slick-prev {
+  display: block !important;
+  position: absolute !important;
+  top: -30% !important;
+  left: 92.5% !important;
+  background-color: #e5e5e5 !important;
+  width: 36px !important;
+  height: 36px !important;
+  border-radius: 6px !important;
+}
+
+.solutionpage-first-slider > .slick-prev:hover {
+  background: #c3a58b !important;
+}
+
+.solutionpage-first-slider > .slick-prev::before {
+  content: "" !important;
+  display: inline-block !important;
+  width: 18px !important;
+  height: 16px !important;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 -6.5 38 38' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' fill='%23000000'%3E%3Cg id='SVGRepo_bgCarrier' stroke-width='0'%3E%3C/g%3E%3Cg id='SVGRepo_tracerCarrier' stroke-linecap='round' stroke-linejoin='round'%3E%3C/g%3E%3Cg id='SVGRepo_iconCarrier'%3E%3Ctitle%3Eleft-arrow%3C/title%3E%3Cdesc%3ECreated with Sketch.%3C/desc%3E%3Cg id='icons' stroke='none' stroke-width='1' fill='none' fill-rule='evenodd'%3E%3Cg id='ui-gambling-website-lined-icnos-casinoshunter' transform='translate(-1641.000000, -158.000000)' fill='%231C1C1F' fill-rule='nonzero'%3E%3Cg id='1' transform='translate(1350.000000, 120.000000)'%3E%3Cpath d='M317.812138,38.5802109 L328.325224,49.0042713 L328.41312,49.0858421 C328.764883,49.4346574 328.96954,49.8946897 329,50.4382227 L328.998248,50.6209428 C328.97273,51.0514917 328.80819,51.4628128 328.48394,51.8313977 L328.36126,51.9580208 L317.812138,62.4197891 C317.031988,63.1934036 315.770571,63.1934036 314.990421,62.4197891 C314.205605,61.6415481 314.205605,60.3762573 314.990358,59.5980789 L322.274264,52.3739093 L292.99947,52.3746291 C291.897068,52.3746291 291,51.4850764 291,50.3835318 C291,49.2819872 291.897068,48.3924345 292.999445,48.3924345 L322.039203,48.3917152 L314.990421,41.4019837 C314.205605,40.6237427 314.205605,39.3584519 314.990421,38.5802109 C315.770571,37.8065964 317.031988,37.8065964 317.812138,38.5802109 Z' id='left-arrow' transform='translate(310.000000, 50.500000) scale(-1, 1) translate(-310.000000, -50.500000) '%3E%3C/path%3E%3C/g%3E%3C/g%3E%3C/g%3E%3C/g%3E%3C/svg%3E") !important;
+  background-repeat: no-repeat !important;
+}
+
+.solutionpage-first-slider > .slick-prev:hover::before {
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 -6.5 38 38' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' fill='%23000000' stroke='%23000000'%3E%3Cg id='SVGRepo_bgCarrier' stroke-width='0'%3E%3C/g%3E%3Cg id='SVGRepo_tracerCarrier' stroke-linecap='round' stroke-linejoin='round'%3E%3C/g%3E%3Cg id='SVGRepo_iconCarrier'%3E%3Ctitle%3Eleft-arrow%3C/title%3E%3Cdesc%3ECreated with Sketch.%3C/desc%3E%3Cg id='icons' stroke='none' stroke-width='1' fill='none' fill-rule='evenodd'%3E%3Cg id='ui-gambling-website-lined-icnos-casinoshunter' transform='translate(-1641.000000, -158.000000)' fill='%23ffffff' fill-rule='nonzero'%3E%3Cg id='1' transform='translate(1350.000000, 120.000000)'%3E%3Cpath d='M317.812138,38.5802109 L328.325224,49.0042713 L328.41312,49.0858421 C328.764883,49.4346574 328.96954,49.8946897 329,50.4382227 L328.998248,50.6209428 C328.97273,51.0514917 328.80819,51.4628128 328.48394,51.8313977 L328.36126,51.9580208 L317.812138,62.4197891 C317.031988,63.1934036 315.770571,63.1934036 314.990421,62.4197891 C314.205605,61.6415481 314.205605,60.3762573 314.990358,59.5980789 L322.274264,52.3739093 L292.99947,52.3746291 C291.897068,52.3746291 291,51.4850764 291,50.3835318 C291,49.2819872 291.897068,48.3924345 292.999445,48.3924345 L322.039203,48.3917152 L314.990421,41.4019837 C314.205605,40.6237427 314.205605,39.3584519 314.990421,38.5802109 C315.770571,37.8065964 317.031988,37.8065964 317.812138,38.5802109 Z' id='left-arrow' transform='translate(310.000000, 50.500000) scale(-1, 1) translate(-310.000000, -50.500000) '%3E%3C/path%3E%3C/g%3E%3C/g%3E%3C/g%3E%3C/g%3E%3C/svg%3E") !important;
+}
+
+.solutionpage-first-slider > .slick-next {
+  display: block !important;
+  position: absolute !important;
+  top: -30% !important;
+  right: 2% !important;
+  background-color: #e5e5e5 !important;
+  width: 36px !important;
+  height: 36px !important;
+  border-radius: 6px !important;
+}
+
+.solutionpage-first-slider > .slick-next:hover {
+  background: #c3a58b !important;
+}
+
+.solutionpage-first-slider > .slick-next::before {
+  content: "" !important;
+  display: inline-block !important;
+  width: 18px !important;
+  height: 16px !important;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 -6.5 38 38' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' fill='%23000000'%3E%3Cg id='SVGRepo_bgCarrier' stroke-width='0'%3E%3C/g%3E%3Cg id='SVGRepo_tracerCarrier' stroke-linecap='round' stroke-linejoin='round'%3E%3C/g%3E%3Cg id='SVGRepo_iconCarrier'%3E%3Ctitle%3Eright-arrow%3C/title%3E%3Cdesc%3ECreated with Sketch.%3C/desc%3E%3Cg id='icons' stroke='none' stroke-width='1' fill='none' fill-rule='evenodd'%3E%3Cg id='ui-gambling-website-lined-icnos-casinoshunter' transform='translate(-1511.000000, -158.000000)' fill='%231C1C1F' fill-rule='nonzero'%3E%3Cg id='1' transform='translate(1350.000000, 120.000000)'%3E%3Cpath d='M187.812138,38.5802109 L198.325224,49.0042713 L198.41312,49.0858421 C198.764883,49.4346574 198.96954,49.8946897 199,50.4382227 L198.998248,50.6209428 C198.97273,51.0514917 198.80819,51.4628128 198.48394,51.8313977 L198.36126,51.9580208 L187.812138,62.4197891 C187.031988,63.1934036 185.770571,63.1934036 184.990421,62.4197891 C184.205605,61.6415481 184.205605,60.3762573 184.990358,59.5980789 L192.274264,52.3739093 L162.99947,52.3746291 C161.897068,52.3746291 161,51.4850764 161,50.3835318 C161,49.2819872 161.897068,48.3924345 162.999445,48.3924345 L192.039203,48.3917152 L184.990421,41.4019837 C184.205605,40.6237427 184.205605,39.3584519 184.990421,38.5802109 C185.770571,37.8065964 187.031988,37.8065964 187.812138,38.5802109 Z' id='right-arrow'%3E%3C/path%3E%3C/g%3E%3C/g%3E%3C/g%3E%3C/g%3E%3C/svg%3E") !important;
+  background-repeat: no-repeat !important;
+}
+
+.solutionpage-first-slider > .slick-next:hover::before {
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 -6.5 38 38' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' fill='%23ffffff' stroke='%23ffffff'%3E%3Cg id='SVGRepo_bgCarrier' stroke-width='0'%3E%3C/g%3E%3Cg id='SVGRepo_tracerCarrier' stroke-linecap='round' stroke-linejoin='round'%3E%3C/g%3E%3Cg id='SVGRepo_iconCarrier'%3E%3Ctitle%3Eright-arrow%3C/title%3E%3Cdesc%3ECreated with Sketch.%3C/desc%3E%3Cg id='icons' stroke='none' stroke-width='1' fill='none' fill-rule='evenodd'%3E%3Cg id='ui-gambling-website-lined-icnos-casinoshunter' transform='translate(-1511.000000, -158.000000)' fill='%23ffffff' fill-rule='nonzero'%3E%3Cg id='1' transform='translate(1350.000000, 120.000000)'%3E%3Cpath d='M187.812138,38.5802109 L198.325224,49.0042713 L198.41312,49.0858421 C198.764883,49.4346574 198.96954,49.8946897 199,50.4382227 L198.998248,50.6209428 C198.97273,51.0514917 198.80819,51.4628128 198.48394,51.8313977 L198.36126,51.9580208 L187.812138,62.4197891 C187.031988,63.1934036 185.770571,63.1934036 184.990421,62.4197891 C184.205605,61.6415481 184.205605,60.3762573 184.990358,59.5980789 L192.274264,52.3739093 L162.99947,52.3746291 C161.897068,52.3746291 161,51.4850764 161,50.3835318 C161,49.2819872 161.897068,48.3924345 162.999445,48.3924345 L192.039203,48.3917152 L184.990421,41.4019837 C184.205605,40.6237427 184.205605,39.3584519 184.990421,38.5802109 C185.770571,37.8065964 187.031988,37.8065964 187.812138,38.5802109 Z' id='right-arrow'%3E%3C/path%3E%3C/g%3E%3C/g%3E%3C/g%3E%3C/g%3E%3C/svg%3E") !important;
+}
+
+@media only screen and (min-width: 300px) and (max-width: 400px) {
+  .solutionpage-first-slider-setting {
+    padding: 52px 0px 0px 0px !important;
+  }
+
+  .solutionpage-first-slider > .slick-prev {
+    display: none !important;
+  }
+
+  .solutionpage-first-slider > .slick-next {
+    display: none !important;
+  }
+}
+
+@media only screen and (min-width: 401px) and (max-width: 600px) {
+  .solutionpage-first-slider-setting {
+    padding: 40px 0px 0px 0px !important;
+  }
+
+  .solutionpage-first-slider > .slick-prev {
+    display: none !important;
+  }
+
+  .solutionpage-first-slider > .slick-next {
+    display: none !important;
+  }
+}
+
+@media only screen and (min-width: 600px) and (max-width: 690px) {
+  .solutionpage-first-slider-setting {
+    padding: 52px 0px 0px 0px !important;
+  }
+
+  .solutionpage-first-slider > .slick-prev {
+    display: none !important;
+  }
+
+  .solutionpage-first-slider > .slick-next {
+    display: none !important;
+  }
+}
+
+@media only screen and (min-width: 700px) and (max-width: 790px) {
+  .solutionpage-first-slider-setting {
+    padding: 52px 0px 0px 0px !important;
+  }
+
+  .solutionpage-first-slider > .slick-prev {
+    display: none !important;
+  }
+
+  .solutionpage-first-slider > .slick-next {
+    display: none !important;
+  }
+}
+
+@media only screen and (min-width: 800px) and (max-width: 900px) {
+  .solutionpage-first-slider-setting {
+    padding: 52px 0px 0px 0px !important;
+  }
+
+  .solutionpage-first-slider > .slick-prev {
+    display: none !important;
+  }
+
+  .solutionpage-first-slider > .slick-next {
+    display: none !important;
+  }
+}
+
+@media only screen and (min-width: 901px) and (max-width: 990px) {
+  .solutionpage-first-slider-setting {
+    padding: 52px 0px 0px 0px !important;
+  }
+
+  .solutionpage-first-slider > .slick-prev {
+    display: none !important;
+  }
+
+  .solutionpage-first-slider > .slick-next {
+    display: none !important;
+  }
+}
+
+@media only screen and (min-width: 1000px) and (max-width: 1099px) {
+  .solutionpage-first-slider-setting {
+    padding: 3% 0px 0px 0px !important;
+  }
+
+  .solutionpage-first-slider > .slick-prev {
+    display: block !important;
+    position: absolute !important;
+    top: 49% !important;
+    left: 0% !important;
+    width: 3.9% !important;
+    height: 12% !important;
+    border-radius: 60px !important;
+    z-index: 100;
+  }
+
+  .solutionpage-first-slider > .slick-next {
+    display: block !important;
+    position: absolute !important;
+    top: 49% !important;
+    right: 0% !important;
+    width: 3.9% !important;
+    height: 12% !important;
+    border-radius: 60px !important;
+    z-index: 100;
+  }
+}
+
+@media only screen and (min-width: 1100px) and (max-width: 1190px) {
+  .solutionpage-first-slider-setting {
+    padding: 3% 0px 0px 0px !important;
+  }
+
+  .solutionpage-first-slider > .slick-prev {
+    display: block !important;
+    position: absolute !important;
+    top: 49% !important;
+    left: 0% !important;
+    width: 3.5% !important;
+    height: 14% !important;
+    border-radius: 60px !important;
+    z-index: 100;
+  }
+
+  .solutionpage-first-slider > .slick-next {
+    display: block !important;
+    position: absolute !important;
+    top: 49% !important;
+    right: 0% !important;
+    width: 3.5% !important;
+    height: 14% !important;
+    border-radius: 60px !important;
+    z-index: 100;
+  }
+}
+
+@media only screen and (min-width: 1200px) and (max-width: 1390px) {
+  .solutionpage-first-slider-setting {
+    padding: 3% 0px 0px 0px !important;
+  }
+
+  .solutionpage-first-slider > .slick-prev {
+    display: block !important;
+    position: absolute !important;
+    top: 49% !important;
+    left: 0% !important;
+    width: 3.9% !important;
+    height: 14% !important;
+    border-radius: 60px !important;
+    z-index: 100;
+  }
+
+  .solutionpage-first-slider > .slick-next {
+    display: block !important;
+    position: absolute !important;
+    top: 49% !important;
+    right: 0% !important;
+    width: 3.9% !important;
+    height: 14% !important;
+    border-radius: 60px !important;
+    z-index: 100;
+  }
+}
+
+@media only screen and (min-width: 1400px) and (max-width: 1590px) {
+  .solutionpage-first-slider-setting {
+    padding: 3% 0px 0px 0px !important;
+  }
+
+  .solutionpage-first-slider > .slick-prev {
+    display: block !important;
+    position: absolute !important;
+    top: 49% !important;
+    left: 0% !important;
+    width: 3.5% !important;
+    height: 14% !important;
+    border-radius: 60px !important;
+    z-index: 100;
+  }
+
+  .solutionpage-first-slider > .slick-next {
+    display: block !important;
+    position: absolute !important;
+    top: 49% !important;
+    right: 0% !important;
+    width: 3.5% !important;
+    height: 14% !important;
+    border-radius: 60px !important;
+    z-index: 100;
+  }
+}
+
+@media only screen and (min-width: 1600px) and (max-width: 1699px) {
+  .solutionpage-first-slider-setting {
+    padding: 3% 0px 0px 0px !important;
+  }
+
+  .solutionpage-first-slider > .slick-prev {
+    display: block !important;
+    position: absolute !important;
+    top: 49% !important;
+    left: 0% !important;
+    width: 3.5% !important;
+    height: 14% !important;
+    border-radius: 60px !important;
+    z-index: 100;
+  }
+
+  .solutionpage-first-slider > .slick-next {
+    display: block !important;
+    position: absolute !important;
+    top: 49% !important;
+    right: 0% !important;
+    width: 3.5% !important;
+    height: 14% !important;
+    border-radius: 60px !important;
+    z-index: 100;
+  }
+}
+
+@media only screen and (min-width: 1700px) and (max-width: 1799px)  {
+  .solutionpage-first-slider-setting {
+    padding: 3% 0px 0px 0px !important;
+  }
+
+  .solutionpage-first-slider > .slick-prev {
+    display: block !important;
+    position: absolute !important;
+    top: 49% !important;
+    left: 0% !important;
+    width: 3% !important;
+    height: 14% !important;
+    border-radius: 60px !important;
+    z-index: 100;
+  }
+
+  .solutionpage-first-slider > .slick-next {
+    display: block !important;
+    position: absolute !important;
+    top: 49% !important;
+    right: 0% !important;
+    width: 3% !important;
+    height: 14% !important;
+    border-radius: 60px !important;
+    z-index: 100;
+  }
+}
+
+@media only screen and (min-width: 1800px) and (max-width: 1899px) {
+  .solutionpage-first-slider-setting {
+    padding: 3% 0px 0px 0px !important;
+  }
+
+  .solutionpage-first-slider > .slick-prev {
+    display: block !important;
+    position: absolute !important;
+    top: 49% !important;
+    left: 0% !important;
+    width: 3% !important;
+    height: 14% !important;
+    border-radius: 60px !important;
+    z-index: 100;
+  }
+
+  .solutionpage-first-slider > .slick-next {
+    display: block !important;
+    position: absolute !important;
+    top: 49% !important;
+    right: 0% !important;
+    width: 3% !important;
+    height: 14% !important;
+    border-radius: 60px !important;
+    z-index: 100;
+  }
+}
+
+@media only screen and (min-width: 1900px) and (max-width: 1999px) {
+  .solutionpage-first-slider-setting {
+    padding: 3% 0px 0px 0px !important;
+  }
+
+  .solutionpage-first-slider > .slick-prev {
+    display: block !important;
+    position: absolute !important;
+    top: 49% !important;
+    left: 0% !important;
+    width: 3.5% !important;
+    height: 14% !important;
+    border-radius: 60px !important;
+    z-index: 100;
+  }
+
+  .solutionpage-first-slider > .slick-next {
+    display: block !important;
+    position: absolute !important;
+    top: 49% !important;
+    right: 0% !important;
+    width: 3.5% !important;
+    height: 14% !important;
+    border-radius: 60px !important;
+    z-index: 100;
+  }
+}
+
+@media only screen and (min-width: 2000px) and (max-width: 2099px)  {
+  .solutionpage-first-slider-setting {
+    padding: 3% 0px 0px 0px !important;
+  }
+
+  .solutionpage-first-slider > .slick-prev {
+    display: block !important;
+    position: absolute !important;
+    top: 49% !important;
+    left: 0% !important;
+    width: 2.5% !important;
+    height: 14% !important;
+    border-radius: 60px !important;
+    z-index: 100;
+  }
+
+  .solutionpage-first-slider > .slick-next {
+    display: block !important;
+    position: absolute !important;
+    top: 49% !important;
+    right: 0% !important;
+    width: 2.5% !important;
+    height: 14% !important;
+    border-radius: 60px !important;
+    z-index: 100;
+  }
+}
+
+@media only screen and (min-width: 2100px) and (max-width: 2199px)   {
+  .solutionpage-first-slider-setting {
+    padding: 3% 0px 0px 0px !important;
+  }
+
+  .solutionpage-first-slider > .slick-prev {
+    display: block !important;
+    position: absolute !important;
+    top: 49% !important;
+    left: 0% !important;
+    width: 3.5% !important;
+    height: 14% !important;
+    border-radius: 60px !important;
+    z-index: 100;
+  }
+
+  .solutionpage-first-slider > .slick-next {
+    display: block !important;
+    position: absolute !important;
+    top: 49% !important;
+    right: 0% !important;
+    width: 3.5% !important;
+    height: 14% !important;
+    border-radius: 60px !important;
+    z-index: 100;
+  }
+}
+
+@media only screen and (min-width: 2400px) {
+  .solutionpage-first-slider-setting {
+    padding: 3% 0px 0px 0px !important;
+  }
+
+  .solutionpage-first-slider > .slick-prev {
+    display: block !important;
+    position: absolute !important;
+    top: 49% !important;
+    left: 0% !important;
+    width: 3.5% !important;
+    height: 14% !important;
+    border-radius: 60px !important;
+    z-index: 100;
+  }
+
+  .solutionpage-first-slider > .slick-next {
+    display: block !important;
+    position: absolute !important;
+    top: 49% !important;
+    right: 0% !important;
+    width: 3.5% !important;
+    height: 14% !important;
+    border-radius: 60px !important;
+    z-index: 100;
+  }
+}
+
+@media only screen and (min-width: 2500px) and (max-width: 2700px) {
+  .solutionpage-first-slider-setting {
+    padding: 3% 0px 0px 0px !important;
+  }
+
+  .solutionpage-first-slider > .slick-prev {
+    display: block !important;
+    position: absolute !important;
+    top: 49% !important;
+    left: 0% !important;
+    width: 3.5% !important;
+    height: 14% !important;
+    border-radius: 60px !important;
+    z-index: 100;
+  }
+
+  .solutionpage-first-slider > .slick-next {
+    display: block !important;
+    position: absolute !important;
+    top: 49% !important;
+    right: 0% !important;
+    width: 3.5% !important;
+    height: 14% !important;
+    border-radius: 60px !important;
+    z-index: 100;
+  }
+}
+
+@media only screen and (min-width: 3200px) {
+  .solutionpage-first-slider-setting {
+    padding: 3% 0px 0px 0px !important;
+  }
+
+  .solutionpage-first-slider > .slick-prev {
+    display: block !important;
+    position: absolute !important;
+    top: 49% !important;
+    left: 0% !important;
+    width: 3.5% !important;
+    height: 14% !important;
+    border-radius: 60px !important;
+    z-index: 100;
+  }
+
+  .solutionpage-first-slider > .slick-next {
+    display: block !important;
+    position: absolute !important;
+    top: 49% !important;
+    right: 0% !important;
+    width: 3.5% !important;
+    height: 14% !important;
+    border-radius: 60px !important;
+    z-index: 100;
+  }
+}

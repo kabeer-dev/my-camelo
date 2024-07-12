@@ -1,0 +1,322 @@
+import React, { useState, useEffect, useCallback } from "react";
+import { Formik, Form } from "formik";
+import * as Yup from "yup";
+import InputFieldFormik from "../base/InputFieldFormik";
+import Button from "../base/Button";
+import axios from "axios";
+import { setLoading } from "../../redux/actions/loaderAction";
+import { message } from "antd";
+import OtpInput from "react-otp-input";
+import HomePhoneSignUp from "./HomePhoneSignUp";
+import Recaptcha from "../base/Recaptcha";
+import { useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+
+import PaymentMethod from "./PaymentMethod";
+import { signInSuccess } from "../../redux/actions/authActions";
+
+export default function HomeEmailSignUp(
+  {
+    setSubTab, setShowSignUp,
+    showAlreadyRegistered,
+    setShowAlreadyRegistered,
+    showOTPScreen,
+    setShowOTPScreen,
+    hideCreateAccountButton,
+    setHideCreateAccountButton,
+    showPhone,
+    setShowPhone,
+    hidePhoneCreateAccountButton,
+    setHidePhoneCreateAccountButton,
+    showPhoneOTPScreen,
+    setShowPhoneOTPScreen,
+    showPaymentMethod,
+    setShowPaymentMethod,
+    recaptchaRef,
+    otp,
+    setOtp,
+    phoneOtp,
+    setPhoneOtp
+  }
+) {
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const [email, setEmail] = useState("");
+  const [error, setError] = useState("");
+
+  const [recaptchaToken, setRecaptchaToken] = useState(null);
+
+  const validationSchema = Yup.object().shape({
+    email: Yup.string().email("Invalid email").required("Email is required"),
+  });
+
+  const initialValues = {
+    email: "",
+  };
+
+  const API_BASE_URL = process.env.REACT_APP_BASE_URL_AMK_TEST;
+
+
+  const onSubmit = async (values, { setSubmitting }) => {
+    dispatch(setLoading(true));
+    if (values.password && showAlreadyRegistered) {
+
+      const headers = {
+        "Content-Type": "application/json",
+        recaptchaToken: recaptchaToken,
+      };
+      try {
+        const response = await axios.post(
+          `${API_BASE_URL}/api/method/airport_transport.api.user.login`,
+          { usr: values.email, pwd: values.password },
+          { headers: headers }
+        );
+        const { token, username } = response.data.data;
+        dispatch(signInSuccess(token, username))
+        dispatch(setLoading(false))
+        setShowPhone(true)
+        setShowPaymentMethod(true)
+      } catch (error) {
+        recaptchaRef.current.reset();
+        message.error(`${error?.response?.data?.msg}`);
+        dispatch(setLoading(false))
+      }
+
+    } else {
+      try {
+        const headers = {
+          "Content-Type": "application/json",
+          recaptchaToken: recaptchaToken,
+        };
+        const response = await axios.get(
+          `${API_BASE_URL}/api/method/airport_transport.api.user.check_email?email=${values.email}`,
+          { headers: headers }
+        );
+        if (response?.status === 200) {
+          try {
+            const otpResponse = await axios.get(
+              `${API_BASE_URL}/api/method/airport_transport.api.user.send_confirmation_email?email=${values.email}`
+            );
+            if (otpResponse?.status === 200) {
+              message.success(`${otpResponse?.data?.msg}`);
+              setShowOTPScreen(true);
+              setEmail(values.email); // Store email for later use
+              setHideCreateAccountButton(true); // Hide create account button
+            }
+          } catch (error) {
+            message.error(`${error?.response?.data?.msg}`);
+            recaptchaRef.current.reset();
+          }
+        }
+      } catch (error) {
+        if (error?.response?.data?.msg === "User already exists") {
+          setEmail(values.email);
+          setShowAlreadyRegistered(true);
+        } else {
+          message.error(`${error?.response?.data?.msg}`);
+          recaptchaRef.current.reset();
+        }
+      }
+      dispatch(setLoading(false));
+      setSubmitting(false);
+    }
+  };
+
+  const handleVerify = useCallback(async () => {
+    dispatch(setLoading(true));
+    try {
+      const response = await axios.get(
+        `${API_BASE_URL}/api/method/airport_transport.api.user.confirm_email?email=${email}&otp=${otp}`
+      );
+      if (response?.status === 200) {
+        message.success(`${response?.data?.msg}`);
+        // const values = { email: email }
+        // dispatch(signUpRequest(values, recaptchaToken, navigate));
+        setShowPhone(true);
+      }
+    } catch (error) {
+      message.error(`${error?.response?.data?.msg}`);
+      setError(`${error?.response?.data?.msg}`);
+    }
+    dispatch(setLoading(false));
+  }, [otp, email, API_BASE_URL]);
+
+  const handleChange = (value) => {
+    setOtp(value);
+    setError(""); // Clear error message when user types
+  };
+
+  useEffect(() => {
+    if (otp.length === 6) {
+      handleVerify();
+    }
+  }, [otp, handleVerify]);
+
+  return (
+    <>
+      {showPaymentMethod ? (
+        <PaymentMethod />
+      ) : showPhone ? (
+        <HomePhoneSignUp
+          email={email}
+          showPaymentMethod={showPaymentMethod} setShowPaymentMethod={setShowPaymentMethod}
+          hidePhoneCreateAccountButton={hidePhoneCreateAccountButton}
+          setHidePhoneCreateAccountButton={setHidePhoneCreateAccountButton}
+          showPhoneOTPScreen={showPhoneOTPScreen}
+          setShowPhoneOTPScreen={setShowPhoneOTPScreen}
+          phoneOtp={phoneOtp}
+          setPhoneOtp={setPhoneOtp}
+          setHideCreateAccountButton={setHideCreateAccountButton}
+          setShowOTPScreen={setShowOTPScreen}
+          setShowPhone={setShowPhone}
+          setOtp={setOtp}
+        />
+      ) : (
+        <Formik
+          initialValues={initialValues}
+          validationSchema={validationSchema}
+          onSubmit={onSubmit}
+        >
+          {({ values }) => (
+            <Form>
+              <div>
+                <InputFieldFormik
+                  label="Enter Your Email Address"
+                  name="email"
+                  type="email"
+                  required
+                />
+              </div>
+
+              {!showAlreadyRegistered && (
+                <div>
+                  <Recaptcha
+                    recaptchaRef={recaptchaRef}
+                    sitekey="6LfE3FEpAAAAAGkeBjkpPeNSqPNWtLPCma7EHVsr"
+                    onChange={(value) => {
+                      setRecaptchaToken(value);
+                    }}
+                  />
+                </div>
+              )}
+
+              {showAlreadyRegistered && (
+                <>
+                  <div>
+                    <InputFieldFormik
+                      label="Password"
+                      name="password"
+                      type="password"
+                      required
+                    />
+                  </div>
+
+                  <div>
+                    <Recaptcha
+                      recaptchaRef={recaptchaRef}
+                      sitekey="6LfE3FEpAAAAAGkeBjkpPeNSqPNWtLPCma7EHVsr"
+                      onChange={(value) => {
+                        setRecaptchaToken(value);
+                      }}
+                    />
+                  </div>
+
+                  <div
+                    className="mt-0 md:mt-2 lg:mt-0 w-full text-sm flex justify-end text-text_steel_blue cursor-pointer"
+                    onClick={() =>
+                      navigate("/forget-password", {
+                        state: { email: values.email },
+                      })
+                    }
+                  >
+                    Forget your password ?
+                  </div>
+
+                  <div className="text-center mt-6 flex flex-col md:flex-row justify-between items-center">
+                    <Button
+                      className="bg-bg_btn_back w-full text-text_white hover:bg-gray-100 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2"
+                      onClick={() => {
+                        setShowAlreadyRegistered(false)
+                      }}
+                      label="Previous"
+                      type="button"
+                    />
+                    <Button
+                      className="bg-background_steel_blue w-full text-text_white hover:bg-gray-100 font-medium rounded text-sm px-5 py-2.5 me-2 mb-2"
+                      label="Login"
+                      type="submit"
+                    />
+                  </div>
+                </>
+              )}
+
+              {!hideCreateAccountButton && !showAlreadyRegistered && (
+                <div className="text-center mt-6 flex flex-col md:flex-row justify-between items-center">
+                  <Button
+                    className="bg-bg_btn_back w-full text-text_white hover:bg-gray-100 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2"
+                    onClick={() => {
+                      setSubTab(1)
+                      setShowSignUp(false)
+                    }}
+                    label="Previous"
+                    type="button"
+                  />
+                  <Button
+                    className="bg-background_steel_blue w-full text-text_white hover:bg-gray-100 font-medium rounded text-sm px-5 py-2.5 me-2 mb-2"
+                    label="Continue"
+                    type="submit"
+                  />
+                </div>
+              )}
+
+              {showOTPScreen && (
+                <>
+                  <div className="mt-3 flex flex-col justify-center">
+                    <label
+                      htmlFor={otp}
+                      className="block mb-2 mt-2 lg:mt-1  text-sm font-medium text-gray-900 dark:text-white"
+                    >
+                      Enter OTP
+                    </label>
+                    <OtpInput
+                      inputStyle="otp-input"
+                      value={otp}
+                      onChange={handleChange}
+                      numInputs={6}
+                      renderInput={(props, i) => <input {...props} key={i} />}
+                    />
+
+                    {error && (
+                      <div className="text-base text-text_warning font-semibold my-2">
+                        {error}
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="my-3 flex flex-col md:flex-row justify-between items-center">
+                    <Button
+                      className="bg-bg_btn_back w-full text-text_white hover:bg-gray-100 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2"
+                      onClick={() => {
+                        setShowOTPScreen(false)
+                        setHideCreateAccountButton(false)
+                        recaptchaRef.current.reset();
+                      }}
+                      label="Previous"
+                      type="button"
+                    />
+                    <Button
+                      className="bg-background_steel_blue w-full text-text_white hover:bg-gray-100 font-medium rounded text-sm px-5 py-2.5 me-2 mb-2"
+                      label="Verify"
+                      type="button"
+                      onClick={handleVerify}
+                    />
+                  </div>
+                </>
+              )}
+            </Form>
+          )}
+        </Formik>
+      )}
+    </>
+  );
+}
