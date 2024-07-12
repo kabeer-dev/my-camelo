@@ -152,17 +152,18 @@ export default function MapModal({ onSubmitDestination, dammamZoneCoords }) {
                     onLoad={onLoad}
                     onClick={onMapClick}
                   >
-                    {/* Your existing map components */}
+                    {/* Polygon for the selected area */}
                     <Polygon
                       paths={convertedCoords}
                       options={{
-                        fillColor: "#4463F0",
-                        fillOpacity: 0.3,
-                        strokeColor: "#355E3B",
+                        fillColor: "#FFFFFF",
+                        fillOpacity: 0,
+                        strokeColor: "#4463F0",
                         strokeOpacity: 1,
-                        strokeWeight: 1,
+                        strokeWeight: 2,
                       }}
                     />
+                    {/* Polygon for the rest of the area */}
                     <Polygon
                       paths={[
                         { lat: 90, lng: -180 },
@@ -171,11 +172,12 @@ export default function MapModal({ onSubmitDestination, dammamZoneCoords }) {
                         { lat: 90, lng: 180 },
                       ]}
                       options={{
-                        fillColor: "#4463F0",
-                        fillOpacity: 0.3,
-                        strokeColor: "#355E3B",
-                        strokeOpacity: 1,
+                        fillColor: "#000000",
+                        fillOpacity: 0.5,
+                        strokeColor: "#000000",
+                        strokeOpacity: 0.5,
                         strokeWeight: 1,
+                        zIndex: 1,
                       }}
                     />
 
