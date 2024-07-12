@@ -162,7 +162,10 @@ export default function MapModal({ onSubmitDestination, dammamZoneCoords }) {
                           { lat: -90, lng: -180 },
                           { lat: 90, lng: -180 },
                         ],
-                        convertedCoords,
+                        ...convertedCoords.map(coord => ({
+                          lat: coord.lat,
+                          lng: coord.lng
+                        }))
                       ]}
                       options={{
                         fillColor: "#000000",
@@ -177,7 +180,7 @@ export default function MapModal({ onSubmitDestination, dammamZoneCoords }) {
                       paths={convertedCoords}
                       options={{
                         fillColor: "#FFFFFF",
-                        fillOpacity: 0,
+                        fillOpacity: 1,
                         strokeColor: "#4463F0",
                         strokeOpacity: 1,
                         strokeWeight: 2,
