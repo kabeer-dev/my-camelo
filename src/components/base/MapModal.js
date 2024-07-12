@@ -152,14 +152,17 @@ export default function MapModal({ onSubmitDestination, dammamZoneCoords }) {
                     onLoad={onLoad}
                     onClick={onMapClick}
                   >
-                    {/* Outer polygon covering the whole map */}
+                    {/* Outer polygon covering the whole map with a hole */}
                     <Polygon
                       paths={[
-                        { lat: 90, lng: -180 },
-                        { lat: 90, lng: 180 },
-                        { lat: -90, lng: 180 },
-                        { lat: -90, lng: -180 },
-                        { lat: 90, lng: -180 },
+                        [
+                          { lat: 90, lng: -180 },
+                          { lat: 90, lng: 180 },
+                          { lat: -90, lng: 180 },
+                          { lat: -90, lng: -180 },
+                          { lat: 90, lng: -180 },
+                        ],
+                        convertedCoords,
                       ]}
                       options={{
                         fillColor: "#000000",
@@ -174,7 +177,7 @@ export default function MapModal({ onSubmitDestination, dammamZoneCoords }) {
                       paths={convertedCoords}
                       options={{
                         fillColor: "#FFFFFF",
-                        fillOpacity: 1,
+                        fillOpacity: 0,
                         strokeColor: "#4463F0",
                         strokeOpacity: 1,
                         strokeWeight: 2,
