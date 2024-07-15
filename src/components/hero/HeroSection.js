@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Icon } from "@iconify/react";
 import AirportRide from "./AirportRide";
 import ScheduledRide from "./ScheduledRide";
@@ -6,10 +6,13 @@ import RideByHour from "./RideByHour";
 import Heading from "../base/Heading";
 import Paragraph from "../base/Paragraph";
 import { setLoading } from "../../redux/actions/loaderAction";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { useLocation } from "react-router-dom";
 
 export default function HeroSection() {
-  const dispatch = useDispatch()
+  const dispatch = useDispatch();
+  // const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
+  const location = useLocation();
   const [activeTab, setActiveTab] = useState("airport");
   const [subTab, setSubTab] = useState(1);
 
@@ -24,6 +27,12 @@ export default function HeroSection() {
   const recaptchaRef = React.createRef();
   const [otp, setOtp] = useState("");
   const [phoneOtp, setPhoneOtp] = useState("");
+
+  useEffect(() => {
+    if (location.state?.showPaymentMethod) {
+      setShowPaymentMethod(true);
+    }
+  }, [location.state]);
 
   const handleTabChange = (tabName) => {
     dispatch(setLoading(true))

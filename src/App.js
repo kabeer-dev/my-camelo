@@ -15,8 +15,9 @@ import MyProfile from "./components/myprofile/MyProfile";
 import { useSelector } from "react-redux";
 import PaymentSuccess from "./components/paymentconfirmation/PaymentSuccess";
 import PaymentFailed from "./components/paymentconfirmation/PaymentFailed";
-import PaymentConfirmation from "./components/paymentconfirmation/PaymentConfirmation";
+// import PaymentConfirmation from "./components/paymentconfirmation/PaymentConfirmation";
 import PhoneSignUp from "./components/signup/PhoneSignUp";
+import PaymentMethodForm from "./components/paymentconfirmation/PaymentMethodForm";
 
 function App() {
   const { isLoggedIn } = useSelector((state) => state.auth);
@@ -36,7 +37,8 @@ function App() {
         <Route path="/reset-password" element={<ResetPassword />} />
         {isLoggedIn && <Route path="/my-bookings" element={<MyBooking />} />}
         {isLoggedIn && <Route path="/my-profile" element={<MyProfile />} />}
-        <Route path="/payment-confirmation" element={<PaymentConfirmation />} />
+        {/* <Route path="/payment-confirmation" element={<PaymentConfirmation />} /> */}
+        <Route path="/payment-confirmation" element={<PaymentMethodForm />} />
         <Route path="/payment-success" element={<PaymentSuccess />} />
         <Route path="/payment-failed" element={<PaymentFailed />} />
       </Routes>

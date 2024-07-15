@@ -15,6 +15,7 @@ import HomeEmailSignUp from "./HomeEmailSignUp";
 import VehicleTypeModal from "../base/VehicleTypeModal";
 import { setLoading } from "../../redux/actions/loaderAction";
 import PaymentMethod from "./PaymentMethod";
+import axios from "axios";
 
 export default function AirportRide(
   {
@@ -44,10 +45,14 @@ export default function AirportRide(
   const { cities } = useSelector((state) => state.cities);
   const { airports } = useSelector((state) => state.airports);
   const { vehicleTypes } = useSelector((state) => state.vehicleTypes);
-  const zoneMap = useSelector((state) => state?.zone?.zone);
-  const map = zoneMap && zoneMap.length > 0 ? zoneMap[0].map : null;
   const services = "Airport Trip";
   const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
+
+  const zoneMap = useSelector((state) => state?.zone?.zone);
+  const [map, setMap] = useState(null);
+  useEffect(() => {
+    setMap(zoneMap && zoneMap.length > 0 ? zoneMap[0].map : null)
+  }, [zoneMap])
 
   // const [subTab, setSubTab] = useState(1);
   const [cityName, setCityName] = useState();
@@ -78,6 +83,30 @@ export default function AirportRide(
     arrivalTime: "",
     sharedRide: false,
   });
+
+  const API_BASE_URL = process.env.REACT_APP_BASE_URL_AMK_TEST;
+  const [sharedRideValue, setSharedRideValue] = useState("");
+  useEffect(() => {
+    const getSharedRideValue = async () => {
+      dispatch(setLoading(true))
+      if(formValues.vehicleType !== ""){
+        try {
+          const response = await axios.get(
+            `${API_BASE_URL}/api/method/airport_transport.api.bookings.get_ride_discount?vehicle_type=${formValues.vehicleType}&language=${'en'}`
+          );
+          if(response && response.status === 200){
+            setSharedRideValue(response.data.data)
+            dispatch(setLoading(false))
+          }
+        } catch (error) {
+          console.log('Error', error);
+          dispatch(setLoading(false))
+        }
+      }
+      dispatch(setLoading(false))
+    }
+    getSharedRideValue()
+  }, [formValues]);
 
   const [vehicleTypeName, setVehicleTypeName] = useState("");
   // console.log('vehicleTypes', vehicleTypes)
@@ -167,13 +196,15 @@ export default function AirportRide(
   return (
     <>
       <div>
-        <Stepper
-          steps={steps}
-          subTab={subTab}
-          className={
-            "flex items-center w-full text-sm font-medium text-center py-4 border-b text-gray-500 sm:text-base justify-between"
-          }
-        />
+        {!showPaymentMethod && (
+          <Stepper
+            steps={steps}
+            subTab={subTab}
+            className={
+              "flex items-center w-full text-sm font-medium text-center py-4 border-b text-gray-500 sm:text-base justify-between"
+            }
+          />
+        )}
 
         <div className="p-2 md:p-4">
           {showSignUp ? (
@@ -208,18 +239,18 @@ export default function AirportRide(
               validationSchema={validationSchema}
               enableReinitialize={true}
               onSubmit={(values, { setSubmitting }) => {
-                if (!isLoggedIn) {
-                  setSubTab(4)
-                  setShowSignUp(true);
-                } else {
-                  const submitValues = {
-                    ...values,
-                    pickupLocation: selectedPickup,
-                    dropoffLocation: selectedDropoff,
-                  };
-                  console.log("Submitted values:", submitValues);
-                  setShowPaymentMethod(true);
-                }
+                // if (!isLoggedIn) {
+                setSubTab(4)
+                setShowSignUp(true);
+                // } else {
+                //   // const submitValues = {
+                //   //   ...values,
+                //   //   pickupLocation: selectedPickup,
+                //   //   dropoffLocation: selectedDropoff,
+                //   // };
+                //   // console.log("Submitted values:", submitValues);
+                //   setShowPaymentMethod(true);
+                // }
                 setSubmitting(false);
               }}
             >
@@ -430,6 +461,7 @@ export default function AirportRide(
                           <Button
                             className="bg-background_steel_blue w-full text-text_white hover:bg-gray-100 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2"
                             onClick={() => {
+                              console.log('aaaa', values)
                               values.vehicleType = vehicleTypeName;
                               handleNext(3, isStep2Valid, values);
                             }}
@@ -446,6 +478,7 @@ export default function AirportRide(
                           label="Shared Ride"
                           name="sharedRide"
                           type="checkbox"
+                          percentageValue={sharedRideValue}
                           onChange={({ fieldName, selectedValue }) =>
                             setFieldValue(fieldName, selectedValue)
                           }

@@ -118,18 +118,20 @@ export default function ScheduledRide({
 
   const onSubmit = (values, { setSubmitting }) => {
     dispatch(setLoading(true))
-    if (!isLoggedIn) {
+    // if (!isLoggedIn) {
+      setSubTab(4)
       setShowSignUp(true);
-    } else {
-      console.log("Submitted values:", values); // Log form values
-      const submitValues = {
-        // Add latlong data to the form values
-        ...values,
-        pickupLocation: selectedPickup,
-        dropoffLocation: selectedDropoff,
-      };
-      console.log("Submitted values:", submitValues);
-    }
+    // } else {
+    //   setShowPaymentMethod(true)
+    //   // console.log("Submitted values:", values); // Log form values
+    //   // const submitValues = {
+    //   //   // Add latlong data to the form values
+    //   //   ...values,
+    //   //   pickupLocation: selectedPickup,
+    //   //   dropoffLocation: selectedDropoff,
+    //   // };
+    //   // console.log("Submitted values:", submitValues);
+    // }
     setSubmitting(false);
     dispatch(setLoading(false))
   };
@@ -142,7 +144,7 @@ export default function ScheduledRide({
   return (
     <>
       <div>
-        {!showSignUp && (
+        {!showPaymentMethod && (
           <Stepper
             steps={steps}
             subTab={subTab}

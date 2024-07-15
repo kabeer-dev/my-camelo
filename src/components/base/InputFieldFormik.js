@@ -8,6 +8,9 @@ import dayjs from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat";
 import "../base/InputFieldSetting.css";
 import moment from "moment/moment";
+import { FaCcVisa, FaCcMastercard } from 'react-icons/fa';
+import { Icon } from "@iconify/react";
+import creditCardType from 'credit-card-type';
 
 dayjs.extend(customParseFormat);
 
@@ -20,6 +23,7 @@ const InputFieldFormik = ({
   onChange,
   arrivalDates,
   setArrivalDates,
+  percentageValue
 }) => {
   const [timeError, setTimeError] = useState("");
   const [, , helpers] = useField(name);
@@ -49,27 +53,25 @@ const InputFieldFormik = ({
   // console.log("child me currentDate me kiya ha??", currentDate);
 
   const handleTimeChange = (time, timeString) => {
+    console.log('Selected Time:', timeString);
+
     // Check if the selected date is the current date
     if (arrivalDates === currentDate) {
-      const currentTime = dayjs(); // Get the current time
-      const selectedTime = dayjs(timeString, "HH:mm"); // Parse the selected time
-
-      // console.log("Current Time:", currentTime.format("HH:mm"));
-      // console.log("Selected Time:", selectedTime.format("HH:mm"));
+      const currentTime = moment(); // Get the current time
+      const selectedTime = moment(timeString, "h:mm A"); // Parse the selected time
 
       // Check if the selected time is at least 2 hours later than the current time
       if (selectedTime.isBefore(currentTime.add(2, "hour"))) {
-        setTimeError(
-          "You cannot select a time earlier than two hours from now."
-        );
+        setTimeError("You cannot select a time earlier than two hours from now.");
         return;
       }
     }
 
     // If the selected date is not the current date or the time selection is valid
     setTimeError(""); // Clear any previous error
-    onChange?.({ fieldName: name, selectedValue: timeString }); // Trigger onChange callback
-    helpers.setValue(timeString); // Set the value using formik helpers
+    onChange?.({ fieldName: name, selectedValue: timeString }); // Trigger onChange callback with 12-hour format time
+    helpers.setValue(timeString); // Set the value using formik helpers in 12-hour format
+    // setValue(time); // Set the state value for the TimePicker
   };
 
   const renderErrorMessage = (msg) => (
@@ -86,6 +88,22 @@ const InputFieldFormik = ({
   const commonProps = {
     name,
     className: "text-gray-900 text-sm block w-full",
+  };
+
+  //for card
+  const [cardType, setCardType] = useState('');
+  const [cardFormetedValue, setCardFormetedValue] = useState('');
+  const handleCardNumberChange = (e) => {
+    let value = e.target.value.replace(/\D/g, '').slice(0, 16); // Remove non-digits and limit to 16 digits
+    const formattedValue = value.replace(/(.{4})/g, '$1 ').trim(); // Add spaces after every 4 digits
+    const detectedCardType = creditCardType(value)[0]?.type;
+
+    setCardType(detectedCardType);
+    setCardFormetedValue(formattedValue)
+    e.target.value = formattedValue;
+    if (formattedValue < 18) {
+      setCardType("");
+    }
   };
 
   return (
@@ -118,7 +136,7 @@ const InputFieldFormik = ({
       {type === "checkbox" && (
         <div className="mb-3 flex flex-row justify-between items-center">
           <div>
-            <div className="text-sm">Select Shared ride to get discount 0%</div>
+            <div className="text-sm">{`Select Shared ride to get discount ${percentageValue}%`}</div>
           </div>
           <div>
             <Field
@@ -167,7 +185,7 @@ const InputFieldFormik = ({
             placeholderText="Select Date"
             wrapperClassName="w-full"
           />
-           <ErrorMessage name={name} render={renderErrorMessage} />
+          <ErrorMessage name={name} render={renderErrorMessage} />
         </>
         // <>
         //   <DatePicker
@@ -200,12 +218,28 @@ const InputFieldFormik = ({
         <>
           <TimePicker
             size="large"
-            onChange={handleTimeChange}
-            value={value ? moment(value, "HH:mm:ss") : null}
-            setValue={value}
-            defaultOpenValue={
-              value ? dayjs(value, "HH:mm:ss") : dayjs("00:00:00", "HH:mm:ss")
-            }
+            onChange={(date, dateString) => {
+              const selectedTime = date ? date.format("HH:mm:ss") : null;
+              console.log('aaaa', selectedTime)
+              if (arrivalDates === currentDate) {
+                const currentTime = moment(); // Get the current time
+                // Check if the selected time is at least 2 hours later than the current time
+                if (selectedTime.isBefore(currentTime.add(2, "hour"))) {
+                  setTimeError("You cannot select a time earlier than two hours from now.");
+                  return;
+                }
+              }
+          
+              // If the selected date is not the current date or the time selection is valid
+              setTimeError(""); // Clear any previous error
+              onChange?.({ fieldName: name, selectedValue: selectedTime }); // Trigger onChange callback with 12-hour format time
+              helpers.setValue(selectedTime);
+              
+              setArrivalDates(selectedTime);
+            }}
+            // value={value ? moment(value, "HH:mm:ss") : null}
+            defaultOpenValue={moment("00:00:00", "HH:mm:ss")}
+            format="h:mm A"
             {...commonProps}
           />
           {timeError && renderErrorMessage(timeError)}
@@ -223,6 +257,31 @@ const InputFieldFormik = ({
               onKeyPress={handleKeyPress}
               {...commonProps}
             />
+          )}
+        </Field>
+      )}
+
+      {["card"].includes(type) && (
+        <Field name={name}>
+          {({ field }) => (
+            <div className="relative flex items-center">
+              <Input
+                size="large"
+                {...field}
+                onKeyPress={handleKeyPress}
+                onChange={(e) => {
+                  field.onChange(e);
+                  handleCardNumberChange(e);
+                }}
+                {...commonProps}
+                value={cardFormetedValue}
+                className="w-full pr-10" // Tailwind CSS for padding right to make space for the logo
+              />
+              <div className="absolute inset-y-0 right-3 flex items-center pointer-events-none">
+                {cardType === 'visa' && <Icon icon="logos:visa" />}
+                {cardType === 'mastercard' && <Icon icon="logos:mastercard" className="text-2xl" />}
+              </div>
+            </div>
           )}
         </Field>
       )}

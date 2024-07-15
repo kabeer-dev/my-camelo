@@ -116,18 +116,20 @@ export default function RideByHour({
     if (vehicleTypeName !== '') {
       values.vehicleType = vehicleTypeName;
       dispatch(setLoading(true))
-      if (!isLoggedIn) {
+      // if (!isLoggedIn) {
+        setSubTab(3)
         setShowSignUp(true);
-      } else {
-        console.log("Submitted values:", values); // Log form values
-        const submitValues = {
-          // Add latlong data to the form values
-          ...values,
-          pickupLocation: selectedPickup,
-          dropoffLocation: selectedDropoff,
-        };
-        console.log("Submitted values:", submitValues);
-      }
+      // } else {
+      //   setShowPaymentMethod(true)
+      //   // console.log("Submitted values:", values); // Log form values
+      //   // const submitValues = {
+      //   //   // Add latlong data to the form values
+      //   //   ...values,
+      //   //   pickupLocation: selectedPickup,
+      //   //   dropoffLocation: selectedDropoff,
+      //   // };
+      //   // console.log("Submitted values:", submitValues);
+      // }
       setSubmitting(false);
       dispatch(setLoading(false))
     }
@@ -156,7 +158,7 @@ export default function RideByHour({
   return (
     <>
       <div>
-        {!showSignUp && (
+        {!showPaymentMethod && (
           <Stepper
             steps={steps}
             subTab={subTab}
@@ -258,7 +260,7 @@ export default function RideByHour({
 
                                 required
                               />
-                              
+
                             </div>
 
                             <div>

@@ -152,38 +152,30 @@ export default function MapModal({ onSubmitDestination, dammamZoneCoords }) {
                     onLoad={onLoad}
                     onClick={onMapClick}
                   >
-                    {/* Outer polygon covering the whole map with a hole */}
+                    {/* Your existing map components */}
+                    <Polygon
+                      paths={convertedCoords}
+                      options={{
+                        fillColor: "#4463F0",
+                        fillOpacity: 0.3,
+                        strokeColor: "#355E3B",
+                        strokeOpacity: 1,
+                        strokeWeight: 1,
+                      }}
+                    />
                     <Polygon
                       paths={[
-                        [
-                          { lat: 90, lng: -180 },
-                          { lat: 90, lng: 180 },
-                          { lat: -90, lng: 180 },
-                          { lat: -90, lng: -180 },
-                          { lat: 90, lng: -180 },
-                        ],
-                        ...convertedCoords.map(coord => ({
-                          lat: coord.lat,
-                          lng: coord.lng
-                        }))
+                        { lat: 90, lng: -180 },
+                        { lat: -90, lng: -180 },
+                        { lat: -90, lng: 180 },
+                        { lat: 90, lng: 180 },
                       ]}
                       options={{
                         fillColor: "#000000",
                         fillOpacity: 0.5,
-                        strokeColor: "#000000",
-                        strokeOpacity: 0,
-                        strokeWeight: 0,
-                      }}
-                    />
-                    {/* Inner polygon for the selected area */}
-                    <Polygon
-                      paths={convertedCoords}
-                      options={{
-                        fillColor: "#FFFFFF",
-                        fillOpacity: 1,
-                        strokeColor: "#4463F0",
-                        strokeOpacity: 1,
-                        strokeWeight: 2,
+                        strokeColor: "#355E3B",
+                        strokeOpacity: 0.5,
+                        strokeWeight: 1,
                       }}
                     />
 
@@ -213,12 +205,12 @@ export default function MapModal({ onSubmitDestination, dammamZoneCoords }) {
                           left: "50%",
                           marginLeft: "-120px",
                           top: "10px",
-                          zIndex: 3,
                         }}
                       />
                     </StandaloneSearchBox>
                   </GoogleMap>
                 </LoadScript>
+
               </div>
               {error && <div className="p-4 text-text_warning">{error}</div>}
               <div className="flex items-center p-4 md:p-5 space-x-3 rtl:space-x-reverse border-gray-200 rounded-b dark:border-gray-600">

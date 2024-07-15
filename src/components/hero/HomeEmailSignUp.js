@@ -10,7 +10,7 @@ import OtpInput from "react-otp-input";
 import HomePhoneSignUp from "./HomePhoneSignUp";
 import Recaptcha from "../base/Recaptcha";
 import { useNavigate } from "react-router-dom";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 
 import PaymentMethod from "./PaymentMethod";
 import { signInSuccess } from "../../redux/actions/authActions";
@@ -43,6 +43,13 @@ export default function HomeEmailSignUp(
   const dispatch = useDispatch();
   const [email, setEmail] = useState("");
   const [error, setError] = useState("");
+
+  const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
+  useEffect(()=> {
+    if(isLoggedIn){
+      setShowPaymentMethod(true)
+    }
+  }, [isLoggedIn])
 
   const [recaptchaToken, setRecaptchaToken] = useState(null);
 
