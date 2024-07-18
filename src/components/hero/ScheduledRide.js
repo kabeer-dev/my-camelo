@@ -13,6 +13,7 @@ import { getZoneRequest } from "../../redux/actions/zoneActions";
 import HomeEmailSignUp from "./HomeEmailSignUp";
 import { setLoading } from "../../redux/actions/loaderAction";
 import VehicleTypeModal from "../base/VehicleTypeModal";
+import PaymentMethod from "./PaymentMethod";
 
 export default function ScheduledRide({
   subTab, setSubTab,
@@ -119,8 +120,8 @@ export default function ScheduledRide({
   const onSubmit = (values, { setSubmitting }) => {
     dispatch(setLoading(true))
     // if (!isLoggedIn) {
-      setSubTab(4)
-      setShowSignUp(true);
+    setSubTab(4)
+    setShowSignUp(true);
     // } else {
     //   setShowPaymentMethod(true)
     //   // console.log("Submitted values:", values); // Log form values
@@ -156,8 +157,38 @@ export default function ScheduledRide({
 
         <div>
           <div className="p-2 md:p-4">
-            {!showSignUp ? (
-              <>
+            {showPaymentMethod ? (
+              <PaymentMethod formValues={formValues} />
+
+            ) :
+              showSignUp ? (
+                <>
+                  <HomeEmailSignUp
+                    formValues={formValues}
+                    setSubTab={setSubTab}
+                    setShowSignUp={setShowSignUp}
+                    showAlreadyRegistered={showAlreadyRegistered}
+                    setShowAlreadyRegistered={setShowAlreadyRegistered}
+                    showOTPScreen={showOTPScreen}
+                    setShowOTPScreen={setShowOTPScreen}
+                    setHideCreateAccountButton={setHideCreateAccountButton}
+                    hideCreateAccountButton={hideCreateAccountButton}
+                    showPhone={showPhone}
+                    setShowPhone={setShowPhone}
+                    hidePhoneCreateAccountButton={hidePhoneCreateAccountButton}
+                    setHidePhoneCreateAccountButton={setHidePhoneCreateAccountButton}
+                    showPhoneOTPScreen={showPhoneOTPScreen}
+                    setShowPhoneOTPScreen={setShowPhoneOTPScreen}
+                    showPaymentMethod={showPaymentMethod}
+                    setShowPaymentMethod={setShowPaymentMethod}
+                    recaptchaRef={recaptchaRef}
+                    otp={otp}
+                    setOtp={setOtp}
+                    phoneOtp={phoneOtp}
+                    setPhoneOtp={setPhoneOtp}
+                  />
+                </>
+              ) : (
                 <Formik
                   initialValues={formValues}
                   validationSchema={validationSchema}
@@ -395,34 +426,7 @@ export default function ScheduledRide({
                     );
                   }}
                 </Formik>
-              </>
-            ) : (
-              <>
-                <HomeEmailSignUp
-                  setSubTab={setSubTab}
-                  setShowSignUp={setShowSignUp}
-                  showAlreadyRegistered={showAlreadyRegistered}
-                  setShowAlreadyRegistered={setShowAlreadyRegistered}
-                  showOTPScreen={showOTPScreen}
-                  setShowOTPScreen={setShowOTPScreen}
-                  setHideCreateAccountButton={setHideCreateAccountButton}
-                  hideCreateAccountButton={hideCreateAccountButton}
-                  showPhone={showPhone}
-                  setShowPhone={setShowPhone}
-                  hidePhoneCreateAccountButton={hidePhoneCreateAccountButton}
-                  setHidePhoneCreateAccountButton={setHidePhoneCreateAccountButton}
-                  showPhoneOTPScreen={showPhoneOTPScreen}
-                  setShowPhoneOTPScreen={setShowPhoneOTPScreen}
-                  showPaymentMethod={showPaymentMethod}
-                  setShowPaymentMethod={setShowPaymentMethod}
-                  recaptchaRef={recaptchaRef}
-                  otp={otp}
-                  setOtp={setOtp}
-                  phoneOtp={phoneOtp}
-                  setPhoneOtp={setPhoneOtp}
-                />
-              </>
-            )}
+              )}
           </div>
         </div>
       </div>

@@ -13,6 +13,7 @@ import { getZoneRequest } from "../../redux/actions/zoneActions";
 import HomeEmailSignUp from "./HomeEmailSignUp";
 import { setLoading } from "../../redux/actions/loaderAction";
 import VehicleTypeModal from "../base/VehicleTypeModal";
+import PaymentMethod from "./PaymentMethod";
 
 export default function RideByHour({
   subTab, setSubTab,
@@ -117,8 +118,8 @@ export default function RideByHour({
       values.vehicleType = vehicleTypeName;
       dispatch(setLoading(true))
       // if (!isLoggedIn) {
-        setSubTab(3)
-        setShowSignUp(true);
+      setSubTab(3)
+      setShowSignUp(true);
       // } else {
       //   setShowPaymentMethod(true)
       //   // console.log("Submitted values:", values); // Log form values
@@ -170,245 +171,252 @@ export default function RideByHour({
 
         <div>
           <div className="p-2 md:p-4">
-            {!showSignUp ? (
-              <>
-                {" "}
-                <Formik
-                  initialValues={formValues}
-                  validationSchema={validationSchema}
-                  onSubmit={onSubmit}
-                >
-                  {({ values, errors, setFieldValue, validateForm }) => {
-                    const isStep1Valid =
-                      values.bookingByHours &&
-                      values.arrivalCity &&
-                      values.arrivalDate &&
-                      values.arrivalTime;
-                    // const isStep2Valid = values.vehicleType;
+            {showPaymentMethod ? (
+              <PaymentMethod formValues={formValues} />
 
-                    return (
-                      <Form className="mx-auto w-full">
-                        {subTab === 1 && (
-                          <>
-                            <div>
-                              <InputFieldFormik
-                                label="Booking Vehicle By Hours"
-                                name="bookingByHours"
-                                type="select"
-                                options={byHoursOptions}
-                                value={
-                                  formValues.bookingByHours ||
-                                  onChangeFormValues.bookingByHours
-                                }
-                                onChange={(valueObj) => {
-                                  const { fieldName, selectedValue } = valueObj;
-                                  setFieldValue(fieldName, selectedValue);
-                                  setOnChangeFormValues((prevValues) => ({
-                                    ...prevValues,
-                                    [fieldName]: selectedValue,
-                                  }));
-                                }}
-                                required
-                              />
-                            </div>
+            ) :
 
-                            <div>
-                              <InputFieldFormik
-                                label="Arrival City"
-                                name="arrivalCity"
-                                type="select"
-                                options={
-                                  cities &&
-                                  cities.data &&
-                                  cities.data.map((city) => ({
-                                    value: city,
-                                    label: city,
-                                  }))
-                                }
-                                value={
-                                  formValues.arrivalCity ||
-                                  onChangeFormValues.arrivalCity
-                                }
-                                onChange={(valueObj) => {
-                                  const { fieldName, selectedValue } = valueObj;
-                                  setFieldValue(fieldName, selectedValue);
-                                  setCityName(selectedValue);
-                                  setOnChangeFormValues((prevValues) => ({
-                                    ...prevValues,
-                                    [fieldName]: selectedValue,
-                                  }));
-                                }}
-                                required
-                              />
-                            </div>
+              showSignUp ? (
+                <>
+                  <HomeEmailSignUp
+                    formValues={formValues}
+                    setSubTab={setSubTab}
+                    setShowSignUp={setShowSignUp}
+                    showAlreadyRegistered={showAlreadyRegistered}
+                    setShowAlreadyRegistered={setShowAlreadyRegistered}
+                    showOTPScreen={showOTPScreen}
+                    setShowOTPScreen={setShowOTPScreen}
+                    setHideCreateAccountButton={setHideCreateAccountButton}
+                    hideCreateAccountButton={hideCreateAccountButton}
+                    showPhone={showPhone}
+                    setShowPhone={setShowPhone}
+                    hidePhoneCreateAccountButton={hidePhoneCreateAccountButton}
+                    setHidePhoneCreateAccountButton={setHidePhoneCreateAccountButton}
+                    showPhoneOTPScreen={showPhoneOTPScreen}
+                    setShowPhoneOTPScreen={setShowPhoneOTPScreen}
+                    showPaymentMethod={showPaymentMethod}
+                    setShowPaymentMethod={setShowPaymentMethod}
+                    recaptchaRef={recaptchaRef}
+                    otp={otp}
+                    setOtp={setOtp}
+                    phoneOtp={phoneOtp}
+                    setPhoneOtp={setPhoneOtp}
+                  />
+                </>
+              ) : (
 
-                            <div >
-                              <InputFieldFormik
-                                label="Arrival Date"
-                                name="arrivalDate"
-                                type="arrivalDate"
-                                value={values.arrivalDate}
-                                arrivalDates={arrivalDates}
-                                setArrivalDates={setArrivalDates}
-                                onChange={({ date, dateString }) => {
-                                  setOnChangeFormValues((prevValues) => ({
-                                    ...prevValues,
-                                    ['arrivalDate']: dateString,
-                                  }));
-                                  setFieldValue('arrivalDate', dateString);
-                                }}
+                <>
+                  {" "}
+                  <Formik
+                    initialValues={formValues}
+                    validationSchema={validationSchema}
+                    onSubmit={onSubmit}
+                  >
+                    {({ values, errors, setFieldValue, validateForm }) => {
+                      const isStep1Valid =
+                        values.bookingByHours &&
+                        values.arrivalCity &&
+                        values.arrivalDate &&
+                        values.arrivalTime;
+                      // const isStep2Valid = values.vehicleType;
 
-                                required
-                              />
-
-                            </div>
-
-                            <div>
-                              <InputFieldFormik
-                                label="Arrival Time"
-                                name="arrivalTime"
-                                type="arrivalTime"
-                                value={values.arrivalTime || ''}
-
-                                arrivalDates={arrivalDates}
-                                onChange={({ fieldName, selectedValue }) => {
-                                  setOnChangeFormValues((prevValues) => ({
-                                    ...prevValues,
-                                    [fieldName]: selectedValue,
-                                  }));
-                                  setFieldValue(fieldName, selectedValue);
-                                }}
-                                required
-                              />
-                            </div>
-
-                            <div className="w-full mt-3">
-                              <Button
-                                className="bg-background_steel_blue w-full text-text_white hover:bg-gray-100 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2"
-                                onClick={() => {
-                                  dispatch(setLoading(true))
-                                  validateForm().then(() => {
-                                    if (isStep1Valid) {
-                                      setSubTab(2);
-                                      setFormValues(values);
-                                    }
-                                  });
-                                  dispatch(setLoading(false))
-                                }}
-                                label="Next"
-                                type="button"
-                                disabled={!isStep1Valid}
-                              />
-                            </div>
-                          </>
-                        )}
-
-                        {subTab === 2 && (
-                          <>
-                            {/* <div>
-                              <VehicleTypeModal />
-                            </div> */}
-                            {/* <div className="pb-4 border-b border-gray-300">
-                              <InputFieldFormik
-                                label="Vehicle type"
-                                name="vehicleType"
-                                type="select"
-                                options={
-                                  vehicleTypes &&
-                                  vehicleTypes.data &&
-                                  vehicleTypes.data.map((vehicle) => ({
-                                    value: vehicle.name,
-                                    label: vehicle.name,
-                                  }))
-                                }
-                                value={
-                                  formValues.vehicleType ||
-                                  onChangeFormValues.vehicleType
-                                }
-                                onChange={(valueObj) => {
-                                  const { fieldName, selectedValue } = valueObj;
-                                  setFieldValue(fieldName, selectedValue);
-                                  setOnChangeFormValues((prevValues) => ({
-                                    ...prevValues,
-                                    [fieldName]: selectedValue,
-                                  }));
-                                }}
-                                required
-                              />
-                            </div> */}
-                            <div>
-                              <VehicleTypeModal
-                                vehicleTypeName={vehicleTypeName}
-                                setVehicleTypeName={setVehicleTypeName}
-                              />
-                            </div>
-
-                            <div className="my-4 flex flex-col md:flex-row justify-between items-start">
-                              <div className="w-full md:w-1/2 mx-0 md:mx-1">
-                                <Heading
-                                  title={"Set Your Destination"}
-                                  className={"text-xl text-text_black"}
+                      return (
+                        <Form className="mx-auto w-full">
+                          {subTab === 1 && (
+                            <>
+                              <div>
+                                <InputFieldFormik
+                                  label="Booking Vehicle By Hours"
+                                  name="bookingByHours"
+                                  type="select"
+                                  options={byHoursOptions}
+                                  value={
+                                    formValues.bookingByHours ||
+                                    onChangeFormValues.bookingByHours
+                                  }
+                                  onChange={(valueObj) => {
+                                    const { fieldName, selectedValue } = valueObj;
+                                    setFieldValue(fieldName, selectedValue);
+                                    setOnChangeFormValues((prevValues) => ({
+                                      ...prevValues,
+                                      [fieldName]: selectedValue,
+                                    }));
+                                  }}
+                                  required
                                 />
                               </div>
-                              <div className="w-full md:w-1/2 mx-0 md:mx-1">
-                                <MapModal
-                                  onSubmitDestination={handleMapSubmit}
-                                  dammamZoneCoords={map}
+
+                              <div>
+                                <InputFieldFormik
+                                  label="Arrival City"
+                                  name="arrivalCity"
+                                  type="select"
+                                  options={
+                                    cities &&
+                                    cities.data &&
+                                    cities.data.map((city) => ({
+                                      value: city,
+                                      label: city,
+                                    }))
+                                  }
+                                  value={
+                                    formValues.arrivalCity ||
+                                    onChangeFormValues.arrivalCity
+                                  }
+                                  onChange={(valueObj) => {
+                                    const { fieldName, selectedValue } = valueObj;
+                                    setFieldValue(fieldName, selectedValue);
+                                    setCityName(selectedValue);
+                                    setOnChangeFormValues((prevValues) => ({
+                                      ...prevValues,
+                                      [fieldName]: selectedValue,
+                                    }));
+                                  }}
+                                  required
                                 />
                               </div>
-                            </div>
 
-                            <div className="mt-3 flex flex-col md:flex-row justify-between items-center">
-                              <div className="w-full md:w-1/2 mx-0 md:mx-1">
+                              <div >
+                                <InputFieldFormik
+                                  label="Arrival Date"
+                                  name="arrivalDate"
+                                  type="arrivalDate"
+                                  value={values.arrivalDate}
+                                  arrivalDates={arrivalDates}
+                                  setArrivalDates={setArrivalDates}
+                                  onChange={({ date, dateString }) => {
+                                    setOnChangeFormValues((prevValues) => ({
+                                      ...prevValues,
+                                      ['arrivalDate']: dateString,
+                                    }));
+                                    setFieldValue('arrivalDate', dateString);
+                                  }}
+
+                                  required
+                                />
+
+                              </div>
+
+                              <div>
+                                <InputFieldFormik
+                                  label="Arrival Time"
+                                  name="arrivalTime"
+                                  type="arrivalTime"
+                                  value={values.arrivalTime || ''}
+
+                                  arrivalDates={arrivalDates}
+                                  onChange={({ fieldName, selectedValue }) => {
+                                    setOnChangeFormValues((prevValues) => ({
+                                      ...prevValues,
+                                      [fieldName]: selectedValue,
+                                    }));
+                                    setFieldValue(fieldName, selectedValue);
+                                  }}
+                                  required
+                                />
+                              </div>
+
+                              <div className="w-full mt-3">
                                 <Button
-                                  className="bg-bg_btn_back w-full text-text_white hover:bg-gray-100 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2"
-                                  onClick={() => handlePrevious(1, values)}
-                                  label="Previous"
+                                  className="bg-background_steel_blue w-full text-text_white hover:bg-gray-100 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2"
+                                  onClick={() => {
+                                    dispatch(setLoading(true))
+                                    validateForm().then(() => {
+                                      if (isStep1Valid) {
+                                        setSubTab(2);
+                                        setFormValues(values);
+                                      }
+                                    });
+                                    dispatch(setLoading(false))
+                                  }}
+                                  label="Next"
                                   type="button"
+                                  disabled={!isStep1Valid}
                                 />
                               </div>
-                              <div className="w-full md:w-1/2 mx-0 md:mx-1">
-                                <Button
-                                  className="bg-background_steel_blue w-full text-text_white hover:bg-gray-100 font-medium rounded-lg text-sm px-5 py-2.5 mb-2"
-                                  label="Submit"
-                                  type="submit"
+                            </>
+                          )}
+
+                          {subTab === 2 && (
+                            <>
+                              {/* <div>
+                             <VehicleTypeModal />
+                           </div> */}
+                              {/* <div className="pb-4 border-b border-gray-300">
+                             <InputFieldFormik
+                               label="Vehicle type"
+                               name="vehicleType"
+                               type="select"
+                               options={
+                                 vehicleTypes &&
+                                 vehicleTypes.data &&
+                                 vehicleTypes.data.map((vehicle) => ({
+                                   value: vehicle.name,
+                                   label: vehicle.name,
+                                 }))
+                               }
+                               value={
+                                 formValues.vehicleType ||
+                                 onChangeFormValues.vehicleType
+                               }
+                               onChange={(valueObj) => {
+                                 const { fieldName, selectedValue } = valueObj;
+                                 setFieldValue(fieldName, selectedValue);
+                                 setOnChangeFormValues((prevValues) => ({
+                                   ...prevValues,
+                                   [fieldName]: selectedValue,
+                                 }));
+                               }}
+                               required
+                             />
+                           </div> */}
+                              <div>
+                                <VehicleTypeModal
+                                  vehicleTypeName={vehicleTypeName}
+                                  setVehicleTypeName={setVehicleTypeName}
                                 />
                               </div>
-                            </div>
-                          </>
-                        )}
-                      </Form>
-                    );
-                  }}
-                </Formik>
-              </>
-            ) : (
-              <>
-                <HomeEmailSignUp
-                  setSubTab={setSubTab}
-                  setShowSignUp={setShowSignUp}
-                  showAlreadyRegistered={showAlreadyRegistered}
-                  setShowAlreadyRegistered={setShowAlreadyRegistered}
-                  showOTPScreen={showOTPScreen}
-                  setShowOTPScreen={setShowOTPScreen}
-                  setHideCreateAccountButton={setHideCreateAccountButton}
-                  hideCreateAccountButton={hideCreateAccountButton}
-                  showPhone={showPhone}
-                  setShowPhone={setShowPhone}
-                  hidePhoneCreateAccountButton={hidePhoneCreateAccountButton}
-                  setHidePhoneCreateAccountButton={setHidePhoneCreateAccountButton}
-                  showPhoneOTPScreen={showPhoneOTPScreen}
-                  setShowPhoneOTPScreen={setShowPhoneOTPScreen}
-                  showPaymentMethod={showPaymentMethod}
-                  setShowPaymentMethod={setShowPaymentMethod}
-                  recaptchaRef={recaptchaRef}
-                  otp={otp}
-                  setOtp={setOtp}
-                  phoneOtp={phoneOtp}
-                  setPhoneOtp={setPhoneOtp}
-                />
-              </>
-            )}
+
+                              <div className="my-4 flex flex-col md:flex-row justify-between items-start">
+                                <div className="w-full md:w-1/2 mx-0 md:mx-1">
+                                  <Heading
+                                    title={"Set Your Destination"}
+                                    className={"text-xl text-text_black"}
+                                  />
+                                </div>
+                                <div className="w-full md:w-1/2 mx-0 md:mx-1">
+                                  <MapModal
+                                    onSubmitDestination={handleMapSubmit}
+                                    dammamZoneCoords={map}
+                                  />
+                                </div>
+                              </div>
+
+                              <div className="mt-3 flex flex-col md:flex-row justify-between items-center">
+                                <div className="w-full md:w-1/2 mx-0 md:mx-1">
+                                  <Button
+                                    className="bg-bg_btn_back w-full text-text_white hover:bg-gray-100 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2"
+                                    onClick={() => handlePrevious(1, values)}
+                                    label="Previous"
+                                    type="button"
+                                  />
+                                </div>
+                                <div className="w-full md:w-1/2 mx-0 md:mx-1">
+                                  <Button
+                                    className="bg-background_steel_blue w-full text-text_white hover:bg-gray-100 font-medium rounded-lg text-sm px-5 py-2.5 mb-2"
+                                    label="Submit"
+                                    type="submit"
+                                  />
+                                </div>
+                              </div>
+                            </>
+                          )}
+                        </Form>
+                      );
+                    }}
+                  </Formik>
+                </>
+              )}
           </div>
         </div>
       </div>

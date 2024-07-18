@@ -1,16 +1,25 @@
 import React, { useState, useRef } from "react";
 import { GoogleMap, LoadScript, Marker, Polygon, StandaloneSearchBox } from "@react-google-maps/api";
 
-export default function MapModal({ onSubmitDestination, dammamZoneCoords }) {
+export default function MapModal({ onSubmitDestination, zoneCoords, cityName}) {
   const containerStyle = {
     width: "100%",
     height: "400px",
   };
 
-  const center = {
-    lat: 26.3927,
-    lng: 49.9777,
-  };
+  let center;
+  if (cityName === 'Dammam') {
+    center = {
+      lat: 26.3927,
+      lng: 49.9777,
+    };
+  }
+  if (cityName === 'Riyadh') {
+    center = {
+      lng: 46.6753,
+      lat: 24.7136
+    }
+  }
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedPickup, setSelectedPickup] = useState(null);
@@ -26,7 +35,7 @@ export default function MapModal({ onSubmitDestination, dammamZoneCoords }) {
     setError("");
   };
 
-  const convertedCoords = dammamZoneCoords.map((coord) => ({
+  const convertedCoords = zoneCoords.map((coord) => ({
     lat: coord[0],
     lng: coord[1],
   }));
@@ -163,7 +172,7 @@ export default function MapModal({ onSubmitDestination, dammamZoneCoords }) {
                         strokeWeight: 1,
                       }}
                     />
-                    <Polygon
+                    {/* <Polygon
                       paths={[
                         { lat: 90, lng: -180 },
                         { lat: -90, lng: -180 },
@@ -177,7 +186,7 @@ export default function MapModal({ onSubmitDestination, dammamZoneCoords }) {
                         strokeOpacity: 0.5,
                         strokeWeight: 1,
                       }}
-                    />
+                    /> */}
 
                     {selectedPickup && <Marker position={selectedPickup} />}
                     {selectedDropoff && <Marker position={selectedDropoff} />}

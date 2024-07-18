@@ -207,8 +207,12 @@ export default function AirportRide(
         )}
 
         <div className="p-2 md:p-4">
-          {showSignUp ? (
+          {showPaymentMethod ? (
+            <PaymentMethod formValues={formValues}/>
+            
+          ) : showSignUp ? (
             <HomeEmailSignUp
+              formValues={formValues}
               setSubTab={setSubTab}
               setShowSignUp={setShowSignUp}
               showAlreadyRegistered={showAlreadyRegistered}
@@ -231,8 +235,6 @@ export default function AirportRide(
               phoneOtp={phoneOtp}
               setPhoneOtp={setPhoneOtp}
             />
-          ) : showPaymentMethod ? (
-            <PaymentMethod />
           ) : (
             <Formik
               initialValues={formValues}
@@ -240,6 +242,7 @@ export default function AirportRide(
               enableReinitialize={true}
               onSubmit={(values, { setSubmitting }) => {
                 // if (!isLoggedIn) {
+    
                 setSubTab(4)
                 setShowSignUp(true);
                 // } else {
@@ -495,6 +498,7 @@ export default function AirportRide(
                             <MapModal
                               onSubmitDestination={handleMapSubmit}
                               dammamZoneCoords={map}
+                              cityName={values.arrivalCity}
                             />
                           </div>
                         </div>

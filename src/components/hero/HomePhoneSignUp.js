@@ -15,6 +15,7 @@ import { useNavigate } from "react-router-dom";
 
 export default function HomePhoneSignUp(
   {
+    formValues,
     email,
     showPaymentMethod,
     setShowPaymentMethod,
@@ -196,7 +197,7 @@ export default function HomePhoneSignUp(
 
       {showPaymentMethod && (
         <>
-          <PaymentMethod />
+          <PaymentMethod formValues={formValues}/>
         </>
       )}
     </>

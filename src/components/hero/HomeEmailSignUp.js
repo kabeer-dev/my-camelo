@@ -17,6 +17,7 @@ import { signInSuccess } from "../../redux/actions/authActions";
 
 export default function HomeEmailSignUp(
   {
+    formValues,
     setSubTab, setShowSignUp,
     showAlreadyRegistered,
     setShowAlreadyRegistered,
@@ -162,9 +163,10 @@ export default function HomeEmailSignUp(
   return (
     <>
       {showPaymentMethod ? (
-        <PaymentMethod />
+        <PaymentMethod formValues={formValues}/>
       ) : showPhone ? (
         <HomePhoneSignUp
+          formValues={formValues}
           email={email}
           showPaymentMethod={showPaymentMethod} setShowPaymentMethod={setShowPaymentMethod}
           hidePhoneCreateAccountButton={hidePhoneCreateAccountButton}

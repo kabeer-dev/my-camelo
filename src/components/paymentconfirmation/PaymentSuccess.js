@@ -2,19 +2,28 @@ import React, { useState, useEffect } from "react";
 import { Link, Events, scrollSpy } from "react-scroll";
 import { CiGlobe } from "react-icons/ci";
 import Button from "../base/Button";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { DownOutlined } from "@ant-design/icons";
 import { Dropdown, message, Space } from "antd";
 import { signOutRequest } from "../../redux/actions/authActions";
+import axios from "axios";
+import { setLoading } from "../../redux/actions/loaderAction";
 
 export default function PaymentSuccess() {
   const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
   const username = useSelector((state) => state.auth.username);
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const location = useLocation();
+  // const formValues = location.state?.formValues;
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [activeSection, setActiveSection] = useState("home");
+  const [saveData, setSaveData] = useState(false);
+
+  const payment = localStorage.getItem('payment');
+  const paymentMethodName = localStorage.getItem('paymentMethodName');
+
 
   // Function to toggle menu
   const toggleMenu = () => {
@@ -44,8 +53,8 @@ export default function PaymentSuccess() {
   ];
 
   useEffect(() => {
-    Events.scrollEvent.register("begin", function (to, element) {});
-    Events.scrollEvent.register("end", function (to, element) {});
+    Events.scrollEvent.register("begin", function (to, element) { });
+    Events.scrollEvent.register("end", function (to, element) { });
 
     scrollSpy.update();
 
@@ -91,6 +100,83 @@ export default function PaymentSuccess() {
       key: "3",
     },
   ];
+
+  const API_BASE_URL = process.env.REACT_APP_BASE_URL_AMK_TEST;
+  useEffect(() => {
+    dispatch(setLoading(true))
+    const createPaymentApi = async () => {
+      const pId = paymentMethodName === 'mada' ? "8a829449515d198b01517d5601df5584" : "8ac7a4ca8c31c0ef018c34634bf30399";
+      const payload = {
+        "type": "PAYMENT",
+        "payload": {
+          "id": pId,
+          "paymentType": "PA",
+          "paymentBrand": "VISA",
+          "amount": "92.00",
+          "currency": "EUR",
+          "presentationAmount": "92.00",
+          "presentationCurrency": "EUR",
+          "descriptor": "3017.7139.1650 OPP_Channel ",
+          "result": {
+            "code": "000.000.000",
+            "description": "Transaction succeeded"
+          },
+          "authentication": {
+            "entityId": "8a8294185282b95b01528382b4940245"
+          },
+          "card": {
+            "bin": "420000",
+            "last4Digits": "0000",
+            "holder": "Jane Jones",
+            "expiryMonth": "05",
+            "expiryYear": "2018"
+          },
+          "customer": {
+            "givenName": "Jones",
+            "surname": "Jane",
+            "merchantCustomerId": "jjones",
+            "sex": "F",
+            "email": "jane@jones.com"
+          },
+          "customParameters": {
+            "SHOPPER_promoCode": "AT052"
+          },
+          "risk": {
+            "score": "0"
+          },
+          "buildNumber": "ec3c704170e54f6d7cf86c6f1969b20f6d855ce5@2015-12-01 12:20:39 +0000",
+          "timestamp": "2015-12-07 16:46:07+0000",
+          "ndc": "8a8294174b7ecb28014b9699220015ca_66b12f658442479c8ca66166c4999e78",
+          "channelName": "OPP_Channel",
+          "source": "SYSTEM",
+          "paymentMethod": "CC",
+          "shortId": "5420.6916.5424"
+        }
+      }
+      try {
+        const response = await axios.post(
+          `${API_BASE_URL}/api/method/airport_transport.api.integrations.hyperpay.create_transaction`, payload, {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+        if (response && response.status === 200) {
+          console.log(response)
+          // dispatch(setLoading(false))
+        }
+      } catch (error) {
+        console.log('Error', error);
+        // dispatch(setLoading(false))
+      }
+    }
+    if(payment){
+      createPaymentApi();
+      localStorage.setItem('payment', 'false');
+      dispatch(setLoading(false))
+    }
+    dispatch(setLoading(false))
+    
+  }, [])
 
   return (
     <div>
@@ -208,9 +294,8 @@ export default function PaymentSuccess() {
             </div>
 
             <div
-              className={`${
-                isMenuOpen ? "block" : "hidden"
-              } justify-between items-center w-full lg:flex lg:w-auto lg:order-1`}
+              className={`${isMenuOpen ? "block" : "hidden"
+                } justify-between items-center w-full lg:flex lg:w-auto lg:order-1`}
               id="mobile-menu-2"
             >
               <ul className="flex flex-col mt-4 font-medium lg:flex-row lg:space-x-8 lg:mt-0">
