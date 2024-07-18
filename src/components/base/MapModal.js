@@ -22,7 +22,7 @@ export default function MapModal({ onSubmitDestination, zoneCoords, cityName}) {
   }
 
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedPickup, setSelectedPickup] = useState(null);
+  const [selectedPickup, setSelectedPickup] = useState({ lat: 24.96321679842545, lng: 46.70039930528715 });
   const [selectedDropoff, setSelectedDropoff] = useState(null);
   const [error, setError] = useState("");
   const [searchBox, setSearchBox] = useState(null); // State to hold the StandaloneSearchBox instance
