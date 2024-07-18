@@ -497,7 +497,7 @@ export default function AirportRide(
                           <div className="w-full md:w-1/2">
                             <MapModal
                               onSubmitDestination={handleMapSubmit}
-                              dammamZoneCoords={map}
+                              zoneCoords={map}
                               cityName={values.arrivalCity}
                             />
                           </div>

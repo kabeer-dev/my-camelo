@@ -103,6 +103,7 @@ export default function MapModal({ onSubmitDestination, zoneCoords, cityName}) {
     }
   };
 
+
   return (
     <>
       <button
