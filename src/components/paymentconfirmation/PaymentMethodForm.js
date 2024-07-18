@@ -23,8 +23,10 @@ const PaymentMethodForm = () => {
     const checkoutId = location.state?.checkoutId;
     const paymentMethodName = location.state?.paymentMethodName;
     const formValues = location.state?.formValues;
-    const successUrl = `http://localhost:3000/payment-success`;
-    const failureUrl = 'http://localhost:3000/payment-failed';
+
+    const baseUrl = window.location.protocol + '//' + window.location.host
+    const successUrl = baseUrl + '/payment-success';
+    const failureUrl = baseUrl + '/payment-failed';
 
     // useEffect(()=>{
       

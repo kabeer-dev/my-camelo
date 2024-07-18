@@ -1,7 +1,7 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { GoogleMap, LoadScript, Marker, Polygon, StandaloneSearchBox } from "@react-google-maps/api";
 
-export default function MapModal({ onSubmitDestination, zoneCoords, cityName}) {
+export default function MapModal({ rideName, rideType, onSubmitDestination, zoneCoords, cityName}) {
   const containerStyle = {
     width: "100%",
     height: "400px",
@@ -22,7 +22,7 @@ export default function MapModal({ onSubmitDestination, zoneCoords, cityName}) {
   }
 
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedPickup, setSelectedPickup] = useState({ lat: 24.96321679842545, lng: 46.70039930528715 });
+  const [selectedPickup, setSelectedPickup] = useState(null);
   const [selectedDropoff, setSelectedDropoff] = useState(null);
   const [error, setError] = useState("");
   const [searchBox, setSearchBox] = useState(null); // State to hold the StandaloneSearchBox instance
@@ -40,35 +40,47 @@ export default function MapModal({ onSubmitDestination, zoneCoords, cityName}) {
     lng: coord[1],
   }));
 
-  const isPointInPolygon = (point, polygon) => {
-    const { lat, lng } = point;
-    let inside = false;
-    for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
-      const xi = polygon[i].lat,
-        yi = polygon[i].lng;
-      const xj = polygon[j].lat,
-        yj = polygon[j].lng;
-
-      const intersect =
-        yi > lng !== yj > lng &&
-        lat < ((xj - xi) * (lng - yi)) / (yj - yi) + xi;
-      if (intersect) inside = !inside;
+  useEffect(() => {
+    if (rideName === "airportRide" && cityName === "Dammam") {
+      const point = { lat: 226.386549082673103, lng: 49.92551494140624 };
+      if (rideType === 'pickup') {
+        setSelectedPickup(point);
+      } else if (rideType === 'dropoff') {
+        setSelectedDropoff(point);
+      }
     }
-    return inside;
-  };
+  }, [rideName, cityName, rideType]);
+
+  // const isPointInPolygon = (point, polygon) => {
+  //   const { lat, lng } = point;
+  //   let inside = false;
+  //   for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
+  //     const xi = polygon[i].lat,
+  //       yi = polygon[i].lng;
+  //     const xj = polygon[j].lat,
+  //       yj = polygon[j].lng;
+
+  //     const intersect =
+  //       yi > lng !== yj > lng &&
+  //       lat < ((xj - xi) * (lng - yi)) / (yj - yi) + xi;
+  //     if (intersect) inside = !inside;
+  //   }
+  //   return inside;
+  // };
 
   const onMapClick = (event) => {
+    console.log('aaa', event.latLng.lat(), event.latLng.lng())
     const point = { lat: event.latLng.lat(), lng: event.latLng.lng() };
-    if (isPointInPolygon(point, convertedCoords)) {
+    // if (isPointInPolygon(point, convertedCoords)) {
       setError("");
       if (!selectedPickup) {
         setSelectedPickup(point);
       } else if (!selectedDropoff) {
         setSelectedDropoff(point);
       }
-    } else {
-      setError("You cannot select a location outside the Dammam zone.");
-    }
+    // } else {
+    //   setError("You cannot select a location outside the Dammam zone.");
+    // }
   };
 
   function submitDestination() {
@@ -163,7 +175,7 @@ export default function MapModal({ onSubmitDestination, zoneCoords, cityName}) {
                     onClick={onMapClick}
                   >
                     {/* Your existing map components */}
-                    <Polygon
+                    {/* <Polygon
                       paths={convertedCoords}
                       options={{
                         fillColor: "#4463F0",
@@ -172,7 +184,7 @@ export default function MapModal({ onSubmitDestination, zoneCoords, cityName}) {
                         strokeOpacity: 1,
                         strokeWeight: 1,
                       }}
-                    />
+                    /> */}
                     {/* <Polygon
                       paths={[
                         { lat: 90, lng: -180 },

@@ -50,6 +50,7 @@ export default function AirportRide(
 
   const zoneMap = useSelector((state) => state?.zone?.zone);
   const [map, setMap] = useState(null);
+  
   useEffect(() => {
     setMap(zoneMap && zoneMap.length > 0 ? zoneMap[0].map : null)
   }, [zoneMap])
@@ -83,7 +84,7 @@ export default function AirportRide(
     arrivalTime: "",
     sharedRide: false,
   });
-
+console.log(formValues)
   const API_BASE_URL = process.env.REACT_APP_BASE_URL_AMK_TEST;
   const [sharedRideValue, setSharedRideValue] = useState("");
   useEffect(() => {
@@ -496,6 +497,8 @@ export default function AirportRide(
                           </div>
                           <div className="w-full md:w-1/2">
                             <MapModal
+                              rideName="airportRide"
+                              rideType={formValues.rideType}
                               onSubmitDestination={handleMapSubmit}
                               zoneCoords={map}
                               cityName={values.arrivalCity}
