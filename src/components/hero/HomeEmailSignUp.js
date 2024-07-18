@@ -179,6 +179,7 @@ export default function HomeEmailSignUp(
           setShowOTPScreen={setShowOTPScreen}
           setShowPhone={setShowPhone}
           setOtp={setOtp}
+          recaptchaRef={recaptchaRef}
         />
       ) : (
         <Formik

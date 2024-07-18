@@ -42,7 +42,11 @@ export default function RideByHour({
   const { cities } = useSelector((state) => state.cities);
   const { vehicleTypes } = useSelector((state) => state.vehicleTypes);
   const zoneMap = useSelector((state) => state?.zone?.zone);
-  const map = zoneMap && zoneMap.length > 0 ? zoneMap[0].map : null;
+  const [map, setMap] = useState(null);
+
+  useEffect(() => {
+    setMap(zoneMap && zoneMap.length > 0 ? zoneMap[0].map : null)
+  }, [zoneMap])
   const services = "Book Vehicle In Hours";
   const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
 
@@ -386,9 +390,14 @@ export default function RideByHour({
                                 </div>
                                 <div className="w-full md:w-1/2 mx-0 md:mx-1">
                                   <MapModal
+
+                                    rideName="rideByHour"
+                                    rideType={formValues.rideType}
                                     onSubmitDestination={handleMapSubmit}
-                                    dammamZoneCoords={map}
+                                    zoneCoords={map}
+                                    cityName={values.arrivalCity}
                                   />
+
                                 </div>
                               </div>
 

@@ -84,7 +84,7 @@ export default function AirportRide(
     arrivalTime: "",
     sharedRide: false,
   });
-console.log(formValues)
+
   const API_BASE_URL = process.env.REACT_APP_BASE_URL_AMK_TEST;
   const [sharedRideValue, setSharedRideValue] = useState("");
   useEffect(() => {

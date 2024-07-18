@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { GoogleMap, LoadScript, Marker, Polygon, StandaloneSearchBox } from "@react-google-maps/api";
 
-export default function MapModal({ rideName, rideType, onSubmitDestination, zoneCoords, cityName}) {
+export default function MapModal({ rideName, rideType, onSubmitDestination, zoneCoords, cityName }) {
   const containerStyle = {
     width: "100%",
     height: "400px",
@@ -41,13 +41,23 @@ export default function MapModal({ rideName, rideType, onSubmitDestination, zone
   }));
 
   useEffect(() => {
-    if (rideName === "airportRide" && cityName === "Dammam") {
-      const point = { lat: 226.386549082673103, lng: 49.92551494140624 };
-      if (rideType === 'pickup') {
-        setSelectedPickup(point);
-      } else if (rideType === 'dropoff') {
-        setSelectedDropoff(point);
+    if (rideName === "airportRide") {
+      if (cityName === "Dammam") {
+        const point = { lat: 26.3927, lng: 49.9777 };
+        if (rideType === 'pickup') {
+          setSelectedPickup(point);
+        } else if (rideType === 'dropoff') {
+          setSelectedDropoff(point);
+        }
+      } else {
+        const point = { lng: 46.6753, lat: 24.7136 };
+        if (rideType === 'pickup') {
+          setSelectedPickup(point);
+        } else if (rideType === 'dropoff') {
+          setSelectedDropoff(point);
+        }
       }
+
     }
   }, [rideName, cityName, rideType]);
 
@@ -69,27 +79,42 @@ export default function MapModal({ rideName, rideType, onSubmitDestination, zone
   // };
 
   const onMapClick = (event) => {
-    console.log('aaa', event.latLng.lat(), event.latLng.lng())
     const point = { lat: event.latLng.lat(), lng: event.latLng.lng() };
     // if (isPointInPolygon(point, convertedCoords)) {
-      setError("");
+    setError("");
+    if (rideName === "airportRide" || rideName === "scheduledRide") {
       if (!selectedPickup) {
         setSelectedPickup(point);
       } else if (!selectedDropoff) {
         setSelectedDropoff(point);
       }
+    } else {
+      if (!selectedPickup) {
+        setSelectedPickup(point);
+      }
+    }
     // } else {
     //   setError("You cannot select a location outside the Dammam zone.");
     // }
   };
 
   function submitDestination() {
-    if (selectedPickup && selectedDropoff) {
-      onSubmitDestination(selectedPickup, selectedDropoff);
-      closeModal();
+    if (rideName === "airportRide" || rideName === "scheduledRide") {
+      if (selectedPickup && selectedDropoff) {
+        onSubmitDestination(selectedPickup, selectedDropoff);
+        closeModal();
+      } else {
+        setError("Please select both pickup and dropoff locations.");
+      }
     } else {
-      setError("Please select both pickup and dropoff locations.");
+      if (selectedPickup) {
+        onSubmitDestination(selectedPickup, null);
+        closeModal();
+      } else {
+        setError("Please select pickup location.");
+      }
     }
+
   }
 
   const onLoad = (ref) => {

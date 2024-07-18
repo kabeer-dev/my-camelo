@@ -12,6 +12,8 @@ import 'react-phone-input-2/lib/style.css';
 
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import Recaptcha from "../base/Recaptcha";
+import { signInSuccess } from "../../redux/actions/authActions";
 
 export default function HomePhoneSignUp(
   {
@@ -28,7 +30,8 @@ export default function HomePhoneSignUp(
     setHideCreateAccountButton,
     setShowOTPScreen,
     setShowPhone,
-    setOtp
+    setOtp,
+    recaptchaRef
 
   }) {
   const navigate = useNavigate();
@@ -36,6 +39,7 @@ export default function HomePhoneSignUp(
   const [error, setError] = useState("");
 
   const [phoneNumber, setPhoneNumber] = useState("");
+  const [recaptchaToken, setRecaptchaToken] = useState(null);
 
   const validationSchema = Yup.object().shape({
     phone: Yup.string().required("Phone is required").min(11, "Phone number must be at least 11 characters"),
@@ -60,9 +64,31 @@ export default function HomePhoneSignUp(
       }
     } catch (error) {
       if (error?.response?.data?.msg === 'SMS OTP not allowed for country') {
-        setShowPaymentMethod(true)
+        const data = {
+          email: email,
+          phone: phoneNumber,
+        }
+        try {
+          const response = await axios.post('https://test-erp.amk.sa/api/method/airport_transport.api.user.register', data, {
+            headers: {
+              'Content-Type': 'application/x-www-form-urlencoded',
+              recaptchaToken: recaptchaToken,
+            },
+          });
+          if (response && response.status === 200) {
+            // console.log('jjj', response.data);
+            dispatch(signInSuccess(response.data.token, response.data.owner));
+            setShowPaymentMethod(true)
+          }
+        }
+        catch (error) {
+          console.error('Error:', error);
+          recaptchaRef.current.reset();
+          // Handle error
+        };
       } else {
         message.error(`${error?.response?.data?.msg}`);
+        recaptchaRef.current.reset();
       }
     }
     dispatch(setLoading(false));
@@ -123,6 +149,15 @@ export default function HomePhoneSignUp(
                 }}
 
               />
+              <div>
+                <Recaptcha
+                  recaptchaRef={recaptchaRef}
+                  sitekey="6LfE3FEpAAAAAGkeBjkpPeNSqPNWtLPCma7EHVsr"
+                  onChange={(value) => {
+                    setRecaptchaToken(value);
+                  }}
+                />
+              </div>
 
               {!hidePhoneCreateAccountButton && (
                 <div className="text-center mt-6 flex flex-col md:flex-row justify-between items-center">
@@ -169,6 +204,16 @@ export default function HomePhoneSignUp(
                     )}
                   </div>
 
+                  <div>
+                    <Recaptcha
+                      recaptchaRef={recaptchaRef}
+                      sitekey="6LfE3FEpAAAAAGkeBjkpPeNSqPNWtLPCma7EHVsr"
+                      onChange={(value) => {
+                        setRecaptchaToken(value);
+                      }}
+                    />
+                  </div>
+
                   <div className="my-3 flex flex-col md:flex-row justify-between items-center">
                     <Button
                       className="bg-bg_btn_back w-full text-text_white hover:bg-gray-100 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2"
@@ -197,7 +242,7 @@ export default function HomePhoneSignUp(
 
       {showPaymentMethod && (
         <>
-          <PaymentMethod formValues={formValues}/>
+          <PaymentMethod formValues={formValues} />
         </>
       )}
     </>

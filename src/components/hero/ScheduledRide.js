@@ -14,6 +14,7 @@ import HomeEmailSignUp from "./HomeEmailSignUp";
 import { setLoading } from "../../redux/actions/loaderAction";
 import VehicleTypeModal from "../base/VehicleTypeModal";
 import PaymentMethod from "./PaymentMethod";
+import axios from "axios";
 
 export default function ScheduledRide({
   subTab, setSubTab,
@@ -42,7 +43,11 @@ export default function ScheduledRide({
   const { cities } = useSelector((state) => state.cities);
   const { vehicleTypes } = useSelector((state) => state.vehicleTypes);
   const zoneMap = useSelector((state) => state?.zone?.zone);
-  const map = zoneMap && zoneMap.length > 0 ? zoneMap[0].map : null;
+  const [map, setMap] = useState(null);
+  
+  useEffect(() => {
+    setMap(zoneMap && zoneMap.length > 0 ? zoneMap[0].map : null)
+  }, [zoneMap])
   const services = "City Trip";
   const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
 
@@ -99,6 +104,30 @@ export default function ScheduledRide({
     dispatch(getZoneRequest(services, cityName));
   }, [dispatch, cityName]);
 
+  const API_BASE_URL = process.env.REACT_APP_BASE_URL_AMK_TEST;
+  const [sharedRideValue, setSharedRideValue] = useState("");
+  useEffect(() => {
+    const getSharedRideValue = async () => {
+      dispatch(setLoading(true))
+      if(formValues.vehicleType !== ""){
+        try {
+          const response = await axios.get(
+            `${API_BASE_URL}/api/method/airport_transport.api.bookings.get_ride_discount?vehicle_type=${formValues.vehicleType}&language=${'en'}`
+          );
+          if(response && response.status === 200){
+            setSharedRideValue(response.data.data)
+            dispatch(setLoading(false))
+          }
+        } catch (error) {
+          console.log('Error', error);
+          dispatch(setLoading(false))
+        }
+      }
+      dispatch(setLoading(false))
+    }
+    getSharedRideValue()
+  }, [formValues]);
+
   const steps = [
     { id: 1, text: "Ride Details" },
     { id: 2, text: "Vehicle Details" },
@@ -141,6 +170,7 @@ export default function ScheduledRide({
     setSelectedPickup(pickup);
     setSelectedDropoff(dropoff);
   };
+  
 
   return (
     <>
@@ -378,6 +408,7 @@ export default function ScheduledRide({
                                 label="Shared Ride"
                                 name="sharedRide"
                                 type="checkbox"
+                                percentageValue={sharedRideValue}
                                 onChange={(valueObj) => {
                                   // Destructure fieldName and selectedValue from the object
                                   const { fieldName, selectedValue } = valueObj;
@@ -397,8 +428,11 @@ export default function ScheduledRide({
                               </div>
                               <div className="w-full md:w-1/2 mx-0 md:mx-1">
                                 <MapModal
-                                  onSubmitDestination={handleMapSubmit}
-                                  dammamZoneCoords={map}
+                                   rideName="scheduledRide"
+                                   rideType={formValues.rideType}
+                                   onSubmitDestination={handleMapSubmit}
+                                   zoneCoords={map}
+                                   cityName={values.arrivalCity}
                                 />
                               </div>
                             </div>
