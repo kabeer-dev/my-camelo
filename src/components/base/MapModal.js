@@ -88,7 +88,7 @@ export default function MapModal({ rideName, rideType, onSubmitDestination, zone
     setError("");
     dispatch(setLoading(true))
     if (rideName === "airportRide") {
-      if (rideType === 'pickup' && selectedPickup !== null) {
+      if (rideType === 'pickup' && selectedPickup === null) {
         const apiKey = "AIzaSyBMTLXpuXtkEfbgChZzsj7LPYlpGxHI9iU";
         const url = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${point.lat},${point.lng}&key=${apiKey}`;
 
