@@ -157,6 +157,10 @@ export default function PaymentConfirmation() {
     setSubmitting(false);
   };
 
+  // useEffect(() => {
+  //   window.location.reload()
+  // }, [])
+
   return (
     <>
       {isLoggedIn && (

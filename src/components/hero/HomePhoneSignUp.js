@@ -77,7 +77,9 @@ export default function HomePhoneSignUp(
           });
           if (response && response.status === 200) {
             // console.log('jjj', response.data);
-            dispatch(signInSuccess(response.data.token, response.data.owner));
+            const token = response.data.data.token;
+            const username = response.data.data.name;
+            dispatch(signInSuccess(token, username));
             setShowPaymentMethod(true)
           }
         }
@@ -102,7 +104,30 @@ export default function HomePhoneSignUp(
         `${API_BASE_URL}/api/method/airport_transport.api.user.confirm_phone?phone=${phoneNumber}&otp=${phoneOtp}`
       );
       if (response?.status === 200) {
-        setShowPaymentMethod(true)
+        const data = {
+          email: email,
+          phone: phoneNumber,
+        }
+        try {
+          const response = await axios.post('https://test-erp.amk.sa/api/method/airport_transport.api.user.register', data, {
+            headers: {
+              'Content-Type': 'application/x-www-form-urlencoded',
+              recaptchaToken: recaptchaToken,
+            },
+          });
+          if (response && response.status === 200) {
+            // console.log('jjj', response.data);
+            const token = response.data.data.token;
+            const username = response.data.data.name;
+            dispatch(signInSuccess(token, username));
+            setShowPaymentMethod(true)
+          }
+        }
+        catch (error) {
+          console.error('Error:', error);
+          recaptchaRef.current.reset();
+          // Handle error
+        };
       }
     } catch (error) {
       message.error(`${error?.response?.data?.msg}`);
@@ -116,11 +141,11 @@ export default function HomePhoneSignUp(
     setError(""); // Clear error message when user types
   };
 
-  useEffect(() => {
-    if (phoneOtp.length === 6) {
-      handleVerify();
-    }
-  }, [phoneOtp, handleVerify]);
+  // useEffect(() => {
+  //   if (phoneOtp.length === 6 && recaptchaToken) {
+  //     handleVerify();
+  //   }
+  // }, [phoneOtp, handleVerify]);
 
   const onlyCountries = ['pk', 'in', 'sa'];
 
@@ -149,15 +174,17 @@ export default function HomePhoneSignUp(
                 }}
 
               />
-              <div>
-                <Recaptcha
-                  recaptchaRef={recaptchaRef}
-                  sitekey="6LfE3FEpAAAAAGkeBjkpPeNSqPNWtLPCma7EHVsr"
-                  onChange={(value) => {
-                    setRecaptchaToken(value);
-                  }}
-                />
-              </div>
+              {!hidePhoneCreateAccountButton && (
+                <div>
+                  <Recaptcha
+                    recaptchaRef={recaptchaRef}
+                    sitekey="6LfE3FEpAAAAAGkeBjkpPeNSqPNWtLPCma7EHVsr"
+                    onChange={(value) => {
+                      setRecaptchaToken(value);
+                    }}
+                  />
+                </div>
+              )}
 
               {!hidePhoneCreateAccountButton && (
                 <div className="text-center mt-6 flex flex-col md:flex-row justify-between items-center">

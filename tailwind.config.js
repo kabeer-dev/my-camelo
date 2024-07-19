@@ -21,7 +21,8 @@ module.exports = {
       bg_btn_back : "#5d5d5d",
       text_warning : "#ff0f0f",
       border_color: "#E1E1E6",
-      border_black: "#000000"
+      border_black: "#000000",
+      bg_light_gray: "#B0B0B0"
     },
   },
   plugins: [],

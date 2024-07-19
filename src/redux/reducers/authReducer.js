@@ -14,10 +14,11 @@ import {
 import secureLocalStorage from "react-secure-storage";
 
 const tokenDetails = secureLocalStorage.getItem("token");
+const usernameDetails = secureLocalStorage.getItem("username");
 const initialState = {
   isLoggedIn: (tokenDetails && true) || false,
   token: tokenDetails || null,
-  username: "",
+  username: usernameDetails || null,
   error: null,
 };
 
@@ -30,7 +31,9 @@ const authReducer = (state = initialState, action) => {
       };
     case SIGN_IN_SUCCESS:
       const { token, username } = action.payload;
+      console.log('token', token)
       secureLocalStorage.setItem("token", token);
+      secureLocalStorage.setItem("username", username);
       return {
         ...state,
         isLoggedIn: true,

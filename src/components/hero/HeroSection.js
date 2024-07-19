@@ -34,6 +34,13 @@ export default function HeroSection() {
     }
   }, [location.state]);
 
+  useEffect(() => {
+    const showPaymentMethod = localStorage.getItem('showPaymentMethod');
+    if(showPaymentMethod){
+      localStorage.removeItem('showPaymentMethod'); // Remove it after reading
+    }
+  }, []);
+
   const handleTabChange = (tabName) => {
     dispatch(setLoading(true))
     if (tabName !== activeTab) {

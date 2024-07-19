@@ -309,7 +309,9 @@ const PaymentMethodForm = () => {
                             <Icon icon="ph:arrow-left" width="25px" height="25px" className="mb-3 cursor-pointer"
                                 onClick={() =>
                                 {
+                                    window.history.back();
                                     localStorage.setItem('hasRefreshed', 'true');
+                                    localStorage.setItem('showPaymentMethod', 'true');
                                     navigate('/', { state: { showPaymentMethod: true } })
                                 }
                                 }

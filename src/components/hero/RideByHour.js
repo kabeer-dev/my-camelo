@@ -14,6 +14,7 @@ import HomeEmailSignUp from "./HomeEmailSignUp";
 import { setLoading } from "../../redux/actions/loaderAction";
 import VehicleTypeModal from "../base/VehicleTypeModal";
 import PaymentMethod from "./PaymentMethod";
+import axios from "axios";
 
 export default function RideByHour({
   subTab, setSubTab,
@@ -71,6 +72,12 @@ export default function RideByHour({
 
   const [vehicleTypeName, setVehicleTypeName] = useState("");
 
+  const [location, setLocation] = useState("")
+  const [destination, setDestination] = useState("");
+  const [price, setPrice] = useState("");
+
+  const API_BASE_URL = process.env.REACT_APP_BASE_URL_AMK_TEST;
+
   useEffect(() => {
     if (vehicleTypeName !== "") {
       // const selectedVehicle = vehicleTypes.data.find(
@@ -117,13 +124,43 @@ export default function RideByHour({
     // vehicleType: Yup.string().required("vehicle Type is required"),
   });
 
-  const onSubmit = (values, { setSubmitting }) => {
+  const onSubmit = async(values, { setSubmitting }) => {
     if (vehicleTypeName !== '') {
       values.vehicleType = vehicleTypeName;
       dispatch(setLoading(true))
       // if (!isLoggedIn) {
-      setSubTab(3)
-      setShowSignUp(true);
+     
+      try {
+        const formattedDate = values.arrivalDate.toLocaleDateString('en-US', {
+          year: 'numeric',
+          month: 'short',
+          day: 'numeric',
+        });
+        const data = {
+          location: location,
+          destination: `${values.arrivalCity}`,
+          vehicle_type: values.vehicleType,
+          rider: values.bookingByHours,
+          arrival_date: formattedDate,
+          arrival_time: values.arrivalTime,
+          shared_discount: 0,
+          language: 'eng'
+        }
+
+        const response = await axios.post(`${API_BASE_URL}/api/method/airport_transport.api.integrations.maps.get_price`, data);
+        if (response && response.status === 200) {
+          // console.log(response.data.data)
+          setPrice(response.data.data.price)
+          dispatch(setLoading(false));
+          setSubTab(4)
+          setShowSignUp(true);
+        }
+      }
+      catch (error) {
+        console.error('Error:', error);
+        dispatch(setLoading(false));
+      };
+
       // } else {
       //   setShowPaymentMethod(true)
       //   // console.log("Submitted values:", values); // Log form values
@@ -176,7 +213,7 @@ export default function RideByHour({
         <div>
           <div className="p-2 md:p-4">
             {showPaymentMethod ? (
-              <PaymentMethod formValues={formValues} />
+              <PaymentMethod formValues={formValues} price={price}/>
 
             ) :
 
@@ -390,12 +427,13 @@ export default function RideByHour({
                                 </div>
                                 <div className="w-full md:w-1/2 mx-0 md:mx-1">
                                   <MapModal
-
                                     rideName="rideByHour"
                                     rideType={formValues.rideType}
                                     onSubmitDestination={handleMapSubmit}
                                     zoneCoords={map}
                                     cityName={values.arrivalCity}
+                                    setLocation={setLocation}
+                                    setDestination={setDestination}
                                   />
 
                                 </div>

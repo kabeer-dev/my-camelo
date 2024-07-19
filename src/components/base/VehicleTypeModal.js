@@ -4,7 +4,7 @@ import Heading from "../base/Heading";
 import { useSelector } from "react-redux";
 import { Input } from "antd";
 
-export default function VehicleTypeModal({vehicleTypeName, setVehicleTypeName}) {
+export default function VehicleTypeModal({ vehicleTypeName, setVehicleTypeName }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [hoveredIndex, setHoveredIndex] = useState(null);
   const [searchText, setSearchText] = useState("");
@@ -115,15 +115,13 @@ export default function VehicleTypeModal({vehicleTypeName, setVehicleTypeName}) 
                             <div>
                               <Heading
                                 title={`${vehicle.name} Car`}
-                                className={`text-lg transition-all duration-300 ${
-                                  isHovered ? "text-text_white" : "text-black"
-                                }`}
+                                className={`text-lg transition-all duration-300 ${isHovered ? "text-text_white" : "text-black"
+                                  }`}
                               />
                             </div>
                             <div
-                              className={`text-gray-200 text-sm ${
-                                isHovered ? "text-text_white" : "text-black"
-                              }`}
+                              className={`text-gray-200 text-sm ${isHovered ? "text-text_white" : "text-black"
+                                }`}
                             >
                               {vehicle.short_name}
                             </div>
@@ -138,11 +136,10 @@ export default function VehicleTypeModal({vehicleTypeName, setVehicleTypeName}) 
 
                             <div className="mt-3 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
                               <div
-                                className={`p-2 flex flex-col justify-center items-center rounded-md text-gray-200 text-center text-sm ${
-                                  isHovered
-                                    ? "bg-text_white text-background_steel_blue"
-                                    : "bg-background_steel_blue text-text_white"
-                                }`}
+                                className={`p-2 flex flex-col justify-center items-center rounded-md text-gray-200 text-center text-sm ${isHovered
+                                  ? "bg-text_white text-background_steel_blue"
+                                  : "bg-background_steel_blue text-text_white"
+                                  }`}
                               >
                                 Available Seats
                                 <div className="flex flex-row justify-center items-center">
@@ -151,19 +148,17 @@ export default function VehicleTypeModal({vehicleTypeName, setVehicleTypeName}) 
                                       icon="mdi:user"
                                       width="1.2em"
                                       height="1.2em"
-                                      className={`${
-                                        isHovered
-                                          ? "bg-text_white text-background_steel_blue"
-                                          : "bg-background_steel_blue text-text_white"
-                                      }`}
+                                      className={`${isHovered
+                                        ? "bg-text_white text-background_steel_blue"
+                                        : "bg-background_steel_blue text-text_white"
+                                        }`}
                                     />
                                   </div>
                                   <div
-                                    className={`mr-2 ${
-                                      isHovered
-                                        ? "bg-text_white text-background_steel_blue"
-                                        : "bg-background_steel_blue text-text_white"
-                                    }`}
+                                    className={`mr-2 ${isHovered
+                                      ? "bg-text_white text-background_steel_blue"
+                                      : "bg-background_steel_blue text-text_white"
+                                      }`}
                                   >
                                     {vehicle.seats}
                                   </div>
@@ -171,11 +166,11 @@ export default function VehicleTypeModal({vehicleTypeName, setVehicleTypeName}) 
                               </div>
 
                               <div
-                                className={`p-2 flex flex-col justify-center items-center rounded-md text-gray-200 text-center text-sm ${
-                                  isHovered
+                                className={`p-2 flex flex-col justify-center items-center rounded-md text-gray-200 text-center text-sm 
+                                  ${isHovered
                                     ? "bg-text_white text-background_steel_blue"
                                     : "bg-background_steel_blue text-text_white"
-                                }`}
+                                  }`}
                               >
                                 Luggage
                                 <div className="flex flex-row justify-center items-center">
@@ -184,19 +179,17 @@ export default function VehicleTypeModal({vehicleTypeName, setVehicleTypeName}) 
                                       icon="iconamoon:shopping-bag-thin"
                                       width="1.2em"
                                       height="1.2em"
-                                      className={`${
-                                        isHovered
-                                          ? "bg-text_white text-background_steel_blue"
-                                          : "bg-background_steel_blue text-text_white"
-                                      }`}
+                                      className={`${isHovered
+                                        ? "bg-text_white text-background_steel_blue"
+                                        : "bg-background_steel_blue text-text_white"
+                                        }`}
                                     />
                                   </div>
                                   <div
-                                    className={`mr-2 ${
-                                      isHovered
-                                        ? "bg-text_white text-background_steel_blue"
-                                        : "bg-background_steel_blue text-text_white"
-                                    }`}
+                                    className={`mr-2 ${isHovered
+                                      ? "bg-text_white text-background_steel_blue"
+                                      : "bg-background_steel_blue text-text_white"
+                                      }`}
                                   >
                                     {vehicle.luggage}
                                   </div>
@@ -204,11 +197,13 @@ export default function VehicleTypeModal({vehicleTypeName, setVehicleTypeName}) 
                               </div>
 
                               <div
-                                className={`p-2 flex flex-col justify-center items-center rounded-md text-gray-200 text-center text-sm ${
-                                  isHovered
-                                    ? "bg-text_white text-background_steel_blue"
-                                    : "bg-background_steel_blue text-text_white"
-                                }`}
+                                className={`p-2 flex flex-col justify-center items-center rounded-md text-gray-200 text-center text-sm 
+                                   ${vehicle.driver ? (
+                                    isHovered
+                                      ? "bg-text_white text-background_steel_blue"
+                                      : "bg-background_steel_blue text-text_white"
+                                  ) : "bg-bg_light_gray text-text_white"
+                                  }`}
                               >
                                 {vehicle.driver ? "Driver" : "No-Driver"}
                                 <div className="flex flex-row justify-center items-center">
@@ -217,19 +212,19 @@ export default function VehicleTypeModal({vehicleTypeName, setVehicleTypeName}) 
                                       icon="healthicons:truck-driver"
                                       width="1.2em"
                                       height="1.2em"
-                                      className={`${
+                                      className={`${vehicle.driver ? (
                                         isHovered
                                           ? "bg-text_white text-background_steel_blue"
                                           : "bg-background_steel_blue text-text_white"
-                                      }`}
+                                      ) : "bg-bg_light_gray text-text_white"
+                                        }`}
                                     />
                                   </div>
                                   <div
-                                    className={`mr-2 ${
-                                      isHovered
-                                        ? "bg-text_white text-background_steel_blue"
-                                        : "bg-background_steel_blue text-text_white"
-                                    }`}
+                                    className={`mr-2 ${isHovered
+                                      ? "bg-text_white text-background_steel_blue"
+                                      : "bg-background_steel_blue text-text_white"
+                                      }`}
                                   >
                                     {vehicle.driver}
                                   </div>
@@ -237,11 +232,13 @@ export default function VehicleTypeModal({vehicleTypeName, setVehicleTypeName}) 
                               </div>
 
                               <div
-                                className={`p-2 flex flex-col justify-center items-center rounded-md text-gray-200 text-center text-sm ${
-                                  isHovered
-                                    ? "bg-text_white text-background_steel_blue"
-                                    : "bg-background_steel_blue text-text_white"
-                                }`}
+                                className={`p-2 flex flex-col justify-center items-center rounded-md text-gray-200 text-center text-sm 
+                                   ${vehicle.wifi ? (
+                                    isHovered
+                                      ? "bg-text_white text-background_steel_blue"
+                                      : "bg-background_steel_blue text-text_white"
+                                  ) : "bg-bg_light_gray text-text_white"
+                                  }`}
                               >
                                 {vehicle.wifi ? "Wifi" : "No-Wifi"}
                                 <div className="flex flex-row justify-center items-center">
@@ -254,19 +251,19 @@ export default function VehicleTypeModal({vehicleTypeName, setVehicleTypeName}) 
                                       }
                                       width="1.2em"
                                       height="1.2em"
-                                      className={`${
+                                      className={`${vehicle.wifi ? (
                                         isHovered
                                           ? "bg-text_white text-background_steel_blue"
                                           : "bg-background_steel_blue text-text_white"
-                                      }`}
+                                      ) : "bg-bg_light_gray text-text_white"
+                                        }`}
                                     />
                                   </div>
                                   <div
-                                    className={`mr-2 ${
-                                      isHovered
-                                        ? "bg-text_white text-background_steel_blue"
-                                        : "bg-background_steel_blue text-text_white"
-                                    }`}
+                                    className={`mr-2 ${isHovered
+                                      ? "bg-text_white text-background_steel_blue"
+                                      : "bg-background_steel_blue text-text_white"
+                                      }`}
                                   >
                                     {vehicle.wifi}
                                   </div>
@@ -274,11 +271,13 @@ export default function VehicleTypeModal({vehicleTypeName, setVehicleTypeName}) 
                               </div>
 
                               <div
-                                className={`p-2 flex flex-col justify-center items-center rounded-md text-gray-200 text-center text-sm ${
-                                  isHovered
-                                    ? "bg-text_white text-background_steel_blue"
-                                    : "bg-background_steel_blue text-text_white"
-                                }`}
+                                className={`p-2 flex flex-col justify-center items-center rounded-md text-gray-200 text-center text-sm 
+                                  ${vehicle.tracking_system ? (
+                                    isHovered
+                                      ? "bg-text_white text-background_steel_blue"
+                                      : "bg-background_steel_blue text-text_white"
+                                  ) : "bg-bg_light_gray text-text_white"
+                                  }`}
                               >
                                 {vehicle.tracking_system
                                   ? "Vehicle tracking system"
@@ -289,19 +288,20 @@ export default function VehicleTypeModal({vehicleTypeName, setVehicleTypeName}) 
                                       icon="streamline:navigation-arrow-on"
                                       width="1.2em"
                                       height="1.2em"
-                                      className={`${
-                                        isHovered
-                                          ? "bg-text_white text-background_steel_blue"
-                                          : "bg-background_steel_blue text-text_white"
-                                      }`}
+                                      className={`
+                                        ${vehicle.tracking_system ? (
+                                          isHovered
+                                            ? "bg-text_white text-background_steel_blue"
+                                            : "bg-background_steel_blue text-text_white"
+                                        ) : "bg-bg_light_gray text-text_white"
+                                        }`}
                                     />
                                   </div>
                                   <div
-                                    className={`mr-2 ${
-                                      isHovered
-                                        ? "bg-text_white text-background_steel_blue"
-                                        : "bg-background_steel_blue text-text_white"
-                                    }`}
+                                    className={`mr-2 ${isHovered
+                                      ? "bg-text_white text-background_steel_blue"
+                                      : "bg-background_steel_blue text-text_white"
+                                      }`}
                                   >
                                     {vehicle.tracking_system}
                                   </div>
@@ -309,11 +309,13 @@ export default function VehicleTypeModal({vehicleTypeName, setVehicleTypeName}) 
                               </div>
 
                               <div
-                                className={`p-2 flex flex-col justify-center items-center rounded-md text-gray-200 text-center text-sm ${
-                                  isHovered
-                                    ? "bg-text_white text-background_steel_blue"
-                                    : "bg-background_steel_blue text-text_white"
-                                }`}
+                                className={`p-2 flex flex-col justify-center items-center rounded-md text-gray-200 text-center text-sm 
+                                   ${vehicle.security_camera ?
+                                    (isHovered
+                                      ? "bg-text_white text-background_steel_blue"
+                                      : "bg-background_steel_blue text-text_white"
+                                    ) : "bg-bg_light_gray text-text_white"}
+                                `}
                               >
                                 {vehicle.security_camera
                                   ? "Security cameras"
@@ -324,19 +326,20 @@ export default function VehicleTypeModal({vehicleTypeName, setVehicleTypeName}) 
                                       icon="ph:security-camera-thin"
                                       width="1.2em"
                                       height="1.2em"
-                                      className={`${
-                                        isHovered
-                                          ? "bg-text_white text-background_steel_blue"
-                                          : "bg-background_steel_blue text-text_white"
-                                      }`}
+                                      className={`
+                                        ${vehicle.security_camera ? (
+                                          isHovered
+                                            ? "bg-text_white text-background_steel_blue"
+                                            : "bg-background_steel_blue text-text_white"
+                                        ) : "bg-bg_light_gray text-text_white"
+                                        }`}
                                     />
                                   </div>
                                   <div
-                                    className={`mr-2 ${
-                                      isHovered
-                                        ? "bg-text_white text-background_steel_blue"
-                                        : "bg-background_steel_blue text-text_white"
-                                    }`}
+                                    className={`mr-2 ${isHovered
+                                      ? "bg-text_white text-background_steel_blue"
+                                      : "bg-background_steel_blue text-text_white"
+                                      }`}
                                   >
                                     {vehicle.security_camera}
                                   </div>

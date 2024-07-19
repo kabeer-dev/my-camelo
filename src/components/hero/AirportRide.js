@@ -50,10 +50,14 @@ export default function AirportRide(
 
   const zoneMap = useSelector((state) => state?.zone?.zone);
   const [map, setMap] = useState(null);
-  
+
   useEffect(() => {
     setMap(zoneMap && zoneMap.length > 0 ? zoneMap[0].map : null)
-  }, [zoneMap])
+  }, [zoneMap]);
+
+  const [location, setLocation] = useState("")
+  const [destination, setDestination] = useState("");
+  const [price, setPrice] = useState("");
 
   // const [subTab, setSubTab] = useState(1);
   const [cityName, setCityName] = useState();
@@ -90,12 +94,12 @@ export default function AirportRide(
   useEffect(() => {
     const getSharedRideValue = async () => {
       dispatch(setLoading(true))
-      if(formValues.vehicleType !== ""){
+      if (formValues.vehicleType !== "") {
         try {
           const response = await axios.get(
             `${API_BASE_URL}/api/method/airport_transport.api.bookings.get_ride_discount?vehicle_type=${formValues.vehicleType}&language=${'en'}`
           );
-          if(response && response.status === 200){
+          if (response && response.status === 200) {
             setSharedRideValue(response.data.data)
             dispatch(setLoading(false))
           }
@@ -209,8 +213,8 @@ export default function AirportRide(
 
         <div className="p-2 md:p-4">
           {showPaymentMethod ? (
-            <PaymentMethod formValues={formValues}/>
-            
+            <PaymentMethod formValues={formValues} price={price}/>
+
           ) : showSignUp ? (
             <HomeEmailSignUp
               formValues={formValues}
@@ -241,11 +245,40 @@ export default function AirportRide(
               initialValues={formValues}
               validationSchema={validationSchema}
               enableReinitialize={true}
-              onSubmit={(values, { setSubmitting }) => {
+              onSubmit={async (values, { setSubmitting }) => {
                 // if (!isLoggedIn) {
-    
-                setSubTab(4)
-                setShowSignUp(true);
+                dispatch(setLoading(true));
+                try {
+                  const formattedDate = values.arrivalDate.toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric',
+                  });
+                  const data = {
+                    location: formValues.rideType === 'pickup' ? location : `${values.airportName}, ${values.terminalNumber}`,
+                    destination: formValues.rideType === 'dropoff' ? destination : `${values.airportName}, ${values.terminalNumber}`,
+                    vehicle_type: values.vehicleType,
+                    rider: values.seatNumber,
+                    arrival_date: formattedDate,
+                    arrival_time: values.arrivalTime,
+                    shared_discount: sharedRideValue,
+                    language: 'eng'
+                  }
+
+                  const response = await axios.post(`${API_BASE_URL}/api/method/airport_transport.api.integrations.maps.get_price`, data);
+                  if (response && response.status === 200) {
+                    // console.log(response.data.data)
+                    setPrice(response.data.data.price)
+                    dispatch(setLoading(false));
+                    setSubTab(4)
+                    setShowSignUp(true);
+                  }
+                }
+                catch (error) {
+                  console.error('Error:', error);
+                  dispatch(setLoading(false));
+                };
+
                 // } else {
                 //   // const submitValues = {
                 //   //   ...values,
@@ -502,6 +535,8 @@ export default function AirportRide(
                               onSubmitDestination={handleMapSubmit}
                               zoneCoords={map}
                               cityName={values.arrivalCity}
+                              setLocation={setLocation}
+                              setDestination={setDestination}
                             />
                           </div>
                         </div>

@@ -11,16 +11,67 @@ import { Formik, Form } from "formik";
 import * as Yup from "yup";
 import InputFieldFormik from "../base/InputFieldFormik";
 import axios from "axios";
+import { setLoading } from "../../redux/actions/loaderAction";
 
 export default function MyProfile() {
   const API_BASE_URL = process.env.REACT_APP_BASE_URL_AMK_TEST;
   const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
+  const token = useSelector((state) => state.auth.token);
   const username = useSelector((state) => state.auth.username);
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [activeSection, setActiveSection] = useState("home");
+  const [userDetails, setUserDetails] = useState(null);
+  const [formValues, setFormValues] = useState({
+    firstName: userDetails ? userDetails.name : "",
+    lastName: "",
+    day: "",
+    month: "",
+    year: "",
+    nationality: "",
+    phoneNumber: "",
+    city: "",
+    state: "",
+    streetAddress: "",
+    password: "",
+    confirmPassword: "",
 
+  });
+  console.log('ttt', token)
+
+  useEffect(() => {
+    dispatch(setLoading(true));
+    const getUserDetails = async () => {
+      try {
+        const response = await axios.get('https://test-erp.amk.sa/api/method/airport_transport.api.user.get_user_info', {
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'Authorization': `Bearer ${token}`
+          },
+        });
+        if (response && response.status === 200) {
+          setUserDetails(response.data.data);
+          const data = response.data.data;
+          setFormValues(prevformValues => ({
+            ...prevformValues,
+            firstName: data.name,
+            nationality: data.country,
+            city: data.city,
+            state: data.state,
+            streetAddress: data.street
+
+          }))
+          dispatch(setLoading(false));
+        }
+      }
+      catch (error) {
+        console.error('Error:', error);
+        dispatch(setLoading(false));
+      };
+    }
+    getUserDetails();
+  }, [token])
   // Function to toggle menu
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
@@ -47,8 +98,8 @@ export default function MyProfile() {
   ];
 
   useEffect(() => {
-    Events.scrollEvent.register("begin", function (to, element) {});
-    Events.scrollEvent.register("end", function (to, element) {});
+    Events.scrollEvent.register("begin", function (to, element) { });
+    Events.scrollEvent.register("end", function (to, element) { });
 
     scrollSpy.update();
 
@@ -144,21 +195,24 @@ export default function MyProfile() {
       });
   }, [API_BASE_URL]);
 
-  const onSubmit = (values, { setSubmitting }) => {
-    console.log(values); // For testing purpose
-    // You can replace the below code with your signup request
-    // axios
-    //   .post(`${API_BASE_URL}/api/signup`, values)
-    //   .then((response) => {
-    //     message.success("Signed up successfully");
-    //     navigate("/sign-in");
-    //   })
-    //   .catch((error) => {
-    //     message.error(error?.response?.data?.msg || "Error signing up");
-    //   })
-    //   .finally(() => {
-    //     setSubmitting(false);
-    //   });
+  const onSubmit = async (values, { setSubmitting }) => {
+    console.log('aaa', values); // For testing purpose
+    dispatch(setLoading(true));
+    try {
+      const response = await axios.post('https://test-erp.amk.sa/api/method/airport_transport.api.user.update_user_info', values, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        },
+      });
+      if (response && response.status === 200) {
+        message.success(response.data.msg);
+        dispatch(setLoading(false));
+      }
+    }
+    catch (error) {
+      console.error('Error:', error);
+      dispatch(setLoading(false));
+    };
     setSubmitting(false);
   };
 
@@ -275,9 +329,8 @@ export default function MyProfile() {
             </div>
             <div
               id="mega-menu-full"
-              className={`${
-                isMenuOpen ? "block" : "hidden"
-              } justify-between items-center w-full text-md md:flex md:w-auto md:order-1`}
+              className={`${isMenuOpen ? "block" : "hidden"
+                } justify-between items-center w-full text-md md:flex md:w-auto md:order-1`}
             >
               <ul className="flex flex-col mt-4 font-medium md:flex-row md:space-x-8 md:mt-0 text-text_white text-md">
                 {menuItems.map((item) => (
@@ -289,9 +342,8 @@ export default function MyProfile() {
                       smooth={true}
                       duration={500}
                       onSetActive={handleSetActive}
-                      className={`block py-2 pr-4 pl-3 text-white rounded md:bg-transparent md:text-primary-700 md:p-0 dark:text-white cursor-pointer ${
-                        activeSection === item.id ? "active" : ""
-                      }`}
+                      className={`block py-2 pr-4 pl-3 text-white rounded md:bg-transparent md:text-primary-700 md:p-0 dark:text-white cursor-pointer ${activeSection === item.id ? "active" : ""
+                        }`}
                     >
                       {item.text}
                     </Link>
@@ -303,157 +355,254 @@ export default function MyProfile() {
         </nav>
       </header>
 
-      <main className="mt-20">
-        {/* Form Section */}
-        <div className="container mx-auto p-4">
-          <Formik
-            initialValues={{
-              firstName: "",
-              lastName: "",
-              day: "",
-              month: "",
-              year: "",
-              nationality: "",
-              phoneNumber: "",
-              city: "",
-              state: "",
-              streetAddress: "",
-              password: "",
-              confirmPassword: "",
-            }}
-            validationSchema={validationSchema}
-            onSubmit={onSubmit}
-          >
-            {({ isSubmitting, setFieldValue }) => (
-              <Form className="space-y-3">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                  <div>
-                    <InputFieldFormik
-                      label="First Name"
-                      name="firstName"
-                      type="text"
-                      placeholder="Enter your first name"
-                    />
+      {userDetails && (
+        <main className="mt-20">
+          {/* Form Section */}
+          <div className="container mx-auto p-4">
+            <Formik
+              initialValues={{
+                firstName: formValues.firstName,
+                lastName: formValues.lastName,
+                day: formValues.day,
+                month: formValues.month,
+                year: formValues.year,
+                nationality: formValues.nationality,
+                phoneNumber: formValues.phoneNumber,
+                city: formValues.city,
+                state: formValues.state,
+                streetAddress: formValues.streetAddress,
+                password: formValues.password,
+                confirmPassword: formValues.confirmPassword,
+              }}
+              validationSchema={validationSchema}
+              onSubmit={onSubmit}
+            >
+              {({ values, isSubmitting, setFieldValue }) => (
+                <Form className="space-y-3">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <div>
+                      <InputFieldFormik
+                        label="First Name"
+                        name="firstName"
+                        type="text"
+                        placeholder="Enter your first name"
+                        value={formValues.firstName}
+                        onChange={(e) => {
+                          values.firstName = e.target.value;
+                          setFormValues(prevformValues => ({
+                            ...prevformValues,
+                            firstName: e.target.value,
+                          }))
+                        }}
+                      />
+                    </div>
+                    <div>
+                      <InputFieldFormik
+                        label="Last Name"
+                        name="lastName"
+                        type="text"
+                        placeholder="Enter your last name"
+                        value={formValues.lastName}
+                        onChange={(e) => {
+                          values.lastName = e.target.value;
+                          setFormValues(prevformValues => ({
+                            ...prevformValues,
+                            lastName: e.target.value,
+                          }))
+                        }}
+                      />
+                    </div>
                   </div>
-                  <div>
-                    <InputFieldFormik
-                      label="Last Name"
-                      name="lastName"
-                      type="text"
-                      placeholder="Enter your last name"
-                    />
-                  </div>
-                </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                  <div>
-                    <InputFieldFormik
-                      label="Day"
-                      name="day"
-                      type="text"
-                      placeholder="DD"
-                    />
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                    <div>
+                      <InputFieldFormik
+                        label="Day"
+                        name="day"
+                        type="text"
+                        placeholder="DD"
+                        value={formValues.day}
+                        onChange={(e) => {
+                          values.day = e.target.value;
+                          setFormValues(prevformValues => ({
+                            ...prevformValues,
+                            day: e.target.value,
+                          }))
+                        }}
+                      />
+                    </div>
+                    <div>
+                      <InputFieldFormik
+                        label="Month"
+                        name="month"
+                        type="text"
+                        placeholder="MM"
+                        value={formValues.month}
+                        onChange={(e) => {
+                          values.month = e.target.value;
+                          setFormValues(prevformValues => ({
+                            ...prevformValues,
+                            month: e.target.value,
+                          }))
+                        }}
+                      />
+                    </div>
+                    <div>
+                      <InputFieldFormik
+                        label="Year"
+                        name="year"
+                        type="text"
+                        placeholder="YYYY"
+                        value={formValues.year}
+                        onChange={(e) => {
+                          values.year = e.target.value;
+                          setFormValues(prevformValues => ({
+                            ...prevformValues,
+                            year: e.target.value,
+                          }))
+                        }}
+                      />
+                    </div>
                   </div>
-                  <div>
-                    <InputFieldFormik
-                      label="Month"
-                      name="month"
-                      type="text"
-                      placeholder="MM"
-                    />
-                  </div>
-                  <div>
-                    <InputFieldFormik
-                      label="Year"
-                      name="year"
-                      type="text"
-                      placeholder="YYYY"
-                    />
-                  </div>
-                </div>
 
-                <div className="grid grid-cols-1 gap-3">
-                  <div>
+                  <div className="grid grid-cols-1 gap-3">
+                    <div>
+                      <InputFieldFormik
+                        label="Nationality"
+                        name="nationality"
+                        type="select"
+                        options={countriesOptions}
+                        value={formValues.nationality}
+                        onChange={(valueObj) => {
+                          const { fieldName, selectedValue } = valueObj;
+                          setFieldValue(fieldName, selectedValue);
+                          setFormValues(prevformValues => ({
+                            ...prevformValues,
+                            nationality: selectedValue,
+                          }))
+
+                        }}
+                        required
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 gap-3">
                     <InputFieldFormik
-                      label="Nationality"
-                      name="nationality"
-                      type="select"
-                      options={countriesOptions}
-                      onChange={(valueObj) => {
-                        const { fieldName, selectedValue } = valueObj;
-                        setFieldValue(fieldName, selectedValue);
+                      label="Phone Number"
+                      name="phoneNumber"
+                      type="text"
+                      placeholder="Enter your phone number"
+                      value={formValues.phoneNumber}
+                      onChange={(e) => {
+                        values.phoneNumber = e.target.value;
+                        setFormValues(prevformValues => ({
+                          ...prevformValues,
+                          phoneNumber: e.target.value,
+                        }))
                       }}
-                      required
                     />
                   </div>
-                </div>
 
-                <div className="grid grid-cols-1 gap-3">
-                  <InputFieldFormik
-                    label="Phone Number"
-                    name="phoneNumber"
-                    type="text"
-                    placeholder="Enter your phone number"
-                  />
-                </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <div>
+                      <InputFieldFormik
+                        label="City"
+                        name="city"
+                        type="text"
+                        placeholder="Enter your city"
+                        value={formValues.city}
+                        onChange={(e) => {
+                          values.city = e.target.value;
+                          setFormValues(prevformValues => ({
+                            ...prevformValues,
+                            city: e.target.value,
+                          }))
+                        }}
+                      />
+                    </div>
+                    <div>
+                      <InputFieldFormik
+                        label="State"
+                        name="state"
+                        type="text"
+                        placeholder="Enter your state"
+                        value={formValues.state}
+                        onChange={(e) => {
+                          values.state = e.target.value;
+                          setFormValues(prevformValues => ({
+                            ...prevformValues,
+                            state: e.target.value,
+                          }))
+                        }}
+                      />
+                    </div>
+                  </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                  <div>
+                  <div className="grid grid-cols-1 gap-3">
                     <InputFieldFormik
-                      label="City"
-                      name="city"
+                      label="Street Address"
+                      name="streetAddress"
                       type="text"
-                      placeholder="Enter your city"
+                      placeholder="Enter your street address"
+                      value={formValues.streetAddress}
+                      onChange={(e) => {
+                        values.streetAddress = e.target.value;
+                        setFormValues(prevformValues => ({
+                          ...prevformValues,
+                          streetAddress: e.target.value,
+                        }))
+                      }}
                     />
                   </div>
-                  <div>
+
+                  <div className="grid grid-cols-1 gap-3">
                     <InputFieldFormik
-                      label="State"
-                      name="state"
-                      type="text"
-                      placeholder="Enter your state"
+                      label="Password"
+                      name="password"
+                      type="password"
+                      placeholder="Enter your password"
+                      value={formValues.password}
+                      onChange={(e) => {
+                        values.password = e.target.value;
+                        setFormValues(prevformValues => ({
+                          ...prevformValues,
+                          password: e.target.value,
+                        }))
+                      }}
                     />
                   </div>
-                </div>
 
-                <div className="grid grid-cols-1 gap-3">
-                  <InputFieldFormik
-                    label="Street Address"
-                    name="streetAddress"
-                    type="text"
-                    placeholder="Enter your street address"
+                  <div className="grid grid-cols-1 gap-3">
+                    <InputFieldFormik
+                      label="Confirm Password"
+                      name="confirmPassword"
+                      type="password"
+                      placeholder="Confirm your password"
+                      value={formValues.confirmPassword}
+                      onChange={(e) => {
+                        values.confirmPassword = e.target.value;
+                        setFormValues(prevformValues => ({
+                          ...prevformValues,
+                          confirmPassword: e.target.value,
+                        }))
+                      }}
+                    />
+                  </div>
+
+                  <Button
+                    type="submit"
+                    label="Save Changes"
+                    className="bg-background_steel_blue w-full text-text_white hover:bg-gray-100 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2"
+                    disabled={isSubmitting}
                   />
-                </div>
+                </Form>
+              )}
+            </Formik>
+          </div>
+        </main>
+      )}
 
-                <div className="grid grid-cols-1 gap-3">
-                  <InputFieldFormik
-                    label="Password"
-                    name="password"
-                    type="password"
-                    placeholder="Enter your password"
-                  />
-                </div>
-
-                <div className="grid grid-cols-1 gap-3">
-                  <InputFieldFormik
-                    label="Confirm Password"
-                    name="confirmPassword"
-                    type="password"
-                    placeholder="Confirm your password"
-                  />
-                </div>
-
-                <Button
-                  type="submit"
-                  label="Save Changes"
-                  className="bg-background_steel_blue w-full text-text_white hover:bg-gray-100 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2"
-                  disabled={isSubmitting}
-                />
-              </Form>
-            )}
-          </Formik>
-        </div>
-      </main>
 
       {/* footer code is here */}
       <footer className="mt-10 w-full py-3 md:py-6 px-10 md:px-20 flex flex-col items-center justify-center bg-background_steel_blue text-text_white">

@@ -44,7 +44,7 @@ export default function ScheduledRide({
   const { vehicleTypes } = useSelector((state) => state.vehicleTypes);
   const zoneMap = useSelector((state) => state?.zone?.zone);
   const [map, setMap] = useState(null);
-  
+
   useEffect(() => {
     setMap(zoneMap && zoneMap.length > 0 ? zoneMap[0].map : null)
   }, [zoneMap])
@@ -74,6 +74,10 @@ export default function ScheduledRide({
   });
 
   const [vehicleTypeName, setVehicleTypeName] = useState("");
+
+  const [location, setLocation] = useState("")
+  const [destination, setDestination] = useState("");
+  const [price, setPrice] = useState("");
 
   useEffect(() => {
     if (vehicleTypeName !== "") {
@@ -109,12 +113,12 @@ export default function ScheduledRide({
   useEffect(() => {
     const getSharedRideValue = async () => {
       dispatch(setLoading(true))
-      if(formValues.vehicleType !== ""){
+      if (formValues.vehicleType !== "") {
         try {
           const response = await axios.get(
             `${API_BASE_URL}/api/method/airport_transport.api.bookings.get_ride_discount?vehicle_type=${formValues.vehicleType}&language=${'en'}`
           );
-          if(response && response.status === 200){
+          if (response && response.status === 200) {
             setSharedRideValue(response.data.data)
             dispatch(setLoading(false))
           }
@@ -146,11 +150,41 @@ export default function ScheduledRide({
     sharedRide: Yup.bool(),
   });
 
-  const onSubmit = (values, { setSubmitting }) => {
+  const onSubmit = async (values, { setSubmitting }) => {
     dispatch(setLoading(true))
+    console.log('gg', values)
     // if (!isLoggedIn) {
-    setSubTab(4)
-    setShowSignUp(true);
+    try {
+      const formattedDate = values.arrivalDate.toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+      });
+      const data = {
+        location: location,
+        destination: destination,
+        vehicle_type: values.vehicleType,
+        rider: values.seatNumber,
+        arrival_date: formattedDate,
+        arrival_time: values.arrivalTime,
+        shared_discount: sharedRideValue,
+        language: 'eng'
+      }
+
+      const response = await axios.post(`${API_BASE_URL}/api/method/airport_transport.api.integrations.maps.get_price`, data);
+      if (response && response.status === 200) {
+        // console.log(response.data.data)
+        setPrice(response.data.data.price)
+        dispatch(setLoading(false));
+        setSubTab(4)
+        setShowSignUp(true);
+      }
+    }
+    catch (error) {
+      console.error('Error:', error);
+      dispatch(setLoading(false));
+    };
+
     // } else {
     //   setShowPaymentMethod(true)
     //   // console.log("Submitted values:", values); // Log form values
@@ -170,7 +204,7 @@ export default function ScheduledRide({
     setSelectedPickup(pickup);
     setSelectedDropoff(dropoff);
   };
-  
+
 
   return (
     <>
@@ -188,7 +222,7 @@ export default function ScheduledRide({
         <div>
           <div className="p-2 md:p-4">
             {showPaymentMethod ? (
-              <PaymentMethod formValues={formValues} />
+              <PaymentMethod formValues={formValues} price={price}/>
 
             ) :
               showSignUp ? (
@@ -428,11 +462,13 @@ export default function ScheduledRide({
                               </div>
                               <div className="w-full md:w-1/2 mx-0 md:mx-1">
                                 <MapModal
-                                   rideName="scheduledRide"
-                                   rideType={formValues.rideType}
-                                   onSubmitDestination={handleMapSubmit}
-                                   zoneCoords={map}
-                                   cityName={values.arrivalCity}
+                                  rideName="scheduledRide"
+                                  rideType={formValues.rideType}
+                                  onSubmitDestination={handleMapSubmit}
+                                  zoneCoords={map}
+                                  cityName={values.arrivalCity}
+                                  setLocation={setLocation}
+                                  setDestination={setDestination}
                                 />
                               </div>
                             </div>

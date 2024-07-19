@@ -5,18 +5,18 @@ import { useNavigate } from "react-router-dom"; // Import useNavigate
 import axios from 'axios';
 import { setLoading } from "../../redux/actions/loaderAction";
 
-export default function PaymentMethod({ formValues }) {
+export default function PaymentMethod({ formValues, price}) {
   const navigate = useNavigate(); // Initialize useNavigate
   const dispatch = useDispatch();
   const { isLoggedIn } = useSelector((state) => state.auth);
-
-  useEffect(() => {
-    const hasRefreshed = localStorage.getItem('hasRefreshed');
-    if (hasRefreshed) {
-      localStorage.removeItem('hasRefreshed');
-      window.location.reload();
-    }
-  }, []);
+console.log('sss', price)
+  // useEffect(() => {
+  //   const hasRefreshed = localStorage.getItem('hasRefreshed');
+  //   if (hasRefreshed) {
+  //     localStorage.removeItem('hasRefreshed');
+  //     window.location.reload();
+  //   }
+  // }, []);
 
   useEffect(() => {
     if (!isLoggedIn) {
@@ -155,7 +155,7 @@ export default function PaymentMethod({ formValues }) {
     <>
       <div className="flex flex-row justify-center items-center text-3xl pb-8 border-b border-border_color">
         <div className="mx-2">Your Ride Cost</div>
-        <div className="mx-2 font-bold text-background_steel_blue">57 SAR</div>
+        <div className="mx-2 font-bold text-background_steel_blue">{price} SAR</div>
       </div>
 
       {paymentMethods.map((method) => (
