@@ -1,6 +1,8 @@
 import React, { useState, useRef, useEffect } from "react";
 import { GoogleMap, LoadScript, Marker, Polygon, StandaloneSearchBox } from "@react-google-maps/api";
 import axios from "axios";
+import { setLoading } from "../../redux/actions/loaderAction";
+import { useDispatch } from "react-redux";
 
 export default function MapModal({ rideName, rideType, onSubmitDestination, zoneCoords, cityName, setLocation, setDestination }) {
   const containerStyle = {
@@ -22,6 +24,7 @@ export default function MapModal({ rideName, rideType, onSubmitDestination, zone
     }
   }
 
+  const dispatch = useDispatch();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedPickup, setSelectedPickup] = useState(null);
   const [selectedDropoff, setSelectedDropoff] = useState(null);
@@ -83,8 +86,9 @@ export default function MapModal({ rideName, rideType, onSubmitDestination, zone
     const point = { lat: event.latLng.lat(), lng: event.latLng.lng() };
     // if (isPointInPolygon(point, convertedCoords)) {
     setError("");
+    dispatch(setLoading(true))
     if (rideName === "airportRide") {
-      if (rideType === 'pickup') {
+      if (rideType === 'pickup' && selectedPickup !== null) {
         const apiKey = "AIzaSyBMTLXpuXtkEfbgChZzsj7LPYlpGxHI9iU";
         const url = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${point.lat},${point.lng}&key=${apiKey}`;
 
@@ -159,6 +163,7 @@ export default function MapModal({ rideName, rideType, onSubmitDestination, zone
     // } else {
     //   setError("You cannot select a location outside the Dammam zone.");
     // }
+    dispatch(setLoading(false))
   };
 
   function submitDestination() {
