@@ -365,14 +365,13 @@ export default function RideByHour({
                                 <Button
                                   className="bg-background_steel_blue w-full text-text_white hover:bg-gray-100 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2"
                                   onClick={() => {
-                                    dispatch(setLoading(true))
                                     validateForm().then(() => {
                                       if (isStep1Valid) {
                                         setSubTab(2);
                                         setFormValues(values);
                                       }
                                     });
-                                    dispatch(setLoading(false))
+                                    
                                   }}
                                   label="Next"
                                   type="button"
