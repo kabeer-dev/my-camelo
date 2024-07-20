@@ -103,7 +103,6 @@ export default function MapModal({ rideName, formValues, onSubmitDestination, zo
   //   }
   //   return inside;
   // };
-  console.log('dd', selectedPickup, selectedDropoff)
   const onMapClick = async (event) => {
     const point = { lat: event.latLng.lat(), lng: event.latLng.lng() };
     // if (isPointInPolygon(point, convertedCoords)) {
@@ -116,7 +115,7 @@ export default function MapModal({ rideName, formValues, onSubmitDestination, zo
 
         try {
           const response = await axios.get(url);
-          const location = response.data.results[0].formatted_address;
+          const location = response.data.results[0];
           // console.log('Location:', location);
           setLocation(location);
         } catch (error) {
@@ -129,7 +128,7 @@ export default function MapModal({ rideName, formValues, onSubmitDestination, zo
 
         try {
           const response = await axios.get(url);
-          const location = response.data.results[0].formatted_address;
+          const location = response.data.results[0];
           // console.log('Location:', location);
           setDestination(location);
         } catch (error) {
@@ -145,7 +144,7 @@ export default function MapModal({ rideName, formValues, onSubmitDestination, zo
 
         try {
           const response = await axios.get(url);
-          const location = response.data.results[0].formatted_address;
+          const location = response.data.results[0];
           // console.log('Location:', location);
           setLocation(location);
           setSelectedPickup(point);
@@ -175,7 +174,7 @@ export default function MapModal({ rideName, formValues, onSubmitDestination, zo
 
       try {
         const response = await axios.get(url);
-        const location = response.data.results[0].formatted_address;
+        const location = response.data.results[0];
         // console.log('Location:', location);
         setLocation(location);
       } catch (error) {

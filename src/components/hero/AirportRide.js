@@ -256,8 +256,8 @@ export default function AirportRide(
                     day: 'numeric',
                   });
                   const data = {
-                    location: formValues.rideType === 'pickup' ? location : `${values.airportName} ${values.terminalNumber} `,
-                    destination: formValues.rideType === 'dropoff' ? destination : `${values.airportName} ${values.terminalNumber}`,
+                    location: location,
+                    destination: destination,
                     vehicle_type: values.vehicleType,
                     rider: values.seatNumber,
                     arrival_date: formattedDate,
