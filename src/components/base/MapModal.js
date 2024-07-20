@@ -62,8 +62,17 @@ export default function MapModal({ rideName, formValues, onSubmitDestination, zo
         } catch (error) {
           console.error('Error fetching location:', error.message);
         }
-        // if (cityName === "Dammam") {
-          // const point = { lat: 26.3927, lng: 49.9777 };
+        if (cityName === "Dammam") {
+          const Dammampoint = { lat: 26.3927, lng: 49.9777 };
+          if (formValues.rideType === 'pickup') {
+            setLocation(`${formValues.airportName} ${formValues.terminalNumber} ${formValues.arrivalCity}`)
+            setSelectedPickup(Dammampoint);
+          } else if (formValues.rideType === 'dropoff') {
+            setDestination(`${formValues.airportName} ${formValues.terminalNumber} ${formValues.arrivalCity}`)
+            setSelectedDropoff(Dammampoint);
+          }
+        } else {
+          const point = { lng: 46.6753, lat: 24.7136 };
           if (formValues.rideType === 'pickup') {
             setLocation(`${formValues.airportName} ${formValues.terminalNumber} ${formValues.arrivalCity}`)
             setSelectedPickup(point);
@@ -71,14 +80,7 @@ export default function MapModal({ rideName, formValues, onSubmitDestination, zo
             setDestination(`${formValues.airportName} ${formValues.terminalNumber} ${formValues.arrivalCity}`)
             setSelectedDropoff(point);
           }
-        // } else {
-          // const point = { lng: 46.6753, lat: 24.7136 };
-          // if (formValues.rideType === 'pickup') {
-          //   setSelectedPickup(point);
-          // } else if (formValues.rideType === 'dropoff') {
-          //   setSelectedDropoff(point);
-          // }
-        // }
+        }
         dispatch(setLoading(false))
       }
     }
