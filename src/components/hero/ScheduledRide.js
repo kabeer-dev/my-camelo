@@ -171,7 +171,7 @@ export default function ScheduledRide({
         shared_discount: sharedRideValue,
         language: 'eng'
       }
-
+console.log('sss', data)
       const response = await axios.post(`${API_BASE_URL}/api/method/airport_transport.api.integrations.maps.get_price`, data);
       if (response && response.status === 200) {
         // console.log(response.data.data)
