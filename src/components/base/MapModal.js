@@ -65,19 +65,19 @@ export default function MapModal({ rideName, formValues, onSubmitDestination, zo
         if (cityName === "Dammam") {
           const Dammampoint = { lat: 26.3927, lng: 49.9777 };
           if (formValues.rideType === 'pickup') {
-            setLocation(`${formValues.airportName} ${formValues.terminalNumber}`)
+            setLocation(`${formValues.airportName} ${formValues.terminalNumber} ${formValues.arrivalCity} Saudi Arabia`)
             setSelectedPickup(point);
           } else if (formValues.rideType === 'dropoff') {
-            setDestination(`${formValues.airportName} ${formValues.terminalNumber}`)
+            setDestination(`${formValues.airportName} ${formValues.terminalNumber} ${formValues.arrivalCity} Saudi Arabia`)
             setSelectedDropoff(point);
           }
         } else {
           const Riyadhpoint = { lng: 46.6753, lat: 24.7136 };
           if (formValues.rideType === 'pickup') {
-            setLocation(`${formValues.airportName} ${formValues.terminalNumber}`)
+            setLocation(`${formValues.airportName} ${formValues.terminalNumber} ${formValues.arrivalCity} Saudi Arabia`)
             setSelectedPickup(point);
           } else if (formValues.rideType === 'dropoff') {
-            setDestination(`${formValues.airportName} ${formValues.terminalNumber}`)
+            setDestination(`${formValues.airportName} ${formValues.terminalNumber} ${formValues.arrivalCity} Saudi Arabia`)
             setSelectedDropoff(point);
           }
         }
