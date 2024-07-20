@@ -4,7 +4,7 @@ import axios from "axios";
 import { setLoading } from "../../redux/actions/loaderAction";
 import { useDispatch } from "react-redux";
 
-export default function MapModal({ rideName, rideType, onSubmitDestination, zoneCoords, cityName, setLocation, setDestination }) {
+export default function MapModal({ rideName, formValues, onSubmitDestination, zoneCoords, cityName, setLocation, setDestination }) {
   const containerStyle = {
     width: "100%",
     height: "400px",
@@ -45,25 +45,45 @@ export default function MapModal({ rideName, rideType, onSubmitDestination, zone
   }));
 
   useEffect(() => {
-    if (rideName === "airportRide") {
-      if (cityName === "Dammam") {
-        const point = { lat: 26.3927, lng: 49.9777 };
-        if (rideType === 'pickup') {
-          setSelectedPickup(point);
-        } else if (rideType === 'dropoff') {
-          setSelectedDropoff(point);
-        }
-      } else {
-        const point = { lng: 46.6753, lat: 24.7136 };
-        if (rideType === 'pickup') {
-          setSelectedPickup(point);
-        } else if (rideType === 'dropoff') {
-          setSelectedDropoff(point);
-        }
-      }
+    const setPickOrDrop = async () => {
+      dispatch(setLoading(true))
+      if (rideName === "airportRide") {
+        let point;
+        const apiKey = "AIzaSyBMTLXpuXtkEfbgChZzsj7LPYlpGxHI9iU";
+        const encodedAddress = encodeURIComponent(`${formValues.airportName} ${formValues.terminalNumber} ${formValues.arrivalCity}`); // Encode the address
+        const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodedAddress}&key=${apiKey}`;
+        try {
+          const response = await axios.get(url);
+          const location = response.data.results[0].geometry.location;
+          const latitude = location.lat;
+          const longitude = location.lng;
+          point = { lat: latitude, lng: longitude };
 
+        } catch (error) {
+          console.error('Error fetching location:', error.message);
+        }
+        // if (cityName === "Dammam") {
+          // const point = { lat: 26.3927, lng: 49.9777 };
+          if (formValues.rideType === 'pickup') {
+            setLocation(`${formValues.airportName} ${formValues.terminalNumber} ${formValues.arrivalCity}`)
+            setSelectedPickup(point);
+          } else if (formValues.rideType === 'dropoff') {
+            setDestination(`${formValues.airportName} ${formValues.terminalNumber} ${formValues.arrivalCity}`)
+            setSelectedDropoff(point);
+          }
+        // } else {
+          // const point = { lng: 46.6753, lat: 24.7136 };
+          // if (formValues.rideType === 'pickup') {
+          //   setSelectedPickup(point);
+          // } else if (formValues.rideType === 'dropoff') {
+          //   setSelectedDropoff(point);
+          // }
+        // }
+        dispatch(setLoading(false))
+      }
     }
-  }, [rideName, cityName, rideType]);
+    setPickOrDrop()
+  }, [rideName, cityName, formValues.rideType]);
 
   // const isPointInPolygon = (point, polygon) => {
   //   const { lat, lng } = point;
@@ -81,14 +101,14 @@ export default function MapModal({ rideName, rideType, onSubmitDestination, zone
   //   }
   //   return inside;
   // };
-
+  console.log('dd', selectedPickup, selectedDropoff)
   const onMapClick = async (event) => {
     const point = { lat: event.latLng.lat(), lng: event.latLng.lng() };
     // if (isPointInPolygon(point, convertedCoords)) {
     setError("");
     dispatch(setLoading(true))
     if (rideName === "airportRide") {
-      if (rideType === 'pickup' && selectedPickup === null) {
+      if (formValues.rideType === 'dropoff' && selectedPickup === null) {
         const apiKey = "AIzaSyBMTLXpuXtkEfbgChZzsj7LPYlpGxHI9iU";
         const url = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${point.lat},${point.lng}&key=${apiKey}`;
 

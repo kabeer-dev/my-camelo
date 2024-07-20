@@ -255,8 +255,8 @@ export default function AirportRide(
                     day: 'numeric',
                   });
                   const data = {
-                    location: formValues.rideType === 'pickup' ? location : `${values.airportName}, ${values.terminalNumber}`,
-                    destination: formValues.rideType === 'dropoff' ? destination : `${values.airportName}, ${values.terminalNumber}`,
+                    location: formValues.rideType === 'pickup' ? location : `${values.airportName} ${values.terminalNumber} ${values.arrivalCity}`,
+                    destination: formValues.rideType === 'dropoff' ? destination : `${values.airportName} ${values.terminalNumber} ${values.arrivalCity}`,
                     vehicle_type: values.vehicleType,
                     rider: values.seatNumber,
                     arrival_date: formattedDate,
@@ -264,7 +264,7 @@ export default function AirportRide(
                     shared_discount: sharedRideValue,
                     language: 'eng'
                   }
-
+console.log('www', data)
                   const response = await axios.post(`${API_BASE_URL}/api/method/airport_transport.api.integrations.maps.get_price`, data);
                   if (response && response.status === 200) {
                     // console.log(response.data.data)
@@ -531,7 +531,7 @@ export default function AirportRide(
                           <div className="w-full md:w-1/2">
                             <MapModal
                               rideName="airportRide"
-                              rideType={formValues.rideType}
+                              formValues={formValues}
                               onSubmitDestination={handleMapSubmit}
                               zoneCoords={map}
                               cityName={values.arrivalCity}
