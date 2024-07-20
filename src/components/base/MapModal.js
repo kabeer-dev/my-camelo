@@ -83,6 +83,7 @@ export default function MapModal({ rideName, formValues, onSubmitDestination, zo
         }
         dispatch(setLoading(false))
       }
+      dispatch(setLoading(false))
     }
     setPickOrDrop()
   }, [rideName, cityName, formValues.rideType]);
