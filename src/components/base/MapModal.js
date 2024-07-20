@@ -50,7 +50,7 @@ export default function MapModal({ rideName, formValues, onSubmitDestination, zo
       if (rideName === "airportRide") {
         let point;
         const apiKey = "AIzaSyBMTLXpuXtkEfbgChZzsj7LPYlpGxHI9iU";
-        const encodedAddress = encodeURIComponent(`${formValues.airportName} ${formValues.terminalNumber} ${formValues.arrivalCity}`); // Encode the address
+        const encodedAddress = encodeURIComponent(`${formValues.airportName} ${formValues.terminalNumber}`); // Encode the address
         const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodedAddress}&key=${apiKey}`;
         try {
           const response = await axios.get(url);
@@ -65,19 +65,19 @@ export default function MapModal({ rideName, formValues, onSubmitDestination, zo
         if (cityName === "Dammam") {
           const Dammampoint = { lat: 26.3927, lng: 49.9777 };
           if (formValues.rideType === 'pickup') {
-            setLocation(`${formValues.airportName} ${formValues.terminalNumber} ${formValues.arrivalCity}`)
+            setLocation(`${formValues.airportName} ${formValues.terminalNumber}`)
             setSelectedPickup(Dammampoint);
           } else if (formValues.rideType === 'dropoff') {
-            setDestination(`${formValues.airportName} ${formValues.terminalNumber} ${formValues.arrivalCity}`)
+            setDestination(`${formValues.airportName} ${formValues.terminalNumber}`)
             setSelectedDropoff(Dammampoint);
           }
         } else {
           const point = { lng: 46.6753, lat: 24.7136 };
           if (formValues.rideType === 'pickup') {
-            setLocation(`${formValues.airportName} ${formValues.terminalNumber} ${formValues.arrivalCity}`)
+            setLocation(`${formValues.airportName} ${formValues.terminalNumber}`)
             setSelectedPickup(point);
           } else if (formValues.rideType === 'dropoff') {
-            setDestination(`${formValues.airportName} ${formValues.terminalNumber} ${formValues.arrivalCity}`)
+            setDestination(`${formValues.airportName} ${formValues.terminalNumber}`)
             setSelectedDropoff(point);
           }
         }
