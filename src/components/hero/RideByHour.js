@@ -15,6 +15,7 @@ import { setLoading } from "../../redux/actions/loaderAction";
 import VehicleTypeModal from "../base/VehicleTypeModal";
 import PaymentMethod from "./PaymentMethod";
 import axios from "axios";
+import { message } from "antd";
 
 export default function RideByHour({
   subTab, setSubTab,
@@ -157,6 +158,9 @@ export default function RideByHour({
         }
       }
       catch (error) {
+        if(error?.response?.data?.msg === 'The booking distance is very short, please modify the reservation locations'){
+          message.error(`${error?.response?.data?.msg}`);
+        }
         console.error('Error:', error);
         dispatch(setLoading(false));
       };
@@ -428,7 +432,7 @@ export default function RideByHour({
                                 <div className="w-full md:w-1/2 mx-0 md:mx-1">
                                   <MapModal
                                     rideName="rideByHour"
-                                    rideType={formValues.rideType}
+                                    formValues={formValues}
                                     onSubmitDestination={handleMapSubmit}
                                     zoneCoords={map}
                                     cityName={values.arrivalCity}

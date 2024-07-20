@@ -16,6 +16,7 @@ import VehicleTypeModal from "../base/VehicleTypeModal";
 import { setLoading } from "../../redux/actions/loaderAction";
 import PaymentMethod from "./PaymentMethod";
 import axios from "axios";
+import { message } from "antd";
 
 export default function AirportRide(
   {
@@ -264,7 +265,7 @@ export default function AirportRide(
                     shared_discount: sharedRideValue,
                     language: 'eng'
                   }
-console.log('www', data)
+
                   const response = await axios.post(`${API_BASE_URL}/api/method/airport_transport.api.integrations.maps.get_price`, data);
                   if (response && response.status === 200) {
                     // console.log(response.data.data)
@@ -275,6 +276,9 @@ console.log('www', data)
                   }
                 }
                 catch (error) {
+                  if(error?.response?.data?.msg === 'The booking distance is very short, please modify the reservation locations'){
+                    message.error(`${error?.response?.data?.msg}`);
+                  }
                   console.error('Error:', error);
                   dispatch(setLoading(false));
                 };

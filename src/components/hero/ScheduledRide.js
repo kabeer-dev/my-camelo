@@ -15,6 +15,7 @@ import { setLoading } from "../../redux/actions/loaderAction";
 import VehicleTypeModal from "../base/VehicleTypeModal";
 import PaymentMethod from "./PaymentMethod";
 import axios from "axios";
+import { message } from "antd";
 
 export default function ScheduledRide({
   subTab, setSubTab,
@@ -181,6 +182,9 @@ export default function ScheduledRide({
       }
     }
     catch (error) {
+      if(error?.response?.data?.msg === 'The booking distance is very short, please modify the reservation locations'){
+        message.error(`${error?.response?.data?.msg}`);
+      }
       console.error('Error:', error);
       dispatch(setLoading(false));
     };
@@ -463,7 +467,7 @@ export default function ScheduledRide({
                               <div className="w-full md:w-1/2 mx-0 md:mx-1">
                                 <MapModal
                                   rideName="scheduledRide"
-                                  rideType={formValues.rideType}
+                                  formValues={formValues}
                                   onSubmitDestination={handleMapSubmit}
                                   zoneCoords={map}
                                   cityName={values.arrivalCity}
