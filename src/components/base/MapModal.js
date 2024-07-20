@@ -63,22 +63,22 @@ export default function MapModal({ rideName, formValues, onSubmitDestination, zo
           console.error('Error fetching location:', error.message);
         }
         if (cityName === "Dammam") {
-          // const Dammampoint = { lat: 26.3927, lng: 49.9777 };
+          const Dammampoint = { lat: 26.3927, lng: 49.9777 };
           if (formValues.rideType === 'pickup') {
             setLocation(`${formValues.airportName} ${formValues.terminalNumber}`)
-            setSelectedPickup(point);
+            setSelectedPickup(Dammampoint);
           } else if (formValues.rideType === 'dropoff') {
             setDestination(`${formValues.airportName} ${formValues.terminalNumber}`)
-            setSelectedDropoff(point);
+            setSelectedDropoff(Dammampoint);
           }
         } else {
-          // const Riyadhpoint = { lng: 46.6753, lat: 24.7136 };
+          const Riyadhpoint = { lng: 46.6753, lat: 24.7136 };
           if (formValues.rideType === 'pickup') {
             setLocation(`${formValues.airportName} ${formValues.terminalNumber}`)
-            setSelectedPickup(point);
+            setSelectedPickup(Riyadhpoint);
           } else if (formValues.rideType === 'dropoff') {
             setDestination(`${formValues.airportName} ${formValues.terminalNumber}`)
-            setSelectedDropoff(point);
+            setSelectedDropoff(Riyadhpoint);
           }
         }
         dispatch(setLoading(false))
@@ -110,7 +110,7 @@ export default function MapModal({ rideName, formValues, onSubmitDestination, zo
     setError("");
     dispatch(setLoading(true))
     if (rideName === "airportRide") {
-      if (formValues.rideType === 'dropoff' && selectedPickup === null) {
+      if (formValues.rideType === 'dropoff') {
         const apiKey = "AIzaSyBMTLXpuXtkEfbgChZzsj7LPYlpGxHI9iU";
         const url = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${point.lat},${point.lng}&key=${apiKey}`;
 
