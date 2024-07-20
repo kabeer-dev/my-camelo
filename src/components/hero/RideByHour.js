@@ -1,475 +1,378 @@
-import React, { useEffect, useState } from "react";
-import Stepper from "../base/Stepper";
-import Button from "../base/Button";
-import Heading from "../base/Heading";
-import MapModal from "../base/MapModal";
-import { useDispatch, useSelector } from "react-redux";
-import { fetchCitiesRequest } from "../../redux/actions/cityActions";
-import { fetchVehicleTypesRequest } from "../../redux/actions/vehicleTypeAction";
-import { Formik, Form } from "formik";
-import * as Yup from "yup";
-import InputFieldFormik from "../base/InputFieldFormik";
-import { getZoneRequest } from "../../redux/actions/zoneActions";
-import HomeEmailSignUp from "./HomeEmailSignUp";
-import { setLoading } from "../../redux/actions/loaderAction";
-import VehicleTypeModal from "../base/VehicleTypeModal";
-import PaymentMethod from "./PaymentMethod";
+import React, { useState, useRef, useEffect } from "react";
+import { GoogleMap, LoadScript, Marker, Polygon, StandaloneSearchBox } from "@react-google-maps/api";
 import axios from "axios";
-import { message } from "antd";
+import { setLoading } from "../../redux/actions/loaderAction";
+import { useDispatch } from "react-redux";
 
-export default function RideByHour({
-  subTab, setSubTab,
-  showSignUp, setShowSignUp,
-  showAlreadyRegistered,
-  setShowAlreadyRegistered,
-  showOTPScreen,
-  setShowOTPScreen,
-  hideCreateAccountButton,
-  setHideCreateAccountButton,
-  showPhone,
-  setShowPhone,
-  hidePhoneCreateAccountButton,
-  setHidePhoneCreateAccountButton,
-  showPhoneOTPScreen,
-  setShowPhoneOTPScreen,
-  showPaymentMethod,
-  setShowPaymentMethod,
-  recaptchaRef,
-  otp,
-  setOtp,
-  phoneOtp,
-  setPhoneOtp
-}) {
+export default function MapModal({ rideName, formValues, onSubmitDestination, zoneCoords, cityName, setLocation, setDestination }) {
+  const containerStyle = {
+    width: "100%",
+    height: "400px",
+  };
+
+  let center;
+  if (cityName === 'Dammam') {
+    center = {
+      lat: 26.3927,
+      lng: 49.9777,
+    };
+  }
+  if (cityName === 'Riyadh') {
+    center = {
+      lng: 46.6753,
+      lat: 24.7136
+    }
+  }
+
   const dispatch = useDispatch();
-  const { cities } = useSelector((state) => state.cities);
-  const { vehicleTypes } = useSelector((state) => state.vehicleTypes);
-  const zoneMap = useSelector((state) => state?.zone?.zone);
-  const [map, setMap] = useState(null);
-
-  useEffect(() => {
-    setMap(zoneMap && zoneMap.length > 0 ? zoneMap[0].map : null)
-  }, [zoneMap])
-  const services = "Book Vehicle In Hours";
-  const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
-
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedPickup, setSelectedPickup] = useState(null);
   const [selectedDropoff, setSelectedDropoff] = useState(null);
-  const [arrivalDates, setArrivalDates] = useState(null);
-  const [cityName, setCityName] = useState(null);
-  const [formValues, setFormValues] = useState({
-    bookingByHours: "",
-    arrivalCity: "",
-    arrivalDate: "",
-    arrivalTime: "",
-    vehicleType: "",
-  });
-  const [onChangeFormValues, setOnChangeFormValues] = useState({
-    bookingByHours: "",
-    arrivalCity: "",
-    arrivalDate: "",
-    arrivalTime: "",
-    vehicleType: "",
-  });
+  const [error, setError] = useState("");
+  const [searchBox, setSearchBox] = useState(null); // State to hold the StandaloneSearchBox instance
 
-  const [vehicleTypeName, setVehicleTypeName] = useState("");
+  const mapRef = useRef(null);
 
-  const [location, setLocation] = useState("")
-  const [destination, setDestination] = useState("");
-  const [price, setPrice] = useState("");
+  const openModal = () => setIsModalOpen(true);
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setError("");
+  };
 
-  const API_BASE_URL = process.env.REACT_APP_BASE_URL_AMK_TEST;
+  const convertedCoords = zoneCoords.map((coord) => ({
+    lat: coord[0],
+    lng: coord[1],
+  }));
 
   useEffect(() => {
-    if (vehicleTypeName !== "") {
-      // const selectedVehicle = vehicleTypes.data.find(
-      //   (vehicle) => vehicle.name === vehicleTypeName
-      // );
-      // setSeatNumberOptions(
-      //   selectedVehicle
-      //     ? Array.from({ length: selectedVehicle.seats }, (_, i) => `${i + 1}`)
-      //     : []
-      // );
-      setOnChangeFormValues((prevValues) => ({
-        ...prevValues,
-        ["vehicleType"]: vehicleTypeName,
-      }));
-    }
-  }, [vehicleTypeName]);
+    const setPickOrDrop = async () => {
+      if (rideName === "airportRide") {
+        dispatch(setLoading(true))
+        let point;
+        const apiKey = "AIzaSyBMTLXpuXtkEfbgChZzsj7LPYlpGxHI9iU";
+        const encodedAddress = encodeURIComponent(`${formValues.airportName} ${formValues.terminalNumber}`); // Encode the address
+        const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodedAddress}&key=${apiKey}`;
+        try {
+          const response = await axios.get(url);
+          const location = response.data.results[0].geometry.location;
+          const latitude = location.lat;
+          const longitude = location.lng;
+          point = { lat: latitude, lng: longitude };
 
-  const handlePrevious = (step, values) => {
+        } catch (error) {
+          console.error('Error fetching location:', error.message);
+        }
+        if (cityName === "Dammam") {
+          const Dammampoint = { lat: 26.3927, lng: 49.9777 };
+          if (formValues.rideType === 'pickup') {
+            setLocation(`${formValues.airportName} ${formValues.terminalNumber} ${formValues.arrivalCity} Saudi Arabia`)
+            setSelectedPickup(point);
+          } else if (formValues.rideType === 'dropoff') {
+            setDestination(`${formValues.airportName} ${formValues.terminalNumber} ${formValues.arrivalCity} Saudi Arabia`)
+            setSelectedDropoff(point);
+          }
+        } else {
+          const Riyadhpoint = { lng: 46.6753, lat: 24.7136 };
+          if (formValues.rideType === 'pickup') {
+            setLocation(`${formValues.airportName} ${formValues.terminalNumber} ${formValues.arrivalCity} Saudi Arabia`)
+            setSelectedPickup(point);
+          } else if (formValues.rideType === 'dropoff') {
+            setDestination(`${formValues.airportName} ${formValues.terminalNumber} ${formValues.arrivalCity} Saudi Arabia`)
+            setSelectedDropoff(point);
+          }
+        }
+        dispatch(setLoading(false))
+      }
+    }
+    setPickOrDrop()
+  }, [rideName, cityName, formValues.rideType]);
+
+  // const isPointInPolygon = (point, polygon) => {
+  //   const { lat, lng } = point;
+  //   let inside = false;
+  //   for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
+  //     const xi = polygon[i].lat,
+  //       yi = polygon[i].lng;
+  //     const xj = polygon[j].lat,
+  //       yj = polygon[j].lng;
+
+  //     const intersect =
+  //       yi > lng !== yj > lng &&
+  //       lat < ((xj - xi) * (lng - yi)) / (yj - yi) + xi;
+  //     if (intersect) inside = !inside;
+  //   }
+  //   return inside;
+  // };
+  console.log('dd', selectedPickup, selectedDropoff)
+  const onMapClick = async (event) => {
+    const point = { lat: event.latLng.lat(), lng: event.latLng.lng() };
+    // if (isPointInPolygon(point, convertedCoords)) {
+    setError("");
     dispatch(setLoading(true))
-    setFormValues(values);
-    setSubTab(step);
+    if (rideName === "airportRide") {
+      if (formValues.rideType === 'dropoff') {
+        const apiKey = "AIzaSyBMTLXpuXtkEfbgChZzsj7LPYlpGxHI9iU";
+        const url = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${point.lat},${point.lng}&key=${apiKey}`;
+
+        try {
+          const response = await axios.get(url);
+          const location = response.data.results[0];
+          // console.log('Location:', location);
+          setLocation(location);
+        } catch (error) {
+          console.error('Error fetching location:', error.message);
+        }
+        setSelectedPickup(point);
+      } else {
+        const apiKey = "AIzaSyBMTLXpuXtkEfbgChZzsj7LPYlpGxHI9iU";
+        const url = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${point.lat},${point.lng}&key=${apiKey}`;
+
+        try {
+          const response = await axios.get(url);
+          const location = response.data.results[0];
+          // console.log('Location:', location);
+          setDestination(location);
+        } catch (error) {
+          console.error('Error fetching location:', error.message);
+        }
+        setSelectedDropoff(point);
+      }
+
+    } else if (rideName === "scheduledRide") {
+      if (!selectedPickup) {
+        const apiKey = "AIzaSyBMTLXpuXtkEfbgChZzsj7LPYlpGxHI9iU";
+        const url = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${point.lat},${point.lng}&key=${apiKey}`;
+
+        try {
+          const response = await axios.get(url);
+          const location = response.data.results[0];
+          // console.log('Location:', location);
+          setLocation(location);
+          setSelectedPickup(point);
+        } catch (error) {
+          console.error('Error fetching location:', error.message);
+        }
+        
+      } else {
+        const apiKey = "AIzaSyBMTLXpuXtkEfbgChZzsj7LPYlpGxHI9iU";
+        const url = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${point.lat},${point.lng}&key=${apiKey}`;
+
+        try {
+          const response = await axios.get(url);
+          const location = response.data.results[0];
+          // console.log('Location:', location);
+          setDestination(location);
+          setSelectedDropoff(point);
+        } catch (error) {
+          console.error('Error fetching location:', error.message);
+        }
+        
+      }
+    } else {
+      // if (!selectedPickup) {
+      const apiKey = "AIzaSyBMTLXpuXtkEfbgChZzsj7LPYlpGxHI9iU";
+      const url = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${point.lat},${point.lng}&key=${apiKey}`;
+
+      try {
+        const response = await axios.get(url);
+        const location = response.data.results[0];
+        // console.log('Location:', location);
+        setLocation(location);
+      } catch (error) {
+        console.error('Error fetching location:', error.message);
+      }
+      setSelectedPickup(point);
+      // }
+    }
+    // } else {
+    //   setError("You cannot select a location outside the Dammam zone.");
+    // }
     dispatch(setLoading(false))
   };
 
-  useEffect(() => {
-    dispatch(fetchCitiesRequest());
-    dispatch(fetchVehicleTypesRequest());
-    dispatch(getZoneRequest(services, cityName));
-  }, [dispatch, cityName]);
-
-  const steps = [
-    { id: 1, text: "Ride Details" },
-    { id: 2, text: "Additional Info" },
-    { id: 3, text: "Account Info" }
-  ];
-
-  const validationSchema = Yup.object().shape({
-    bookingByHours: Yup.string().required(
-      "Booking Vehicle By Hours is required"
-    ),
-    arrivalCity: Yup.string().required("Arrival City is required"),
-    arrivalDate: Yup.string().required("Arrival Date is required"),
-    arrivalTime: Yup.string().required("Arrival Time is required"),
-    // vehicleType: Yup.string().required("vehicle Type is required"),
-  });
-
-  const onSubmit = async(values, { setSubmitting }) => {
-    if (vehicleTypeName !== '') {
-      values.vehicleType = vehicleTypeName;
-      dispatch(setLoading(true))
-      // if (!isLoggedIn) {
-     
-      try {
-        const formattedDate = values.arrivalDate.toLocaleDateString('en-US', {
-          year: 'numeric',
-          month: 'short',
-          day: 'numeric',
-        });
-        const data = {
-          location: location,
-          destination: `${values.arrivalCity}`,
-          vehicle_type: values.vehicleType,
-          rider: values.bookingByHours,
-          arrival_date: formattedDate,
-          arrival_time: values.arrivalTime,
-          shared_discount: 0,
-          language: 'eng'
-        }
-
-        const response = await axios.post(`${API_BASE_URL}/api/method/airport_transport.api.integrations.maps.get_price`, data);
-        if (response && response.status === 200) {
-          // console.log(response.data.data)
-          setPrice(response.data.data.price)
-          dispatch(setLoading(false));
-          setSubTab(4)
-          setShowSignUp(true);
-        }
+  function submitDestination() {
+    if (rideName === "airportRide" || rideName === "scheduledRide") {
+      if (selectedPickup && selectedDropoff) {
+        onSubmitDestination(selectedPickup, selectedDropoff);
+        closeModal();
+      } else {
+        setError("Please select both pickup and dropoff locations.");
       }
-      catch (error) {
-        if(error?.response?.data?.msg === 'The booking distance is very short, please modify the reservation locations'){
-          message.error(`${error?.response?.data?.msg}`);
-        }
-        console.error('Error:', error);
-        dispatch(setLoading(false));
-      };
+    } else {
+      if (selectedPickup) {
+        onSubmitDestination(selectedPickup, null);
+        closeModal();
+      } else {
+        setError("Please select pickup location.");
+      }
+    }
 
-      // } else {
-      //   setShowPaymentMethod(true)
-      //   // console.log("Submitted values:", values); // Log form values
-      //   // const submitValues = {
-      //   //   // Add latlong data to the form values
-      //   //   ...values,
-      //   //   pickupLocation: selectedPickup,
-      //   //   dropoffLocation: selectedDropoff,
-      //   // };
-      //   // console.log("Submitted values:", submitValues);
-      // }
-      setSubmitting(false);
-      dispatch(setLoading(false))
+  }
+
+  const onLoad = (ref) => {
+    mapRef.current = ref;
+  };
+
+  const onSearchBoxLoad = (ref) => {
+    setSearchBox(ref);
+  };
+
+  const onPlacesChanged = () => {
+    const places = searchBox.getPlaces();
+
+    if (places.length === 0) {
+      return;
+    }
+
+    const place = places[0];
+
+    if (place.geometry && place.geometry.location) {
+      mapRef.current.panTo(place.geometry.location);
+      mapRef.current.setZoom(14); // Adjust the zoom level as needed
     }
   };
 
-  const byHoursOptions = [
-    { value: "1", label: "1" },
-    { value: "2", label: "2" },
-    { value: "3", label: "3" },
-    { value: "4", label: "4" },
-    { value: "5", label: "5" },
-    { value: "6", label: "6" },
-    { value: "7", label: "7" },
-    { value: "8", label: "8" },
-    { value: "9", label: "9" },
-    { value: "10", label: "10" },
-    { value: "11", label: "11" },
-    { value: "12", label: "12" },
-  ];
-
-  const handleMapSubmit = (pickup, dropoff) => {
-    setSelectedPickup(pickup);
-    setSelectedDropoff(dropoff);
-  };
 
   return (
     <>
-      <div>
-        {!showPaymentMethod && (
-          <Stepper
-            steps={steps}
-            subTab={subTab}
-            className={
-              "flex items-center w-full text-sm font-medium text-center py-4 border-b text-gray-500 sm:text-base justify-between"
-            }
-          />
-        )}
+      <button
+        onClick={openModal}
+        className="block w-full bg-background_steel_blue text-text_white text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+        type="button"
+      >
+        Set on the map
+      </button>
 
-        <div>
-          <div className="p-2 md:p-4">
-            {showPaymentMethod ? (
-              <PaymentMethod formValues={formValues} price={price}/>
-
-            ) :
-
-              showSignUp ? (
-                <>
-                  <HomeEmailSignUp
-                    formValues={formValues}
-                    setSubTab={setSubTab}
-                    setShowSignUp={setShowSignUp}
-                    showAlreadyRegistered={showAlreadyRegistered}
-                    setShowAlreadyRegistered={setShowAlreadyRegistered}
-                    showOTPScreen={showOTPScreen}
-                    setShowOTPScreen={setShowOTPScreen}
-                    setHideCreateAccountButton={setHideCreateAccountButton}
-                    hideCreateAccountButton={hideCreateAccountButton}
-                    showPhone={showPhone}
-                    setShowPhone={setShowPhone}
-                    hidePhoneCreateAccountButton={hidePhoneCreateAccountButton}
-                    setHidePhoneCreateAccountButton={setHidePhoneCreateAccountButton}
-                    showPhoneOTPScreen={showPhoneOTPScreen}
-                    setShowPhoneOTPScreen={setShowPhoneOTPScreen}
-                    showPaymentMethod={showPaymentMethod}
-                    setShowPaymentMethod={setShowPaymentMethod}
-                    recaptchaRef={recaptchaRef}
-                    otp={otp}
-                    setOtp={setOtp}
-                    phoneOtp={phoneOtp}
-                    setPhoneOtp={setPhoneOtp}
-                  />
-                </>
-              ) : (
-
-                <>
-                  {" "}
-                  <Formik
-                    initialValues={formValues}
-                    validationSchema={validationSchema}
-                    onSubmit={onSubmit}
+      {isModalOpen && (
+        <div
+          id="extralarge-modal"
+          tabIndex="-1"
+          className="fixed top-0 left-0 right-0 z-50 flex justify-center items-center w-full p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[calc(100%-1rem)] max-h-full bg-black bg-opacity-50"
+        >
+          <div className="relative w-full max-w-7xl max-h-full">
+            <div className="relative bg-background_steel_blue rounded-lg shadow dark:bg-gray-700">
+              <div className="flex items-center justify-between p-4 md:p-5 rounded-t dark:border-gray-600">
+                <h3 className="text-xl text-text_white font-medium text-gray-900 dark:text-white">
+                  Select Your Destination
+                </h3>
+                <button
+                  onClick={closeModal}
+                  type="button"
+                  className="text-gray-400 bg-transparent text-text_white hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white"
+                  data-modal-hide="extralarge-modal"
+                >
+                  <svg
+                    className="w-3 h-3"
+                    aria-hidden="true"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 14 14"
                   >
-                    {({ values, errors, setFieldValue, validateForm }) => {
-                      const isStep1Valid =
-                        values.bookingByHours &&
-                        values.arrivalCity &&
-                        values.arrivalDate &&
-                        values.arrivalTime;
-                      // const isStep2Valid = values.vehicleType;
+                    <path
+                      stroke="currentColor"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"
+                    />
+                  </svg>
+                  <span className="sr-only">Close modal</span>
+                </button>
+              </div>
+              <div className="p-4 md:p-5 space-y-4">
+                <LoadScript
+                  googleMapsApiKey="AIzaSyBMTLXpuXtkEfbgChZzsj7LPYlpGxHI9iU"
+                  libraries={["places"]}
+                >
+                  <GoogleMap
+                    mapContainerStyle={containerStyle}
+                    center={center}
+                    zoom={10}
+                    onLoad={onLoad}
+                    onClick={onMapClick}
+                  >
+                    {/* Your existing map components */}
+                    {/* <Polygon
+                      paths={convertedCoords}
+                      options={{
+                        fillColor: "#4463F0",
+                        fillOpacity: 0.3,
+                        strokeColor: "#355E3B",
+                        strokeOpacity: 1,
+                        strokeWeight: 1,
+                      }}
+                    /> */}
+                    {/* <Polygon
+                      paths={[
+                        { lat: 90, lng: -180 },
+                        { lat: -90, lng: -180 },
+                        { lat: -90, lng: 180 },
+                        { lat: 90, lng: 180 },
+                      ]}
+                      options={{
+                        fillColor: "#000000",
+                        fillOpacity: 0.5,
+                        strokeColor: "#355E3B",
+                        strokeOpacity: 0.5,
+                        strokeWeight: 1,
+                      }}
+                    /> */}
 
-                      return (
-                        <Form className="mx-auto w-full">
-                          {subTab === 1 && (
-                            <>
-                              <div>
-                                <InputFieldFormik
-                                  label="Booking Vehicle By Hours"
-                                  name="bookingByHours"
-                                  type="select"
-                                  options={byHoursOptions}
-                                  value={
-                                    formValues.bookingByHours ||
-                                    onChangeFormValues.bookingByHours
-                                  }
-                                  onChange={(valueObj) => {
-                                    const { fieldName, selectedValue } = valueObj;
-                                    setFieldValue(fieldName, selectedValue);
-                                    setOnChangeFormValues((prevValues) => ({
-                                      ...prevValues,
-                                      [fieldName]: selectedValue,
-                                    }));
-                                  }}
-                                  required
-                                />
-                              </div>
+                    {selectedPickup && <Marker position={selectedPickup} label="Pickup" />}
+                    {selectedDropoff && <Marker position={selectedDropoff} label="dropoff" />}
 
-                              <div>
-                                <InputFieldFormik
-                                  label="Arrival City"
-                                  name="arrivalCity"
-                                  type="select"
-                                  options={
-                                    cities &&
-                                    cities.data &&
-                                    cities.data.map((city) => ({
-                                      value: city,
-                                      label: city,
-                                    }))
-                                  }
-                                  value={
-                                    formValues.arrivalCity ||
-                                    onChangeFormValues.arrivalCity
-                                  }
-                                  onChange={(valueObj) => {
-                                    const { fieldName, selectedValue } = valueObj;
-                                    setFieldValue(fieldName, selectedValue);
-                                    setCityName(selectedValue);
-                                    setOnChangeFormValues((prevValues) => ({
-                                      ...prevValues,
-                                      [fieldName]: selectedValue,
-                                    }));
-                                  }}
-                                  required
-                                />
-                              </div>
+                    {/* Standalone Search Box */}
+                    <StandaloneSearchBox
+                      onLoad={onSearchBoxLoad}
+                      onPlacesChanged={onPlacesChanged}
+                    >
+                      <input
+                        type="text"
+                        placeholder="Search for a place"
+                        style={{
+                          boxSizing: `border-box`,
+                          border: `1px solid transparent`,
+                          width: `240px`,
+                          height: `40px`,
+                          padding: `0 12px`,
+                          borderRadius: `3px`,
+                          boxShadow: `0 2px 6px rgba(0, 0, 0, 0.3)`,
+                          fontSize: `14px`,
+                          outline: `none`,
+                          textOverflow: `ellipses`,
+                          position: "absolute",
+                          left: "50%",
+                          marginLeft: "-120px",
+                          top: "10px",
+                        }}
+                      />
+                    </StandaloneSearchBox>
+                  </GoogleMap>
+                </LoadScript>
 
-                              <div >
-                                <InputFieldFormik
-                                  label="Arrival Date"
-                                  name="arrivalDate"
-                                  type="arrivalDate"
-                                  value={values.arrivalDate}
-                                  arrivalDates={arrivalDates}
-                                  setArrivalDates={setArrivalDates}
-                                  onChange={({ date, dateString }) => {
-                                    setOnChangeFormValues((prevValues) => ({
-                                      ...prevValues,
-                                      ['arrivalDate']: dateString,
-                                    }));
-                                    setFieldValue('arrivalDate', dateString);
-                                  }}
-
-                                  required
-                                />
-
-                              </div>
-
-                              <div>
-                                <InputFieldFormik
-                                  label="Arrival Time"
-                                  name="arrivalTime"
-                                  type="arrivalTime"
-                                  value={values.arrivalTime || ''}
-
-                                  arrivalDates={arrivalDates}
-                                  onChange={({ fieldName, selectedValue }) => {
-                                    setOnChangeFormValues((prevValues) => ({
-                                      ...prevValues,
-                                      [fieldName]: selectedValue,
-                                    }));
-                                    setFieldValue(fieldName, selectedValue);
-                                  }}
-                                  required
-                                />
-                              </div>
-
-                              <div className="w-full mt-3">
-                                <Button
-                                  className="bg-background_steel_blue w-full text-text_white hover:bg-gray-100 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2"
-                                  onClick={() => {
-                                    validateForm().then(() => {
-                                      if (isStep1Valid) {
-                                        setSubTab(2);
-                                        setFormValues(values);
-                                      }
-                                    });
-                                    
-                                  }}
-                                  label="Next"
-                                  type="button"
-                                  disabled={!isStep1Valid}
-                                />
-                              </div>
-                            </>
-                          )}
-
-                          {subTab === 2 && (
-                            <>
-                              {/* <div>
-                             <VehicleTypeModal />
-                           </div> */}
-                              {/* <div className="pb-4 border-b border-gray-300">
-                             <InputFieldFormik
-                               label="Vehicle type"
-                               name="vehicleType"
-                               type="select"
-                               options={
-                                 vehicleTypes &&
-                                 vehicleTypes.data &&
-                                 vehicleTypes.data.map((vehicle) => ({
-                                   value: vehicle.name,
-                                   label: vehicle.name,
-                                 }))
-                               }
-                               value={
-                                 formValues.vehicleType ||
-                                 onChangeFormValues.vehicleType
-                               }
-                               onChange={(valueObj) => {
-                                 const { fieldName, selectedValue } = valueObj;
-                                 setFieldValue(fieldName, selectedValue);
-                                 setOnChangeFormValues((prevValues) => ({
-                                   ...prevValues,
-                                   [fieldName]: selectedValue,
-                                 }));
-                               }}
-                               required
-                             />
-                           </div> */}
-                              <div>
-                                <VehicleTypeModal
-                                  vehicleTypeName={vehicleTypeName}
-                                  setVehicleTypeName={setVehicleTypeName}
-                                />
-                              </div>
-
-                              <div className="my-4 flex flex-col md:flex-row justify-between items-start">
-                                <div className="w-full md:w-1/2 mx-0 md:mx-1">
-                                  <Heading
-                                    title={"Set Your Destination"}
-                                    className={"text-xl text-text_black"}
-                                  />
-                                </div>
-                                <div className="w-full md:w-1/2 mx-0 md:mx-1">
-                                  <MapModal
-                                    rideName="rideByHour"
-                                    formValues={formValues}
-                                    onSubmitDestination={handleMapSubmit}
-                                    zoneCoords={map}
-                                    cityName={values.arrivalCity}
-                                    setLocation={setLocation}
-                                    setDestination={setDestination}
-                                  />
-
-                                </div>
-                              </div>
-
-                              <div className="mt-3 flex flex-col md:flex-row justify-between items-center">
-                                <div className="w-full md:w-1/2 mx-0 md:mx-1">
-                                  <Button
-                                    className="bg-bg_btn_back w-full text-text_white hover:bg-gray-100 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2"
-                                    onClick={() => handlePrevious(1, values)}
-                                    label="Previous"
-                                    type="button"
-                                  />
-                                </div>
-                                <div className="w-full md:w-1/2 mx-0 md:mx-1">
-                                  <Button
-                                    className="bg-background_steel_blue w-full text-text_white hover:bg-gray-100 font-medium rounded-lg text-sm px-5 py-2.5 mb-2"
-                                    label="Submit"
-                                    type="submit"
-                                  />
-                                </div>
-                              </div>
-                            </>
-                          )}
-                        </Form>
-                      );
-                    }}
-                  </Formik>
-                </>
-              )}
+              </div>
+              {error && <div className="p-4 text-text_warning">{error}</div>}
+              <div className="flex items-center p-4 md:p-5 space-x-3 rtl:space-x-reverse border-gray-200 rounded-b dark:border-gray-600">
+                <button
+                  onClick={submitDestination}
+                  type="button"
+                  className="text-background_steel_blue border bg-text_white border-text_white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+                >
+                  Confirm Your Destination
+                </button>
+                <button
+                  onClick={closeModal}
+                  type="button"
+                  className="py-2.5 px-5 ms-3 text-sm font-medium rounded-lg border border-background_white text-background_white"
+                >
+                  Decline
+                </button>
+              </div>
+            </div>
           </div>
         </div>
-      </div>
+      )}
     </>
   );
 }
+
