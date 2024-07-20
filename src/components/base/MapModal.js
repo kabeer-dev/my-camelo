@@ -148,23 +148,25 @@ export default function MapModal({ rideName, formValues, onSubmitDestination, zo
           const location = response.data.results[0].formatted_address;
           // console.log('Location:', location);
           setLocation(location);
+          setSelectedPickup(point);
         } catch (error) {
           console.error('Error fetching location:', error.message);
         }
-        setSelectedPickup(point);
+        
       } else {
         const apiKey = "AIzaSyBMTLXpuXtkEfbgChZzsj7LPYlpGxHI9iU";
         const url = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${point.lat},${point.lng}&key=${apiKey}`;
 
         try {
           const response = await axios.get(url);
-          const location = response.data.results[0].formatted_address;
+          const location = response.data.results[0];
           // console.log('Location:', location);
           setDestination(location);
+          setSelectedDropoff(point);
         } catch (error) {
           console.error('Error fetching location:', error.message);
         }
-        setSelectedDropoff(point);
+        
       }
     } else {
       // if (!selectedPickup) {
