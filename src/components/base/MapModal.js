@@ -46,8 +46,8 @@ export default function MapModal({ rideName, formValues, onSubmitDestination, zo
 
   useEffect(() => {
     const setPickOrDrop = async () => {
-      dispatch(setLoading(true))
       if (rideName === "airportRide") {
+        dispatch(setLoading(true))
         let point;
         const apiKey = "AIzaSyBMTLXpuXtkEfbgChZzsj7LPYlpGxHI9iU";
         const encodedAddress = encodeURIComponent(`${formValues.airportName} ${formValues.terminalNumber}`); // Encode the address
