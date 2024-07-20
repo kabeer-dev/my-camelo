@@ -115,7 +115,7 @@ export default function MapModal({ rideName, formValues, onSubmitDestination, zo
 
         try {
           const response = await axios.get(url);
-          const location = response.data.results[0];
+          const location = response.data.results[0].formatted_address;
           // console.log('Location:', location);
           setLocation(location);
         } catch (error) {
@@ -128,7 +128,7 @@ export default function MapModal({ rideName, formValues, onSubmitDestination, zo
 
         try {
           const response = await axios.get(url);
-          const location = response.data.results[0];
+          const location = response.data.results[0].formatted_address;
           // console.log('Location:', location);
           setDestination(location);
         } catch (error) {
@@ -144,7 +144,7 @@ export default function MapModal({ rideName, formValues, onSubmitDestination, zo
 
         try {
           const response = await axios.get(url);
-          const location = response.data.results[0];
+          const location = response.data.results[0].formatted_address;
           // console.log('Location:', location);
           setLocation(location);
           setSelectedPickup(point);
@@ -158,7 +158,7 @@ export default function MapModal({ rideName, formValues, onSubmitDestination, zo
 
         try {
           const response = await axios.get(url);
-          const location = response.data.results[0];
+          const location = response.data.results[0].formatted_address;
           // console.log('Location:', location);
           setDestination(location);
           setSelectedDropoff(point);
@@ -174,7 +174,7 @@ export default function MapModal({ rideName, formValues, onSubmitDestination, zo
 
       try {
         const response = await axios.get(url);
-        const location = response.data.results[0];
+        const location = response.data.results[0].formatted_address;
         // console.log('Location:', location);
         setLocation(location);
       } catch (error) {
