@@ -8,6 +8,7 @@ import Paragraph from "../base/Paragraph";
 import { setLoading } from "../../redux/actions/loaderAction";
 import { useDispatch, useSelector } from "react-redux";
 import { useLocation } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
 export default function HeroSection() {
   const dispatch = useDispatch();
@@ -15,6 +16,9 @@ export default function HeroSection() {
   const location = useLocation();
   const [activeTab, setActiveTab] = useState("airport");
   const [subTab, setSubTab] = useState(1);
+  const language = useSelector((state) => state.auth.language);
+
+  const [t, i18n] = useTranslation("global")
 
   const [showSignUp, setShowSignUp] = useState(false);
   const [showAlreadyRegistered, setShowAlreadyRegistered] = useState(false);
@@ -36,7 +40,7 @@ export default function HeroSection() {
 
   useEffect(() => {
     const showPaymentMethod = localStorage.getItem('showPaymentMethod');
-    if(showPaymentMethod){
+    if (showPaymentMethod) {
       localStorage.removeItem('showPaymentMethod'); // Remove it after reading
     }
   }, []);
@@ -79,7 +83,7 @@ export default function HeroSection() {
         setOtp("")
         setPhoneOtp("")
       }
-    }else{
+    } else {
       if (subTab === 3 && showSignUp && !showAlreadyRegistered && !showOTPScreen && !showPhone && !showPhoneOTPScreen && !showPaymentMethod) {
         setSubTab(1)
         setShowSignUp(false)
@@ -113,25 +117,26 @@ export default function HeroSection() {
             ? "bg-scheduled_ride_bg"
             : "bg-by_hour_bg"
           } transition-all duration-300 mx-auto h-auto bg-cover bg-fixed bg-start bg-no-repeat`}
+          dir={language === 'ar' ? 'rtl' : 'ltr'}
       >
         <div className="py-5 md:py-10 px-10 md:px-20 flex flex-col md:flex-col lg:flex-row justify-between items-center">
           <div className="md:w-[592px]">
             <div className="my-4">
               {activeTab === "airport" ? (
                 <Heading
-                  title="Airport Ride"
+                  title={t("hero.airport.title")}
                   className="text-2xl md:text-5xl lg:text-5xl text-text_white"
                 />
               ) : null}
               {activeTab === "scheduled" ? (
                 <Heading
-                  title="Scheduled Ride"
+                  title={t("hero.schedule.title")}
                   className="text-2xl md:text-5xl lg:text-5xl text-text_white"
                 />
               ) : null}
               {activeTab === "hour" ? (
                 <Heading
-                  title="Ride By Hour"
+                  title={t("hero.ride.title")}
                   className="text-2xl md:text-5xl lg:text-5xl text-text_white"
                 />
               ) : null}
@@ -139,19 +144,19 @@ export default function HeroSection() {
             <div className="my-4 w-11/12">
               {activeTab === "airport" ? (
                 <Paragraph
-                  title="Embark on seamless journeys with our airport transfer service—effortlessly whisking you to and from your destination in style, comfort, and punctuality, leaving you free to relax or prepare for your next adventure."
+                  title={t("hero.airport.paragraph")}
                   className="text-normal md:text-lg  lg:text-lg  text-text_white"
                 />
               ) : null}
               {activeTab === "scheduled" ? (
                 <Paragraph
-                  title="Embark on seamless journeys with our airport transfer service—effortlessly whisking you to and from your destination in style, comfort, and punctuality, leaving you free to relax or prepare for your next adventure."
+                  title={t("hero.schedule.paragraph")}
                   className="text-normal md:text-lg  lg:text-lg  text-text_white"
                 />
               ) : null}
               {activeTab === "hour" ? (
                 <Paragraph
-                  title="Secure your peace of mind with our pre-scheduled car bookings, ensuring prompt, reliable transportation with experienced drivers at your service, tailored to your itinerary and preferences."
+                  title={t("hero.ride.paragraph")}
                   className="text-normal md:text-lg  lg:text-lg  text-text_white"
                 />
               ) : null}
@@ -171,7 +176,9 @@ export default function HeroSection() {
                 <div className="py-1">
                   <Icon icon="icons8:airport" width="28px" height="28px" />
                 </div>
-                <div className="py-1 text-sm md:text-normal text-center">Airport Ride</div>
+                <div className="py-1 text-sm md:text-normal text-center">
+                  {t("hero.airport.title")}
+                </div>
               </div>
               <div
                 className={`py-1 px-5 md:py-2 md:px-10 flex flex-col items-center cursor-pointer rounded transition-all duration-300 ${activeTab === "scheduled"
@@ -188,7 +195,7 @@ export default function HeroSection() {
                   />
                 </div>
                 <div className="py-1 text-sm md:text-normal text-center">
-                  Scheduled Ride
+                  {t("hero.schedule.title")}
                 </div>
               </div>
               <div
@@ -201,7 +208,9 @@ export default function HeroSection() {
                 <div className="py-1">
                   <Icon icon="mingcute:hours-line" width="28px" height="28px" />
                 </div>
-                <div className="py-1 text-sm md:text-normal text-center">Ride By Hour</div>
+                <div className="py-1 text-sm md:text-normal text-center">
+                  {t("hero.ride.title")}
+                </div>
               </div>
             </div>
             {/* tabs code is here */}

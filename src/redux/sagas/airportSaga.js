@@ -5,13 +5,15 @@ import {
   fetchAirportSuccess,
   fetchAirportFailure,
 } from "../actions/airportActions";
+import secureLocalStorage from "react-secure-storage";
 
 const API_BASE_URL = process.env.REACT_APP_BASE_URL_AMK_TEST;
 
 function fetchAirport(action) {
   const cityName = action.payload;
+  const language = secureLocalStorage.getItem("language");
   return axios.get(
-    `${API_BASE_URL}/api/method/airport_transport.api.bookings.get_airport?city=${cityName}`
+    `${API_BASE_URL}/api/method/airport_transport.api.bookings.get_airport?city=${cityName}&language=${language ? language : 'eng'}`
   );
 }
 

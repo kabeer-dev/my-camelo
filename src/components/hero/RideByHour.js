@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import Stepper from "../base/Stepper";
 import Button from "../base/Button";
 import Heading from "../base/Heading";
@@ -16,6 +16,7 @@ import VehicleTypeModal from "../base/VehicleTypeModal";
 import PaymentMethod from "./PaymentMethod";
 import axios from "axios";
 import { message } from "antd";
+import { useTranslation } from "react-i18next";
 
 export default function RideByHour({
   subTab, setSubTab,
@@ -46,11 +47,15 @@ export default function RideByHour({
   const zoneMap = useSelector((state) => state?.zone?.zone);
   const [map, setMap] = useState(null);
 
+  const language = useSelector((state) => state.auth.language);
+
   useEffect(() => {
     setMap(zoneMap && zoneMap.length > 0 ? zoneMap[0].map : null)
   }, [zoneMap])
   const services = "Book Vehicle In Hours";
   const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
+
+  const [t, i18n] = useTranslation("global");
 
   const [selectedPickup, setSelectedPickup] = useState(null);
   const [selectedDropoff, setSelectedDropoff] = useState(null);
@@ -106,14 +111,43 @@ export default function RideByHour({
   useEffect(() => {
     dispatch(fetchCitiesRequest());
     dispatch(fetchVehicleTypesRequest());
-    dispatch(getZoneRequest(services, cityName));
+    console.log('aa', cityName)
+    const expectedCityName = cityName ? cityName : 'Dammam';
+    dispatch(getZoneRequest(services, expectedCityName));
   }, [dispatch, cityName]);
 
-  const steps = [
-    { id: 1, text: "Ride Details" },
-    { id: 2, text: "Additional Info" },
-    { id: 3, text: "Account Info" }
-  ];
+  useEffect(() => {
+    if(cities.data?.length > 0 && !cityName){
+      setFormValues((prevValues) => ({
+        ...prevValues,
+        "arrivalCity": cities.data[0],
+      }));
+      setOnChangeFormValues((prevValues) => ({
+        ...prevValues,
+        "arrivalCity": cities.data[0],
+      }));
+      setCityName(cities.data[0])
+    }
+  }, [cities])
+
+  // const steps = [
+  //   { id: 1, text: t("hero.stepper_steps.ride_detail_text") },
+  //   { id: 2, text: t("hero.stepper_steps.additional_info_text") },
+  //   { id: 3, text: t("hero.stepper_steps.account_info_text") },
+  // ];
+
+  const steps = useMemo(() => {
+    const baseSteps = [
+      { id: 1, text: t("hero.stepper_steps.ride_detail_text") },
+      { id: 2, text: t("hero.stepper_steps.additional_info_text") },
+    ];
+
+    if (!isLoggedIn) {
+      baseSteps.push({ id: 4, text: t("hero.stepper_steps.account_info_text") });
+    }
+
+    return baseSteps;
+  }, [isLoggedIn, t]);
 
   const validationSchema = Yup.object().shape({
     bookingByHours: Yup.string().required(
@@ -125,18 +159,22 @@ export default function RideByHour({
     // vehicleType: Yup.string().required("vehicle Type is required"),
   });
 
-  const onSubmit = async(values, { setSubmitting }) => {
+  const onSubmit = async (values, { setSubmitting }) => {
+    if (!location) {
+      message.error(t("hero.errors.map_required"));
+    }
     if (vehicleTypeName !== '') {
       values.vehicleType = vehicleTypeName;
       dispatch(setLoading(true))
       // if (!isLoggedIn) {
-     
+
       try {
-        const formattedDate = values.arrivalDate.toLocaleDateString('en-US', {
-          year: 'numeric',
-          month: 'short',
-          day: 'numeric',
-        });
+        const getADATE = new Date(formValues.arrivalDate);
+        const year = getADATE.getFullYear();
+        const month = String(getADATE.getMonth() + 1).padStart(2, '0'); // Month is zero-indexed, so we add 1
+        const day = String(getADATE.getDate()).padStart(2, '0');
+        const formattedDate = `${year}-${month}-${day}`;
+
         const data = {
           location: location,
           destination: `${values.arrivalCity}`,
@@ -145,21 +183,26 @@ export default function RideByHour({
           arrival_date: formattedDate,
           arrival_time: values.arrivalTime,
           shared_discount: 0,
-          language: 'eng'
+          language: language ? language : 'eng'
         }
-        console.log('sss', data)
         const response = await axios.post(`${API_BASE_URL}/api/method/airport_transport.api.integrations.maps.get_price`, data);
         if (response && response.status === 200) {
           // console.log(response.data.data)
-          setPrice(response.data.data.price)
-          dispatch(setLoading(false));
-          setSubTab(4)
-          setShowSignUp(true);
+          if (isLoggedIn) {
+            setPrice(response.data.data.price)
+            dispatch(setLoading(false));
+            setShowPaymentMethod(true)
+          } else {
+            setPrice(response.data.data.price)
+            dispatch(setLoading(false));
+            setSubTab(4)
+            setShowSignUp(true);
+          }
         }
       }
       catch (error) {
-        if(error?.response?.data?.msg === 'The booking distance is very short, please modify the reservation locations'){
-          message.error(`${error?.response?.data?.msg}`);
+        if (error?.response?.data?.msg === 'The booking distance is very short, please modify the reservation locations') {
+          message.error(`${t("hero.errors.short_distance")}`);
         }
         console.error('Error:', error);
         dispatch(setLoading(false));
@@ -200,6 +243,7 @@ export default function RideByHour({
     setSelectedPickup(pickup);
     setSelectedDropoff(dropoff);
   };
+  
 
   return (
     <>
@@ -217,7 +261,25 @@ export default function RideByHour({
         <div>
           <div className="p-2 md:p-4">
             {showPaymentMethod ? (
-              <PaymentMethod formValues={formValues} price={price}/>
+              <PaymentMethod
+                formValues={formValues}
+                correctPrice={price}
+                selectedPickup={selectedPickup}
+                selectedDropoff={selectedDropoff}
+                location={location}
+                destination={destination}
+                sharedRideValue={0}
+                setSubTab={setSubTab}
+                setShowSignUp={setShowSignUp}
+                setShowAlreadyRegistered={setShowAlreadyRegistered}
+                setShowOTPScreen={setShowOTPScreen}
+                setHideCreateAccountButton={setHideCreateAccountButton}
+                setShowPhone={setShowPhone}
+                setHidePhoneCreateAccountButton={setHidePhoneCreateAccountButton}
+                setShowPhoneOTPScreen={setShowPhoneOTPScreen}
+                setShowPaymentMethod={setShowPaymentMethod}
+                 rideName="rideByHour"
+              />
 
             ) :
 
@@ -260,7 +322,7 @@ export default function RideByHour({
                     {({ values, errors, setFieldValue, validateForm }) => {
                       const isStep1Valid =
                         values.bookingByHours &&
-                        values.arrivalCity &&
+                        // values.arrivalCity &&
                         values.arrivalDate &&
                         values.arrivalTime;
                       // const isStep2Valid = values.vehicleType;
@@ -271,7 +333,7 @@ export default function RideByHour({
                             <>
                               <div>
                                 <InputFieldFormik
-                                  label="Booking Vehicle By Hours"
+                                  label={t("hero.booking_by_hours")}
                                   name="bookingByHours"
                                   type="select"
                                   options={byHoursOptions}
@@ -293,7 +355,7 @@ export default function RideByHour({
 
                               <div>
                                 <InputFieldFormik
-                                  label="Arrival City"
+                                  label={t("hero.arrival_city_text")}
                                   name="arrivalCity"
                                   type="select"
                                   options={
@@ -312,6 +374,10 @@ export default function RideByHour({
                                     const { fieldName, selectedValue } = valueObj;
                                     setFieldValue(fieldName, selectedValue);
                                     setCityName(selectedValue);
+                                    setFormValues((prevValues) => ({
+                                      ...prevValues,
+                                      [fieldName]: selectedValue,
+                                    }));
                                     setOnChangeFormValues((prevValues) => ({
                                       ...prevValues,
                                       [fieldName]: selectedValue,
@@ -323,7 +389,7 @@ export default function RideByHour({
 
                               <div >
                                 <InputFieldFormik
-                                  label="Arrival Date"
+                                  label={t("hero.arrival_date_text")}
                                   name="arrivalDate"
                                   type="arrivalDate"
                                   value={values.arrivalDate}
@@ -344,7 +410,7 @@ export default function RideByHour({
 
                               <div>
                                 <InputFieldFormik
-                                  label="Arrival Time"
+                                  label={t("hero.arrival_time_text")}
                                   name="arrivalTime"
                                   type="arrivalTime"
                                   value={values.arrivalTime || ''}
@@ -365,15 +431,16 @@ export default function RideByHour({
                                 <Button
                                   className="bg-background_steel_blue w-full text-text_white hover:bg-gray-100 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2"
                                   onClick={() => {
+                                    values.arrivalCity = formValues.arrivalCity
                                     validateForm().then(() => {
                                       if (isStep1Valid) {
                                         setSubTab(2);
                                         setFormValues(values);
                                       }
                                     });
-                                    
+
                                   }}
-                                  label="Next"
+                                  label={t("next_text")}
                                   type="button"
                                   disabled={!isStep1Valid}
                                 />
@@ -424,7 +491,7 @@ export default function RideByHour({
                               <div className="my-4 flex flex-col md:flex-row justify-between items-start">
                                 <div className="w-full md:w-1/2 mx-0 md:mx-1">
                                   <Heading
-                                    title={"Set Your Destination"}
+                                    label={t("hero.set_destination_text")}
                                     className={"text-xl text-text_black"}
                                   />
                                 </div>
@@ -447,14 +514,14 @@ export default function RideByHour({
                                   <Button
                                     className="bg-bg_btn_back w-full text-text_white hover:bg-gray-100 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2"
                                     onClick={() => handlePrevious(1, values)}
-                                    label="Previous"
+                                    label={t("previous_text")}
                                     type="button"
                                   />
                                 </div>
                                 <div className="w-full md:w-1/2 mx-0 md:mx-1">
                                   <Button
                                     className="bg-background_steel_blue w-full text-text_white hover:bg-gray-100 font-medium rounded-lg text-sm px-5 py-2.5 mb-2"
-                                    label="Submit"
+                                    label={t("submit_text")}
                                     type="submit"
                                   />
                                 </div>

@@ -1,0 +1,78 @@
+.otp-input {
+  width: 60px !important;
+  height: 50px;
+  border: 1px solid lightgray;
+  margin-inline: 5px;
+  border-radius: 4px;
+}
+
+@media only screen and (min-width: 300px) and (max-width: 400px) {
+  .otp-input {
+    width: 32px !important;
+    height: 32px;
+    border: 1px solid lightgray;
+    margin-inline: 5px;
+    border-radius: 4px;
+  }
+}
+
+@media only screen and (min-width: 401px) and (max-width: 600px) {
+  .otp-input {
+    width: 32px !important;
+    height: 32px;
+    border: 1px solid lightgray;
+    margin-inline: 5px;
+    border-radius: 4px;
+  }
+}
+
+@media only screen and (min-width: 600px) and (max-width: 690px) {
+}
+
+@media only screen and (min-width: 700px) and (max-width: 790px) {
+}
+
+@media only screen and (min-width: 800px) and (max-width: 900px) {
+}
+
+@media only screen and (min-width: 901px) and (max-width: 990px) {
+}
+
+@media only screen and (min-width: 1000px) and (max-width: 1099px) {
+}
+
+@media only screen and (min-width: 1100px) and (max-width: 1190px) {
+}
+
+@media only screen and (min-width: 1200px) and (max-width: 1390px) {
+}
+
+@media only screen and (min-width: 1400px) and (max-width: 1590px) {
+}
+
+@media only screen and (min-width: 1600px) and (max-width: 1699px) {
+}
+
+@media only screen and (min-width: 1700px) and (max-width: 1799px) {
+}
+
+@media only screen and (min-width: 1800px) and (max-width: 1899px) {
+}
+
+@media only screen and (min-width: 1900px) and (max-width: 1999px) {
+}
+
+@media only screen and (min-width: 2000px) and (max-width: 2099px) {
+}
+
+@media only screen and (min-width: 2100px) and (max-width: 2199px) {
+}
+
+@media only screen and (min-width: 2400px) {
+}
+
+@media only screen and (min-width: 2500px) and (max-width: 2700px) {
+}
+
+@media only screen and (min-width: 3200px) {
+}

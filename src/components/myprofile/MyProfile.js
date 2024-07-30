@@ -1,101 +1,94 @@
 import React, { useState, useEffect } from "react";
-import { Link, Events, scrollSpy } from "react-scroll";
-import { CiGlobe } from "react-icons/ci";
+import { Events, scrollSpy } from "react-scroll";
 import Button from "../base/Button";
-import { useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
-import { DownOutlined } from "@ant-design/icons";
-import { Dropdown, message, Space } from "antd";
-import { signOutRequest } from "../../redux/actions/authActions";
+import { message } from "antd";
 import { Formik, Form } from "formik";
 import * as Yup from "yup";
 import InputFieldFormik from "../base/InputFieldFormik";
 import axios from "axios";
 import { setLoading } from "../../redux/actions/loaderAction";
+import Header from "../base/Header";
+import Footer from "../base/Footer";
+import { useTranslation } from "react-i18next";
 
 export default function MyProfile() {
   const API_BASE_URL = process.env.REACT_APP_BASE_URL_AMK_TEST;
-  const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
   const token = useSelector((state) => state.auth.token);
-  const username = useSelector((state) => state.auth.username);
+  const language = useSelector((state) => state.auth.language);
   const dispatch = useDispatch();
-  const navigate = useNavigate();
+  const [t, i18n] = useTranslation("global");
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [activeSection, setActiveSection] = useState("home");
   const [userDetails, setUserDetails] = useState(null);
   const [formValues, setFormValues] = useState({
-    firstName: userDetails ? userDetails.name : "",
-    lastName: "",
+    rider_name: userDetails ? userDetails.name : "",
+    // lastName: "",
     day: "",
     month: "",
     year: "",
     nationality: "",
-    phoneNumber: "",
+    email: "",
+    mobile_number: "",
     city: "",
     state: "",
-    streetAddress: "",
-    password: "",
-    confirmPassword: "",
-
+    street: "",
+    // password: "",
+    // confirmPassword: "",
   });
-  console.log('ttt', token)
 
   useEffect(() => {
     dispatch(setLoading(true));
     const getUserDetails = async () => {
       try {
-        const response = await axios.get('https://test-erp.amk.sa/api/method/airport_transport.api.user.get_user_info', {
-          headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-            'Authorization': `Bearer ${token}`
-          },
-        });
+        const response = await axios.get(
+          `${API_BASE_URL}/api/method/airport_transport.api.user.get_user_info`,
+          {
+            headers: {
+              "Content-Type": "application/x-www-form-urlencoded",
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
         if (response && response.status === 200) {
+          // console.log('sss', response.data.data)
           setUserDetails(response.data.data);
           const data = response.data.data;
-          setFormValues(prevformValues => ({
+          let day = "";
+          let month = "";
+          let year = "";
+          if (data.dob) {
+            let parts = data.dob.split("-");
+            year = parseInt(parts[0]);
+            month = parseInt(parts[1]);
+            day = parseInt(parts[2]);
+          }
+          setFormValues((prevformValues) => ({
             ...prevformValues,
-            firstName: data.name,
-            nationality: data.country,
+            rider_name: data.rider_name,
+            // lastName: data?.lastName ? data.lastName : "",
+            day: day,
+            month: month,
+            year: year,
+            nationality: data.nationality,
+            email: data.email,
+            mobile_number: data.mobile_number,
             city: data.city,
             state: data.state,
-            streetAddress: data.street
-
-          }))
+            street: data.street,
+          }));
           dispatch(setLoading(false));
         }
-      }
-      catch (error) {
-        console.error('Error:', error);
+      } catch (error) {
+        console.error("Error:", error);
         dispatch(setLoading(false));
-      };
-    }
+      }
+    };
     getUserDetails();
-  }, [token])
+  }, [token]);
   // Function to toggle menu
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
   };
-
-  // Define array of menu items with corresponding component IDs
-  const menuItems = [
-    { id: "home", text: "Home" },
-    { id: "services", text: "Services" },
-    { id: "vehicleType", text: "Vehicle Type" },
-    // Add more menu items as needed
-  ];
-
-  const footerItems = [
-    { id: "home", text: "Home" },
-    { id: "services", text: "Services" },
-    { id: "vehicleType", text: "Vehicle Type" },
-  ];
-
-  const footerItemsTwo = [
-    { text: "Privacy Policy", href: "#" },
-    { text: "Terms of Service", href: "#" },
-    { text: "Cookies Settings", href: "#" },
-  ];
 
   useEffect(() => {
     Events.scrollEvent.register("begin", function (to, element) { });
@@ -109,66 +102,29 @@ export default function MyProfile() {
     };
   }, []);
 
-  const handleSetActive = (to) => {
-    setActiveSection(to);
-  };
-
-  const onClick = ({ key }) => {
-    switch (key) {
-      case "1":
-        navigate("/my-profile");
-        break;
-      case "2":
-        navigate("/my-bookings");
-        break;
-      case "3":
-        message.success(`Logged out`);
-        dispatch(signOutRequest());
-        navigate("/");
-        break;
-      default:
-        break;
-    }
-  };
-
-  const items = [
-    {
-      label: "My Profile",
-      key: "1",
-    },
-    {
-      label: "My Booking",
-      key: "2",
-    },
-    {
-      label: "Logout",
-      key: "3",
-    },
-  ];
-
   const validationSchema = Yup.object().shape({
-    firstName: Yup.string().required("First Name is required"),
-    lastName: Yup.string().required("Last Name is required"),
-    day: Yup.string().required("Day is required"),
-    month: Yup.string().required("Month is required"),
-    year: Yup.string().required("Year is required"),
-    nationality: Yup.string().required("Nationality is required"),
-    phoneNumber: Yup.string()
-      .matches(/^[0-9]+$/, "Phone Number must be only digits")
-      .required("Phone Number is required"),
-    city: Yup.string().required("City is required"),
-    state: Yup.string().required("State is required"),
-    streetAddress: Yup.string().required("Street Address is required"),
-    password: Yup.string()
-      .required("Password is required")
-      .min(8, "Password must be at least 8 characters")
-      .max(20, "Password cannot be more than 20 characters")
-      .matches(/[A-Z]/, "Password must have at least 1 uppercase letter")
-      .matches(/[a-z]/, "Password must have at least 1 lowercase letter")
-      .matches(/[@$!%*?&#]/, "Password must have at least 1 symbol"),
-    confirmPassword: Yup.string()
-      .oneOf([Yup.ref("password"), null], "Passwords must match")
-      .required("Confirm Password is required"),
+    rider_name: Yup.string().required(t("errors.rider_name_error")),
+    // lastName: Yup.string().required(t("errors.last_name_error")),
+    day: Yup.string().required(t("errors.day_error")),
+    month: Yup.string().required(t("errors.month_error")),
+    year: Yup.string().required(t("errors.year_error")),
+    nationality: Yup.string().required(t("errors.nationality_errr")),
+    // mobile_number: Yup.string()
+    //   .matches(/^[0-9]+$/, "Phone Number must be only digits")
+    //   .required("Phone Number is required"),
+    city: Yup.string().required(t("errors.city_error")),
+    state: Yup.string().required(t("errors.state_error")),
+    street: Yup.string().required(t("errors.street_error")),
+    // password: Yup.string()
+    //   .required(t("errors.password_error"))
+    //   .min(8, t("errors.password_min_error"))
+    //   .max(20, t("errors.password_max_error"))
+    //   .matches(/[A-Z]/, t("errors.password_uppercase_error"))
+    //   .matches(/[a-z]/, t("errors.password_lowercase_error"))
+    //   .matches(/[@$!%*?&#]/, t("errors.password_symbol_error")),
+    // confirmPassword: Yup.string()
+    //   .oneOf([Yup.ref("password"), null], t("errors.confirm_password_error2"))
+    //   .required(t("errors.confirm_password_error")),
   });
 
   const [countriesOptions, setCountriesOptions] = useState([]);
@@ -196,270 +152,152 @@ export default function MyProfile() {
   }, [API_BASE_URL]);
 
   const onSubmit = async (values, { setSubmitting }) => {
-    console.log('aaa', values); // For testing purpose
+    // Transform the values before submitting
+    const dob = `${values.year}-${values.month}-${values.day}`;
+    const transformedValues = {
+      ...values,
+      dob, // Add the dob field in 'year-month-day' format
+      country: values.nationality, // Add the country field with the nationality value
+    };
+
+    // Remove the day, month, and year fields
+    delete transformedValues.day;
+    delete transformedValues.month;
+    delete transformedValues.year;
+
+    console.log("Transformed values for my profile:", transformedValues); // For testing purpose
     dispatch(setLoading(true));
     try {
-      const response = await axios.post('https://test-erp.amk.sa/api/method/airport_transport.api.user.update_user_info', values, {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        },
-      });
+      const response = await axios.post(
+        `${API_BASE_URL}/api/method/airport_transport.api.user.update_user_info`,
+        transformedValues,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
       if (response && response.status === 200) {
         message.success(response.data.msg);
         dispatch(setLoading(false));
       }
-    }
-    catch (error) {
-      console.error('Error:', error);
+    } catch (error) {
+      console.error("Error:", error);
       dispatch(setLoading(false));
-    };
+    }
     setSubmitting(false);
   };
 
   return (
     <div>
-      <header className="fixed top-0 left-0 w-full z-50">
-        {" "}
-        {/* Make header fixed */}
-        <nav className="bg-background_steel_blue md:h-20 lg:h-20 px-4 lg:px-20 py-2.5 dark:bg-gray-800">
-          <div className="flex flex-wrap justify-between items-center mx-auto max-w-screen-xl md:h-full lg:h-full">
-            <button onClick={() => navigate("/")} className="flex items-center">
-              <img
-                src="/assets/header/logo.png"
-                className="w-14 h-14 sm:h-14 my-2"
-                alt="Camelo Logo"
-              />
-            </button>
-            <div className="flex flex-row justify-center items-baseline lg:order-2">
-              <div>
-                <Button
-                  className="text-text_white font-medium text-md mr-2 hidden md:flex"
-                  onClick={() =>
-                    (window.location.href = "http://localhost:3000/#")
-                  }
-                  label={
-                    <>
-                      <div className="flex flex-row justify-center items-baseline">
-                        <CiGlobe className="text-xl" />
-                        <div className="text-md px-2">Ar</div>
-                      </div>
-                    </>
-                  }
-                  disabled={true}
-                  type="button"
-                />
-              </div>
-
-              {!isLoggedIn ? (
-                <>
-                  <div>
-                    <Button
-                      className="hidden md:flex bg-transparent text-text_white font-medium text-md px-2.5 cursor-pointer"
-                      onClick={() => navigate("/sign-in")} // Use navigate here
-                      label="Sign in"
-                      type="button"
-                    />
-                  </div>
-                  <div>
-                    <Button
-                      className="cursor-pointer hidden md:flex text-text_steel_blue bg-background_white border border-gray-300 focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-100 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:border-gray-600 dark:focus:ring-gray-700"
-                      onClick={() => navigate("/create-new-account")}
-                      label="Create new account"
-                      type="button"
-                    />
-                  </div>
-                </>
-              ) : (
-                <>
-                  <div>
-                    <Dropdown
-                      menu={{
-                        items,
-                        onClick,
-                      }}
-                    >
-                      <div
-                        className="cursor-pointer hidden md:flex text-text_steel_blue bg-background_white border border-gray-300 focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-100 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:border-gray-600 dark:focus:ring-gray-700"
-                        onClick={(e) => e.preventDefault()}
-                      >
-                        <Space>
-                          {username || "User"}
-                          <DownOutlined />
-                        </Space>
-                      </div>
-                    </Dropdown>
-                    {/* <div
-                className="cursor-pointer hidden md:flex text-text_steel_blue bg-background_white border border-gray-300 focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-100 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:border-gray-600 dark:focus:ring-gray-700"
-                onClick={handleLogout}
-              >
-                <Space>
-                  Logout
-                  <DownOutlined />
-                </Space>
-              </div> */}
-                  </div>
-                </>
-              )}
-
-              <button
-                onClick={toggleMenu}
-                data-collapse-toggle="mega-menu-full"
-                type="button"
-                className="inline-flex justify-center items-center p-2 ml-1 w-10 h-10 text-gray-500 rounded-lg md:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-600"
-                aria-controls="mega-menu-full"
-                aria-expanded="false"
-              >
-                <span className="sr-only">Open main menu</span>
-                <svg
-                  aria-hidden="true"
-                  className="w-5 h-5"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M4 6h16M4 12h16m-7 6h7"
-                  ></path>
-                </svg>
-              </button>
-            </div>
-            <div
-              id="mega-menu-full"
-              className={`${isMenuOpen ? "block" : "hidden"
-                } justify-between items-center w-full text-md md:flex md:w-auto md:order-1`}
-            >
-              <ul className="flex flex-col mt-4 font-medium md:flex-row md:space-x-8 md:mt-0 text-text_white text-md">
-                {menuItems.map((item) => (
-                  <li key={item.id}>
-                    <Link
-                      activeClass="active"
-                      to={item.id}
-                      spy={true}
-                      smooth={true}
-                      duration={500}
-                      onSetActive={handleSetActive}
-                      className={`block py-2 pr-4 pl-3 text-white rounded md:bg-transparent md:text-primary-700 md:p-0 dark:text-white cursor-pointer ${activeSection === item.id ? "active" : ""
-                        }`}
-                    >
-                      {item.text}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </div>
-        </nav>
-      </header>
+      <Header />
 
       {userDetails && (
-        <main className="mt-20">
+        <main className="mt-20" dir={language === 'ar' ? 'rtl' : 'ltr'}>
           {/* Form Section */}
           <div className="container mx-auto p-4">
             <Formik
               initialValues={{
-                firstName: formValues.firstName,
-                lastName: formValues.lastName,
+                rider_name: formValues.rider_name,
+                // lastName: formValues.lastName,
                 day: formValues.day,
                 month: formValues.month,
                 year: formValues.year,
                 nationality: formValues.nationality,
-                phoneNumber: formValues.phoneNumber,
+                email: formValues.email,
+                mobile_number: formValues.mobile_number,
                 city: formValues.city,
                 state: formValues.state,
-                streetAddress: formValues.streetAddress,
-                password: formValues.password,
-                confirmPassword: formValues.confirmPassword,
+                street: formValues.street,
+                // password: formValues.password,
+                // confirmPassword: formValues.confirmPassword,
               }}
               validationSchema={validationSchema}
               onSubmit={onSubmit}
             >
               {({ values, isSubmitting, setFieldValue }) => (
                 <Form className="space-y-3">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  <div className="grid grid-cols-1 md:grid-cols-1 gap-3">
                     <div>
                       <InputFieldFormik
-                        label="First Name"
-                        name="firstName"
+                        label={t("my_profile.first_name_text")}
+                        name="rider_name"
                         type="text"
                         placeholder="Enter your first name"
-                        value={formValues.firstName}
+                        value={formValues.rider_name}
                         onChange={(e) => {
-                          values.firstName = e.target.value;
-                          setFormValues(prevformValues => ({
+                          values.rider_name = e.target.value;
+                          setFormValues((prevformValues) => ({
                             ...prevformValues,
-                            firstName: e.target.value,
-                          }))
+                            rider_name: e.target.value,
+                          }));
                         }}
                       />
                     </div>
-                    <div>
+                    {/* <div>
                       <InputFieldFormik
-                        label="Last Name"
+                        label={t("my_profile.last_name_text")}
                         name="lastName"
                         type="text"
                         placeholder="Enter your last name"
                         value={formValues.lastName}
                         onChange={(e) => {
                           values.lastName = e.target.value;
-                          setFormValues(prevformValues => ({
+                          setFormValues((prevformValues) => ({
                             ...prevformValues,
                             lastName: e.target.value,
-                          }))
+                          }));
                         }}
                       />
-                    </div>
+                    </div> */}
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                     <div>
                       <InputFieldFormik
-                        label="Day"
+                        label={t("my_profile.day_text")}
                         name="day"
                         type="text"
                         placeholder="DD"
                         value={formValues.day}
                         onChange={(e) => {
                           values.day = e.target.value;
-                          setFormValues(prevformValues => ({
+                          setFormValues((prevformValues) => ({
                             ...prevformValues,
                             day: e.target.value,
-                          }))
+                          }));
                         }}
                       />
                     </div>
                     <div>
                       <InputFieldFormik
-                        label="Month"
+                        label={t("my_profile.month_text")}
                         name="month"
                         type="text"
                         placeholder="MM"
                         value={formValues.month}
                         onChange={(e) => {
                           values.month = e.target.value;
-                          setFormValues(prevformValues => ({
+                          setFormValues((prevformValues) => ({
                             ...prevformValues,
                             month: e.target.value,
-                          }))
+                          }));
                         }}
                       />
                     </div>
                     <div>
                       <InputFieldFormik
-                        label="Year"
+                        label={t("my_profile.year_text")}
                         name="year"
                         type="text"
                         placeholder="YYYY"
                         value={formValues.year}
                         onChange={(e) => {
                           values.year = e.target.value;
-                          setFormValues(prevformValues => ({
+                          setFormValues((prevformValues) => ({
                             ...prevformValues,
                             year: e.target.value,
-                          }))
+                          }));
                         }}
                       />
                     </div>
@@ -468,7 +306,7 @@ export default function MyProfile() {
                   <div className="grid grid-cols-1 gap-3">
                     <div>
                       <InputFieldFormik
-                        label="Nationality"
+                        label={t("my_profile.nationality_text")}
                         name="nationality"
                         type="select"
                         options={countriesOptions}
@@ -476,11 +314,10 @@ export default function MyProfile() {
                         onChange={(valueObj) => {
                           const { fieldName, selectedValue } = valueObj;
                           setFieldValue(fieldName, selectedValue);
-                          setFormValues(prevformValues => ({
+                          setFormValues((prevformValues) => ({
                             ...prevformValues,
                             nationality: selectedValue,
-                          }))
-
+                          }));
                         }}
                         required
                       />
@@ -489,51 +326,54 @@ export default function MyProfile() {
 
                   <div className="grid grid-cols-1 gap-3">
                     <InputFieldFormik
-                      label="Phone Number"
-                      name="phoneNumber"
-                      type="text"
-                      placeholder="Enter your phone number"
-                      value={formValues.phoneNumber}
-                      onChange={(e) => {
-                        values.phoneNumber = e.target.value;
-                        setFormValues(prevformValues => ({
-                          ...prevformValues,
-                          phoneNumber: e.target.value,
-                        }))
-                      }}
+                      label={t("my_profile.email_text")}
+                      name="email"
+                      type="readOnly"
+                      readOnly={true}
+                      value={formValues.email}
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-1 gap-3">
+                    <InputFieldFormik
+                      label={t("my_profile.phone_number_text")}
+                      name="phone"
+                      type="readOnly"
+                      readOnly={true}
+                      value={formValues.mobile_number}
                     />
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                     <div>
                       <InputFieldFormik
-                        label="City"
+                        label={t("my_profile.city_text")}
                         name="city"
                         type="text"
                         placeholder="Enter your city"
                         value={formValues.city}
                         onChange={(e) => {
                           values.city = e.target.value;
-                          setFormValues(prevformValues => ({
+                          setFormValues((prevformValues) => ({
                             ...prevformValues,
                             city: e.target.value,
-                          }))
+                          }));
                         }}
                       />
                     </div>
                     <div>
                       <InputFieldFormik
-                        label="State"
+                        label={t("my_profile.state_text")}
                         name="state"
                         type="text"
                         placeholder="Enter your state"
                         value={formValues.state}
                         onChange={(e) => {
                           values.state = e.target.value;
-                          setFormValues(prevformValues => ({
+                          setFormValues((prevformValues) => ({
                             ...prevformValues,
                             state: e.target.value,
-                          }))
+                          }));
                         }}
                       />
                     </div>
@@ -541,58 +381,58 @@ export default function MyProfile() {
 
                   <div className="grid grid-cols-1 gap-3">
                     <InputFieldFormik
-                      label="Street Address"
-                      name="streetAddress"
+                      label={t("my_profile.street_address_text")}
+                      name="street"
                       type="text"
                       placeholder="Enter your street address"
-                      value={formValues.streetAddress}
+                      value={formValues.street}
                       onChange={(e) => {
-                        values.streetAddress = e.target.value;
-                        setFormValues(prevformValues => ({
+                        values.street = e.target.value;
+                        setFormValues((prevformValues) => ({
                           ...prevformValues,
-                          streetAddress: e.target.value,
-                        }))
+                          street: e.target.value,
+                        }));
                       }}
                     />
                   </div>
 
-                  <div className="grid grid-cols-1 gap-3">
+                  {/* <div className="grid grid-cols-1 gap-3">
                     <InputFieldFormik
-                      label="Password"
+                      label={t("my_profile.password_text")}
                       name="password"
                       type="password"
                       placeholder="Enter your password"
                       value={formValues.password}
                       onChange={(e) => {
                         values.password = e.target.value;
-                        setFormValues(prevformValues => ({
+                        setFormValues((prevformValues) => ({
                           ...prevformValues,
                           password: e.target.value,
-                        }))
+                        }));
                       }}
                     />
                   </div>
 
                   <div className="grid grid-cols-1 gap-3">
                     <InputFieldFormik
-                      label="Confirm Password"
+                      label={t("my_profile.confirm_password")}
                       name="confirmPassword"
                       type="password"
                       placeholder="Confirm your password"
                       value={formValues.confirmPassword}
                       onChange={(e) => {
                         values.confirmPassword = e.target.value;
-                        setFormValues(prevformValues => ({
+                        setFormValues((prevformValues) => ({
                           ...prevformValues,
                           confirmPassword: e.target.value,
-                        }))
+                        }));
                       }}
                     />
-                  </div>
+                  </div> */}
 
                   <Button
                     type="submit"
-                    label="Save Changes"
+                    label={t("my_profile.save_changes_text")}
                     className="bg-background_steel_blue w-full text-text_white hover:bg-gray-100 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2"
                     disabled={isSubmitting}
                   />
@@ -603,65 +443,7 @@ export default function MyProfile() {
         </main>
       )}
 
-
-      {/* footer code is here */}
-      <footer className="mt-10 w-full py-3 md:py-6 px-10 md:px-20 flex flex-col items-center justify-center bg-background_steel_blue text-text_white">
-        <div className="mb-4">
-          <img
-            src="/assets/footer/logo.png"
-            alt="Mashrook Trips"
-            className="w-16 md:w-32 h-16 md:h-32"
-          />
-        </div>
-        <div className="my-2 md:my-4">
-          <ul className="flex flex-col items-center mt-2 md:mt-4 font-normal md:font-medium md:flex-row md:items-baseline lg:space-x-8 lg:mt-0">
-            {footerItems.map((item) => (
-              <li key={item.id}>
-                <Link
-                  to={item.id}
-                  spy={true}
-                  smooth={true}
-                  onClick={toggleMenu} // Close menu on link click
-                  className="text-text_white block cursor-pointer py-1 md:py-2 pr-2 md:pr-4 pl-2 md:pl-3 text-white rounded bg-primary-700 lg:bg-transparent lg:text-primary-700 lg:p-0 dark:text-white"
-                >
-                  {item.text}
-                </Link>
-              </li>
-            ))}
-            <li
-              onClick={() => navigate("/sign-in")}
-              className="text-text_white block cursor-pointer py-1 md:py-2 pr-2 md:pr-4 pl-2 md:pl-3 text-white rounded bg-primary-700 lg:bg-transparent lg:text-primary-700 lg:p-0 dark:text-white"
-            >
-              Sign in
-            </li>
-            <li>
-              <Button
-                className="hidden md:flex cursor-pointer text-text_steel_blue bg-background_white border border-gray-300 focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-100 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:border-gray-600 dark:focus:ring-gray-700"
-                onClick={() => navigate("/create-new-account")}
-                label="Create new account"
-                type="button"
-              />
-            </li>
-          </ul>
-        </div>
-        <div className="mt-4 border-t w-full pt-2 flex flex-col-reverse md:flex-row justify-between items-center">
-          <div className="mt-3 md:0">
-            Copyright © 2024 AMK or its affiliates
-          </div>
-          <div className="flex flex-row justify-end items-center">
-            <ul className="flex flex-col md:flex-row items-center mt-3 text-sm font-medium text-gray-500 dark:text-gray-400 sm:mt-0">
-              {footerItemsTwo.map((item, index) => (
-                <li key={index} className="mt-3 md:0">
-                  <a href={item.href} className="hover:underline me-4 md:me-6">
-                    {item.text}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </div>
-        </div>
-      </footer>
-      {/* footer code is here */}
+      <Footer />
     </div>
   );
 }

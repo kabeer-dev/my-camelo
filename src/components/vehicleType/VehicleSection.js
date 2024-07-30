@@ -8,11 +8,14 @@ import "slick-carousel/slick/slick-theme.css";
 import "./Vehicle.css";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchVehicleTypesRequest } from "../../redux/actions/vehicleTypeAction";
+import { useTranslation } from "react-i18next";
 
 export default function VehicleSection() {
   const dispatch = useDispatch();
 
   const { vehicleTypes } = useSelector((state) => state.vehicleTypes);
+  const language = useSelector((state) => state.auth.language);
+  const [t, i18n] = useTranslation("global")
 
   useEffect(() => {
     dispatch(fetchVehicleTypesRequest());
@@ -186,17 +189,17 @@ export default function VehicleSection() {
   };
 
   return (
-    <div className="px-6 md:px-12 pb-5 md:pb-10">
-      <div className="mt-2 md:mt-3 mb-4 md:mb-7 flex flex-col md:flex-row justify-between items-start">
+    <div className="px-6 md:px-12 pb-5 md:pb-10" >
+      <div className="mt-2 md:mt-3 mb-4 md:mb-7 flex flex-col md:flex-row justify-between items-start" dir={language === 'ar' ? 'rtl' : 'ltr'}>
         <div className="w-full md:w-1/2">
           <Heading
-            title="Vehicle Type"
+            title={t("vehicle_type.heading")}
             className="text-5xl text-text_steel_blue"
           />
         </div>
         <div className="w-full md:w-1/2 mt-3 md:mt-0">
           <Paragraph
-            title="Join us and learn about our service in digital transformation and discover the unlimited possibilities that await you."
+           title={t("vehicle_type.paragraph")}
             className="text-lg text-[#454545]"
           />
         </div>

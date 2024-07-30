@@ -12,9 +12,11 @@ import {
   signInFailure,
   signOutFailure,
   signUpFailure,
+  languageChange
 } from "../actions/authActions";
 import { message } from "antd";
 import { setLoading } from "../actions/loaderAction";
+import secureLocalStorage from "react-secure-storage";
 
 const API_BASE_URL = process.env.REACT_APP_BASE_URL_AMK_TEST;
 
@@ -26,17 +28,35 @@ function* signInSaga(action) {
     recaptchaToken: recaptchaToken,
   };
   try {
-    const response = yield axios.post(
-      `${API_BASE_URL}/api/method/airport_transport.api.user.login`,
-      { usr: email, pwd: password },
-      { headers: headers }
-    );
-    const { token, username } = response.data.data;
-    yield put(signInSuccess(token, username));
-    yield put(setLoading(false));
-    // Navigate to the home page on successful sign-in
-    if (navigate) {
-      navigate("/");
+    const response = yield axios.post(`${API_BASE_URL}/api/method/airport_transport.api.user.detect_email?email=${email}`);
+    if (response && response.status === 200) {
+      // console.log('ggg', response.data.msg);
+      if (response.data.msg === 'Transport User') {
+        const signinResponse = yield axios.post(
+          `${API_BASE_URL}/api/method/airport_transport.api.user.login`,
+          { usr: email, pwd: password },
+          { headers: headers }
+        );
+        const { token, username } = signinResponse.data.data;
+        const getEmail = signinResponse.data.data.email
+        yield put(signInSuccess(token, username, getEmail));
+        yield put(setLoading(false));
+        // Navigate to the home page on successful sign-in
+        if (navigate) {
+          navigate("/");
+        }
+      } else {
+        const agentResponse = yield axios.post(
+          `https://alsheikh.test.masarat-transport.com/api/method/airport_transport.api.agent.login?usr=${email}&pwd=${password}`);
+          const { token, username } = agentResponse.data.data;
+          const getEmail = agentResponse.data.data.email
+          yield put(signInSuccess(token, username, getEmail));
+        secureLocalStorage.setItem("agent", true);
+        yield put(setLoading(false));
+        if (navigate) {
+          navigate("/agent", {state: {email: email}});
+        }
+      }
     }
   } catch (error) {
     yield put(signInFailure(error.response.data.msg));
@@ -48,6 +68,7 @@ function* signInSaga(action) {
 function* signUpSaga(action) {
   yield put(setLoading(true));
   const { values, recaptchaToken, navigate } = action.payload;
+  const language = secureLocalStorage.getItem("language");
   const headers = {
     "Content-Type": "application/json",
     recaptchaToken: recaptchaToken,

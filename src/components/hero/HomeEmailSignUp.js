@@ -14,48 +14,52 @@ import { useDispatch, useSelector } from "react-redux";
 
 import PaymentMethod from "./PaymentMethod";
 import { signInSuccess } from "../../redux/actions/authActions";
+import { useTranslation } from "react-i18next";
 
-export default function HomeEmailSignUp(
-  {
-    formValues,
-    setSubTab, setShowSignUp,
-    showAlreadyRegistered,
-    setShowAlreadyRegistered,
-    showOTPScreen,
-    setShowOTPScreen,
-    hideCreateAccountButton,
-    setHideCreateAccountButton,
-    showPhone,
-    setShowPhone,
-    hidePhoneCreateAccountButton,
-    setHidePhoneCreateAccountButton,
-    showPhoneOTPScreen,
-    setShowPhoneOTPScreen,
-    showPaymentMethod,
-    setShowPaymentMethod,
-    recaptchaRef,
-    otp,
-    setOtp,
-    phoneOtp,
-    setPhoneOtp
-  }
-) {
+export default function HomeEmailSignUp({
+  formValues,
+  setSubTab,
+  setShowSignUp,
+  showAlreadyRegistered,
+  setShowAlreadyRegistered,
+  showOTPScreen,
+  setShowOTPScreen,
+  hideCreateAccountButton,
+  setHideCreateAccountButton,
+  showPhone,
+  setShowPhone,
+  hidePhoneCreateAccountButton,
+  setHidePhoneCreateAccountButton,
+  showPhoneOTPScreen,
+  setShowPhoneOTPScreen,
+  showPaymentMethod,
+  setShowPaymentMethod,
+  recaptchaRef,
+  otp,
+  setOtp,
+  phoneOtp,
+  setPhoneOtp,
+}) {
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const [timer, setTimer] = useState(30); // Timer state
+  const [showResend, setShowResend] = useState(false); // State to show resend button
   const [email, setEmail] = useState("");
   const [error, setError] = useState("");
 
+  const [t, i18n] = useTranslation("global");
+
   const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
-  useEffect(()=> {
-    if(isLoggedIn){
-      setShowPaymentMethod(true)
+  useEffect(() => {
+    if (isLoggedIn) {
+      setShowPaymentMethod(true);
     }
-  }, [isLoggedIn])
+  }, [isLoggedIn]);
 
   const [recaptchaToken, setRecaptchaToken] = useState(null);
 
   const validationSchema = Yup.object().shape({
-    email: Yup.string().email("Invalid email").required("Email is required"),
+    email: Yup.string().email("Invalid email").required(t("errors.email_error")),
   });
 
   const initialValues = {
@@ -64,11 +68,9 @@ export default function HomeEmailSignUp(
 
   const API_BASE_URL = process.env.REACT_APP_BASE_URL_AMK_TEST;
 
-
   const onSubmit = async (values, { setSubmitting }) => {
     dispatch(setLoading(true));
     if (values.password && showAlreadyRegistered) {
-
       const headers = {
         "Content-Type": "application/json",
         recaptchaToken: recaptchaToken,
@@ -80,16 +82,15 @@ export default function HomeEmailSignUp(
           { headers: headers }
         );
         const { token, username } = response.data.data;
-        dispatch(signInSuccess(token, username))
-        dispatch(setLoading(false))
-        setShowPhone(true)
-        setShowPaymentMethod(true)
+        dispatch(signInSuccess(token, username));
+        dispatch(setLoading(false));
+        setShowPhone(true);
+        setShowPaymentMethod(true);
       } catch (error) {
         recaptchaRef.current.reset();
         message.error(`${error?.response?.data?.msg}`);
-        dispatch(setLoading(false))
+        dispatch(setLoading(false));
       }
-
     } else {
       try {
         const headers = {
@@ -110,6 +111,7 @@ export default function HomeEmailSignUp(
               setShowOTPScreen(true);
               setEmail(values.email); // Store email for later use
               setHideCreateAccountButton(true); // Hide create account button
+              setTimer(30)
             }
           } catch (error) {
             message.error(`${error?.response?.data?.msg}`);
@@ -160,15 +162,49 @@ export default function HomeEmailSignUp(
     }
   }, [otp, handleVerify]);
 
+  useEffect(() => {
+    let interval = null;
+    if (timer > 0) {
+      interval = setInterval(() => {
+        setTimer((prevTimer) => prevTimer - 1);
+      }, 1000);
+    } else {
+      setShowResend(true); // Show resend button when timer completes
+      clearInterval(interval);
+    }
+    return () => clearInterval(interval);
+  }, [timer]);
+
+  const handleResend = async () => {
+    // Handle resend OTP logic
+    dispatch(setLoading(true))
+    try {
+      const otpResponse = await axios.get(
+        `${API_BASE_URL}/api/method/airport_transport.api.user.send_confirmation_email?email=${email}`,
+      );
+      // Redirect to OTP verification screen
+      if (otpResponse?.status === 200) {
+        setTimer(30); // Reset timer
+        setShowResend(false); // Hide resend button
+        message.success(`${otpResponse?.data?.msg}`);
+      }
+    } catch (error) {
+      message.error(`${error?.response?.data?.msg}`);
+    }
+    dispatch(setLoading(false))
+    // Implement OTP resend API call here
+  };
+
   return (
     <>
       {showPaymentMethod ? (
-        <PaymentMethod formValues={formValues}/>
+        <PaymentMethod formValues={formValues} />
       ) : showPhone ? (
         <HomePhoneSignUp
           formValues={formValues}
           email={email}
-          showPaymentMethod={showPaymentMethod} setShowPaymentMethod={setShowPaymentMethod}
+          showPaymentMethod={showPaymentMethod}
+          setShowPaymentMethod={setShowPaymentMethod}
           hidePhoneCreateAccountButton={hidePhoneCreateAccountButton}
           setHidePhoneCreateAccountButton={setHidePhoneCreateAccountButton}
           showPhoneOTPScreen={showPhoneOTPScreen}
@@ -189,16 +225,16 @@ export default function HomeEmailSignUp(
         >
           {({ values }) => (
             <Form>
-              <div>
+              <div dir="ltr">
                 <InputFieldFormik
-                  label="Enter Your Email Address"
+                  label={t("hero.enter_email_text")}
                   name="email"
                   type="email"
                   required
                 />
               </div>
 
-              {!showAlreadyRegistered && (
+              {!showAlreadyRegistered && !showOTPScreen && (
                 <div>
                   <Recaptcha
                     recaptchaRef={recaptchaRef}
@@ -212,9 +248,9 @@ export default function HomeEmailSignUp(
 
               {showAlreadyRegistered && (
                 <>
-                  <div>
+                  <div dir="ltr">
                     <InputFieldFormik
-                      label="Password"
+                      label={t("hero.password_text")}
                       name="password"
                       type="password"
                       required
@@ -239,21 +275,21 @@ export default function HomeEmailSignUp(
                       })
                     }
                   >
-                    Forget your password ?
+                    {t("hero.forget_password_text")}
                   </div>
 
                   <div className="text-center mt-6 flex flex-col md:flex-row justify-between items-center">
                     <Button
                       className="bg-bg_btn_back w-full text-text_white hover:bg-gray-100 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2"
                       onClick={() => {
-                        setShowAlreadyRegistered(false)
+                        setShowAlreadyRegistered(false);
                       }}
-                      label="Previous"
+                      label={(t("previous_text"))}
                       type="button"
                     />
                     <Button
                       className="bg-background_steel_blue w-full text-text_white hover:bg-gray-100 font-medium rounded text-sm px-5 py-2.5 me-2 mb-2"
-                      label="Login"
+                      label={(t("login_text"))}
                       type="submit"
                     />
                   </div>
@@ -265,15 +301,15 @@ export default function HomeEmailSignUp(
                   <Button
                     className="bg-bg_btn_back w-full text-text_white hover:bg-gray-100 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2"
                     onClick={() => {
-                      setSubTab(1)
-                      setShowSignUp(false)
+                      setSubTab(1);
+                      setShowSignUp(false);
                     }}
-                    label="Previous"
+                    label={(t("previous_text"))}
                     type="button"
                   />
                   <Button
                     className="bg-background_steel_blue w-full text-text_white hover:bg-gray-100 font-medium rounded text-sm px-5 py-2.5 me-2 mb-2"
-                    label="Continue"
+                    label={t("continue_text")}
                     type="submit"
                   />
                 </div>
@@ -286,16 +322,17 @@ export default function HomeEmailSignUp(
                       htmlFor={otp}
                       className="block mb-2 mt-2 lg:mt-1  text-sm font-medium text-gray-900 dark:text-white"
                     >
-                      Enter OTP
+                      {t("hero.enter_otp_text")}
                     </label>
-                    <OtpInput
-                      inputStyle="otp-input"
-                      value={otp}
-                      onChange={handleChange}
-                      numInputs={6}
-                      renderInput={(props, i) => <input {...props} key={i} />}
-                    />
-
+                    <div dir="ltr">
+                      <OtpInput
+                        inputStyle="otp-input"
+                        value={otp}
+                        onChange={handleChange}
+                        numInputs={6}
+                        renderInput={(props, i) => <input {...props} key={i} />}
+                      />
+                    </div>
                     {error && (
                       <div className="text-base text-text_warning font-semibold my-2">
                         {error}
@@ -303,20 +340,39 @@ export default function HomeEmailSignUp(
                     )}
                   </div>
 
+                  <div className="mt-2 flex flex-row justify-start items-center">
+                    <div className="mr-1">
+                      {showResend ? (
+                        <Button
+                          className="bg-background_steel_blue w-20 text-center text-text_white hover:bg-gray-100 font-medium rounded text-sm px-1 py-2 me-2 mb-2"
+                          label={t("resend_text")}
+                          type="button"
+                          onClick={handleResend}
+                        />
+                      ) : (
+                        `${t("hero.resend_otp_text")} - ${Math.floor(timer / 60)
+                          .toString()
+                          .padStart(2, "0")}:${(timer % 60)
+                            .toString()
+                            .padStart(2, "0")}`
+                      )}
+                    </div>
+                  </div>
+
                   <div className="my-3 flex flex-col md:flex-row justify-between items-center">
                     <Button
                       className="bg-bg_btn_back w-full text-text_white hover:bg-gray-100 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2"
                       onClick={() => {
-                        setShowOTPScreen(false)
-                        setHideCreateAccountButton(false)
+                        setShowOTPScreen(false);
+                        setHideCreateAccountButton(false);
                         recaptchaRef.current.reset();
                       }}
-                      label="Previous"
+                      label={t("previous_text")}
                       type="button"
                     />
                     <Button
                       className="bg-background_steel_blue w-full text-text_white hover:bg-gray-100 font-medium rounded text-sm px-5 py-2.5 me-2 mb-2"
-                      label="Verify"
+                      label={t("verify_text")}
                       type="button"
                       onClick={handleVerify}
                     />

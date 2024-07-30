@@ -5,16 +5,18 @@ import {
     getZoneSuccess,
     getZoneFailure,
 } from "../actions/zoneActions";
+import secureLocalStorage from "react-secure-storage";
 
 const API_BASE_URL = process.env.REACT_APP_BASE_URL_AMK_TEST;
 
 // Handle fetch zone saga
 function* fetchZoneSaga(action) {
     const { services, cityName } = action.payload;
+    const language = secureLocalStorage.getItem("language");
     try {
         const response = yield call(
             axios.get,
-            `${API_BASE_URL}/api/method/airport_transport.api.bookings.get_zones?service=${services}&city=${cityName}&language=en`
+            `${API_BASE_URL}/api/method/airport_transport.api.bookings.get_zones?service=${services}&city=${cityName}&language=${language ? language : 'eng'}`
         );
         const zones = response?.data?.data;
         if (zones) {

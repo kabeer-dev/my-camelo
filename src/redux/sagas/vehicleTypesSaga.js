@@ -5,12 +5,14 @@ import {
   fetchVehicleTypesSuccess,
   fetchVehicleTypesFailure,
 } from "../actions/vehicleTypeAction";
+import secureLocalStorage from "react-secure-storage";
 
 const API_BASE_URL = process.env.REACT_APP_BASE_URL_AMK_TEST;
 
 function fetchvehicleTypes() {
+  const language = secureLocalStorage.getItem("language");
   return axios.get(
-    `${API_BASE_URL}/api/method/airport_transport.api.bookings.get_vehicle_types?language=eng`
+    `${API_BASE_URL}/api/method/airport_transport.api.bookings.get_vehicle_types?language=${language ? language : 'eng'}`
   );
 }
 

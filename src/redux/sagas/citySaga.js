@@ -5,13 +5,15 @@ import {
   fetchCitiesSuccess,
   fetchCitiesFailure,
 } from "../actions/cityActions";
+import secureLocalStorage from "react-secure-storage";
 
 const API_BASE_URL = process.env.REACT_APP_BASE_URL_AMK_TEST;
 
 // Fetch cities from API
 function fetchCities() {
+  const language = secureLocalStorage.getItem("language");
   return axios.get(
-    `${API_BASE_URL}/api/method/airport_transport.api.bookings.get_city?language=eng&service=Airport Trip`
+    `${API_BASE_URL}/api/method/airport_transport.api.bookings.get_city?language=${language ? language : 'eng'}&service=Airport Trip`
   );
 }
 

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import Stepper from "../base/Stepper";
 import Button from "../base/Button";
 import Heading from "../base/Heading";
@@ -16,6 +16,7 @@ import VehicleTypeModal from "../base/VehicleTypeModal";
 import PaymentMethod from "./PaymentMethod";
 import axios from "axios";
 import { message } from "antd";
+import { useTranslation } from "react-i18next";
 
 export default function ScheduledRide({
   subTab, setSubTab,
@@ -43,14 +44,16 @@ export default function ScheduledRide({
   const dispatch = useDispatch();
   const { cities } = useSelector((state) => state.cities);
   const { vehicleTypes } = useSelector((state) => state.vehicleTypes);
+  const language = useSelector((state) => state.auth.language);
   const zoneMap = useSelector((state) => state?.zone?.zone);
   const [map, setMap] = useState(null);
-
   useEffect(() => {
     setMap(zoneMap && zoneMap.length > 0 ? zoneMap[0].map : null)
   }, [zoneMap])
   const services = "City Trip";
   const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
+
+  const [t, i18n] = useTranslation("global");
 
   const [seatNumberOptions, setSeatNumberOptions] = useState([]);
   const [selectedPickup, setSelectedPickup] = useState(null);
@@ -106,8 +109,24 @@ export default function ScheduledRide({
   useEffect(() => {
     dispatch(fetchCitiesRequest());
     dispatch(fetchVehicleTypesRequest());
-    dispatch(getZoneRequest(services, cityName));
+    console.log('aa', cityName)
+    const expectedCityName = cityName ? cityName : 'Dammam';
+    dispatch(getZoneRequest(services, expectedCityName));
   }, [dispatch, cityName]);
+
+  useEffect(() => {
+    if(cities.data?.length > 0 && !cityName){
+      setFormValues((prevValues) => ({
+        ...prevValues,
+        "arrivalCity": cities.data[0],
+      }));
+      setOnChangeFormValues((prevValues) => ({
+        ...prevValues,
+        "arrivalCity": cities.data[0],
+      }));
+      setCityName(cities.data[0])
+    }
+  }, [cities])
 
   const API_BASE_URL = process.env.REACT_APP_BASE_URL_AMK_TEST;
   const [sharedRideValue, setSharedRideValue] = useState("");
@@ -117,7 +136,7 @@ export default function ScheduledRide({
       if (formValues.vehicleType !== "") {
         try {
           const response = await axios.get(
-            `${API_BASE_URL}/api/method/airport_transport.api.bookings.get_ride_discount?vehicle_type=${formValues.vehicleType}&language=${'en'}`
+            `${API_BASE_URL}/api/method/airport_transport.api.bookings.get_ride_discount?vehicle_type=${formValues.vehicleType}&language=${language}`
           );
           if (response && response.status === 200) {
             setSharedRideValue(response.data.data)
@@ -133,12 +152,19 @@ export default function ScheduledRide({
     getSharedRideValue()
   }, [formValues]);
 
-  const steps = [
-    { id: 1, text: "Ride Details" },
-    { id: 2, text: "Vehicle Details" },
-    { id: 3, text: "Additional Info" },
-    { id: 4, text: "Account Info" },
-  ];
+  const steps = useMemo(() => {
+    const baseSteps = [
+      { id: 1, text: t("hero.stepper_steps.ride_detail_text") },
+      { id: 2, text: t("hero.stepper_steps.vehicle_detail_text") },
+      { id: 3, text: t("hero.stepper_steps.additional_info_text") }
+    ];
+
+    if (!isLoggedIn) {
+      baseSteps.push({ id: 4, text: t("hero.stepper_steps.account_info_text") });
+    }
+
+    return baseSteps;
+  }, [isLoggedIn, t]);
 
   // const [subTab, setSubTab] = useState(1);
 
@@ -152,15 +178,19 @@ export default function ScheduledRide({
   });
 
   const onSubmit = async (values, { setSubmitting }) => {
+    if (!location || !destination) {
+      message.error(t("hero.errors.map_required"));
+    }
     dispatch(setLoading(true))
-    console.log('gg', values)
     // if (!isLoggedIn) {
     try {
-      const formattedDate = values.arrivalDate.toLocaleDateString('en-US', {
-        year: 'numeric',
-        month: 'short',
-        day: 'numeric',
-      });
+      const getADATE = new Date(formValues.arrivalDate);
+
+      const year = getADATE.getFullYear();
+      const month = String(getADATE.getMonth() + 1).padStart(2, '0'); // Month is zero-indexed, so we add 1
+      const day = String(getADATE.getDate()).padStart(2, '0');
+      const formattedDate = `${year}-${month}-${day}`;
+
       const data = {
         location: location,
         destination: destination,
@@ -169,21 +199,27 @@ export default function ScheduledRide({
         arrival_date: formattedDate,
         arrival_time: values.arrivalTime,
         shared_discount: sharedRideValue,
-        language: 'eng'
+        language: language ? language : 'eng'
       }
-      console.log('sss', data)
+      // console.log('hh', data)
       const response = await axios.post(`${API_BASE_URL}/api/method/airport_transport.api.integrations.maps.get_price`, data);
       if (response && response.status === 200) {
         // console.log(response.data.data)
-        setPrice(response.data.data.price)
-        dispatch(setLoading(false));
-        setSubTab(4)
-        setShowSignUp(true);
+        if (isLoggedIn) {
+          setPrice(response.data.data.price)
+          dispatch(setLoading(false));
+          setShowPaymentMethod(true)
+        } else {
+          setPrice(response.data.data.price)
+          dispatch(setLoading(false));
+          setSubTab(4)
+          setShowSignUp(true);
+        }
       }
     }
     catch (error) {
-      if(error?.response?.data?.msg === 'The booking distance is very short, please modify the reservation locations'){
-        message.error(`${error?.response?.data?.msg}`);
+      if (error?.response?.data?.msg === 'The booking distance is very short, please modify the reservation locations') {
+        message.error(`${t("hero.errors.short_distance")}`);
       }
       console.error('Error:', error);
       dispatch(setLoading(false));
@@ -209,7 +245,6 @@ export default function ScheduledRide({
     setSelectedDropoff(dropoff);
   };
 
-
   return (
     <>
       <div>
@@ -226,7 +261,25 @@ export default function ScheduledRide({
         <div>
           <div className="p-2 md:p-4">
             {showPaymentMethod ? (
-              <PaymentMethod formValues={formValues} price={price}/>
+              <PaymentMethod
+                formValues={formValues}
+                correctPrice={price}
+                selectedPickup={selectedPickup}
+                selectedDropoff={selectedDropoff}
+                location={location}
+                destination={destination}
+                sharedRideValue={sharedRideValue}
+                setSubTab={setSubTab}
+                setShowSignUp={setShowSignUp}
+                setShowAlreadyRegistered={setShowAlreadyRegistered}
+                setShowOTPScreen={setShowOTPScreen}
+                setHideCreateAccountButton={setHideCreateAccountButton}
+                setShowPhone={setShowPhone}
+                setHidePhoneCreateAccountButton={setHidePhoneCreateAccountButton}
+                setShowPhoneOTPScreen={setShowPhoneOTPScreen}
+                setShowPaymentMethod={setShowPaymentMethod}
+                rideName="scheduledRide"
+              />
 
             ) :
               showSignUp ? (
@@ -264,7 +317,7 @@ export default function ScheduledRide({
                 >
                   {({ values, errors, setFieldValue, validateForm }) => {
                     const isStep1Valid =
-                      values.arrivalCity &&
+                      // values.arrivalCity &&
                       values.arrivalDate &&
                       values.arrivalTime;
                     const isStep2Valid =
@@ -279,7 +332,7 @@ export default function ScheduledRide({
                           <>
                             <div>
                               <InputFieldFormik
-                                label="Arrival City"
+                                label={t("hero.arrival_city_text")}
                                 name="arrivalCity"
                                 type="select"
                                 options={
@@ -298,6 +351,10 @@ export default function ScheduledRide({
                                   const { fieldName, selectedValue } = valueObj;
                                   setFieldValue(fieldName, selectedValue);
                                   setCityName(selectedValue);
+                                  setFormValues((prevValues) => ({
+                                    ...prevValues,
+                                    [fieldName]: selectedValue,
+                                  }));
                                   setOnChangeFormValues((prevValues) => ({
                                     ...prevValues,
                                     [fieldName]: selectedValue,
@@ -309,7 +366,7 @@ export default function ScheduledRide({
 
                             <div>
                               <InputFieldFormik
-                                label="Arrival Date"
+                                label={t("hero.arrival_date_text")}
                                 name="arrivalDate"
                                 type="arrivalDate"
                                 value={values.arrivalDate || ''}
@@ -335,7 +392,7 @@ export default function ScheduledRide({
 
                             <div>
                               <InputFieldFormik
-                                label="Arrival Time"
+                                label={t("hero.arrival_time_text")}
                                 name="arrivalTime"
                                 type="arrivalTime"
                                 value={values.arrivalTime || ''}
@@ -357,6 +414,7 @@ export default function ScheduledRide({
                                 onClick={() => {
                                   dispatch(setLoading(true))
                                   validateForm().then(() => {
+                                    values.arrivalCity = formValues.arrivalCity;
                                     if (isStep1Valid) {
                                       setSubTab(2);
                                       setFormValues(values);
@@ -364,7 +422,7 @@ export default function ScheduledRide({
                                   });
                                   dispatch(setLoading(false))
                                 }}
-                                label="Next"
+                                label={t("next_text")}
                                 type="button"
                                 disabled={!isStep1Valid}
                               />
@@ -383,7 +441,7 @@ export default function ScheduledRide({
 
                             <div>
                               <InputFieldFormik
-                                label="Seat Number"
+                                label={t("hero.seat_number_text")}
                                 name="seatNumber"
                                 type="select"
                                 options={seatNumberOptions.map((number) => ({
@@ -411,7 +469,7 @@ export default function ScheduledRide({
                                 <Button
                                   className="bg-bg_btn_back w-full text-text_white hover:bg-gray-100 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2"
                                   onClick={() => handlePrevious(1, values)}
-                                  label="Previous"
+                                  label={t("previous_text")}
                                   disabled={false}
                                   type="button"
                                 />
@@ -430,7 +488,7 @@ export default function ScheduledRide({
                                     });
                                     dispatch(setLoading(false))
                                   }}
-                                  label="Next"
+                                  label={t("next_text")}
                                   type="button"
                                   disabled={!isStep2Valid}
                                 />
@@ -443,7 +501,7 @@ export default function ScheduledRide({
                           <>
                             <div className="border-b border-gray-300">
                               <InputFieldFormik
-                                label="Shared Ride"
+                                label={t("hero.shared_ride_text")}
                                 name="sharedRide"
                                 type="checkbox"
                                 percentageValue={sharedRideValue}
@@ -460,7 +518,7 @@ export default function ScheduledRide({
                             <div className="my-4 flex flex-col md:flex-row justify-between items-start">
                               <div className="w-full md:w-1/2 mx-0 md:mx-1">
                                 <Heading
-                                  title={"Set Your Destination"}
+                                  title={t("hero.set_destination_text")}
                                   className={"text-xl text-text_black"}
                                 />
                               </div>
@@ -482,14 +540,14 @@ export default function ScheduledRide({
                                 <Button
                                   className="bg-bg_btn_back w-full text-text_white hover:bg-gray-100 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2"
                                   onClick={() => handlePrevious(2, values)}
-                                  label="Previous"
+                                  label={t("previous_text")}
                                   type="button"
                                 />
                               </div>
                               <div className="w-full md:w-1/2 mx-0 md:mx-1">
                                 <Button
                                   className="bg-background_steel_blue w-full text-text_white hover:bg-gray-100 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2"
-                                  label="Submit"
+                                  label={t("submit_text")}
                                   type="submit"
                                 />
                               </div>

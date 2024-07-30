@@ -3,21 +3,24 @@ import { GoogleMap, LoadScript, Marker, Polygon, StandaloneSearchBox } from "@re
 import axios from "axios";
 import { setLoading } from "../../redux/actions/loaderAction";
 import { useDispatch } from "react-redux";
+import { useTranslation } from "react-i18next";
 
 export default function MapModal({ rideName, formValues, onSubmitDestination, zoneCoords, cityName, setLocation, setDestination }) {
+  console.log(rideName, formValues, 'aaa', cityName)
+  const [t, i18n] = useTranslation("global")
   const containerStyle = {
     width: "100%",
     height: "400px",
   };
 
   let center;
-  if (cityName === 'Dammam') {
+  if (cityName === t("hero.dammam_text")) {
     center = {
       lat: 26.3927,
       lng: 49.9777,
     };
   }
-  if (cityName === 'Riyadh') {
+  if (cityName === t("hero.riyadh_text")) {
     center = {
       lng: 46.6753,
       lat: 24.7136
@@ -62,21 +65,21 @@ export default function MapModal({ rideName, formValues, onSubmitDestination, zo
         } catch (error) {
           console.error('Error fetching location:', error.message);
         }
-        if (cityName === "Dammam") {
+        if (cityName === t("hero.dammam_text")) {
           const Dammampoint = { lat: 26.3927, lng: 49.9777 };
-          if (formValues.rideType === 'pickup') {
+          if (formValues.rideType === t("hero.pickup_value_text")) {
             setLocation(`${formValues.airportName} ${formValues.terminalNumber} ${formValues.arrivalCity} Saudi Arabia`)
             setSelectedPickup(point);
-          } else if (formValues.rideType === 'dropoff') {
+          } else if (formValues.rideType === t("hero.dropoff_value_text")) {
             setDestination(`${formValues.airportName} ${formValues.terminalNumber} ${formValues.arrivalCity} Saudi Arabia`)
             setSelectedDropoff(point);
           }
         } else {
           const Riyadhpoint = { lng: 46.6753, lat: 24.7136 };
-          if (formValues.rideType === 'pickup') {
+          if (formValues.rideType === t("hero.pickup_value_text")) {
             setLocation(`${formValues.airportName} ${formValues.terminalNumber} ${formValues.arrivalCity} Saudi Arabia`)
             setSelectedPickup(point);
-          } else if (formValues.rideType === 'dropoff') {
+          } else if (formValues.rideType === t("hero.dropoff_value_text")) {
             setDestination(`${formValues.airportName} ${formValues.terminalNumber} ${formValues.arrivalCity} Saudi Arabia`)
             setSelectedDropoff(point);
           }
@@ -87,29 +90,30 @@ export default function MapModal({ rideName, formValues, onSubmitDestination, zo
     setPickOrDrop()
   }, [rideName, cityName, formValues.rideType]);
 
-  // const isPointInPolygon = (point, polygon) => {
-  //   const { lat, lng } = point;
-  //   let inside = false;
-  //   for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
-  //     const xi = polygon[i].lat,
-  //       yi = polygon[i].lng;
-  //     const xj = polygon[j].lat,
-  //       yj = polygon[j].lng;
+  const isPointInPolygon = (point, polygon) => {
+    const { lat, lng } = point;
+    let inside = false;
+    for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
+      const xi = polygon[i].lat,
+        yi = polygon[i].lng;
+      const xj = polygon[j].lat,
+        yj = polygon[j].lng;
 
-  //     const intersect =
-  //       yi > lng !== yj > lng &&
-  //       lat < ((xj - xi) * (lng - yi)) / (yj - yi) + xi;
-  //     if (intersect) inside = !inside;
-  //   }
-  //   return inside;
-  // };
+      const intersect =
+        yi > lng !== yj > lng &&
+        lat < ((xj - xi) * (lng - yi)) / (yj - yi) + xi;
+      if (intersect) inside = !inside;
+    }
+    return inside;
+  };
+  
   const onMapClick = async (event) => {
     const point = { lat: event.latLng.lat(), lng: event.latLng.lng() };
-    // if (isPointInPolygon(point, convertedCoords)) {
+    if (isPointInPolygon(point, convertedCoords)) {
     setError("");
     dispatch(setLoading(true))
     if (rideName === "airportRide") {
-      if (formValues.rideType === 'dropoff') {
+      if (formValues.rideType === t("hero.dropoff_value_text")) {
         const apiKey = "AIzaSyBMTLXpuXtkEfbgChZzsj7LPYlpGxHI9iU";
         const url = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${point.lat},${point.lng}&key=${apiKey}`;
 
@@ -117,7 +121,7 @@ export default function MapModal({ rideName, formValues, onSubmitDestination, zo
           const response = await axios.get(url);
           const location = response.data.results[0].formatted_address;
           // console.log('Location:', location);
-          setLocation(location);
+          setLocation(`${location} Saudi Arabia`);
         } catch (error) {
           console.error('Error fetching location:', error.message);
         }
@@ -130,7 +134,8 @@ export default function MapModal({ rideName, formValues, onSubmitDestination, zo
           const response = await axios.get(url);
           const location = response.data.results[0].formatted_address;
           // console.log('Location:', location);
-          setDestination(location);
+          
+          setDestination(`${location} Saudi Arabia`);
         } catch (error) {
           console.error('Error fetching location:', error.message);
         }
@@ -146,7 +151,7 @@ export default function MapModal({ rideName, formValues, onSubmitDestination, zo
           const response = await axios.get(url);
           const location = response.data.results[0].formatted_address;
           // console.log('Location:', location);
-          setLocation(location);
+          setLocation(`${location} Saudi Arabia`);
           setSelectedPickup(point);
         } catch (error) {
           console.error('Error fetching location:', error.message);
@@ -160,7 +165,7 @@ export default function MapModal({ rideName, formValues, onSubmitDestination, zo
           const response = await axios.get(url);
           const location = response.data.results[0].formatted_address;
           // console.log('Location:', location);
-          setDestination(location);
+          setDestination(`${location} Saudi Arabia`);
           setSelectedDropoff(point);
         } catch (error) {
           console.error('Error fetching location:', error.message);
@@ -176,16 +181,16 @@ export default function MapModal({ rideName, formValues, onSubmitDestination, zo
         const response = await axios.get(url);
         const location = response.data.results[0].formatted_address;
         // console.log('Location:', location);
-        setLocation(location);
+        setLocation(`${location} Saudi Arabia`);
       } catch (error) {
         console.error('Error fetching location:', error.message);
       }
       setSelectedPickup(point);
       // }
     }
-    // } else {
-    //   setError("You cannot select a location outside the Dammam zone.");
-    // }
+    } else {
+      setError("You cannot select a location outside the Dammam zone.");
+    }
     dispatch(setLoading(false))
   };
 
@@ -239,7 +244,7 @@ export default function MapModal({ rideName, formValues, onSubmitDestination, zo
         className="block w-full bg-background_steel_blue text-text_white text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
         type="button"
       >
-        Set on the map
+        {t("hero.set_on_map_text")}
       </button>
 
       {isModalOpen && (
@@ -252,7 +257,7 @@ export default function MapModal({ rideName, formValues, onSubmitDestination, zo
             <div className="relative bg-background_steel_blue rounded-lg shadow dark:bg-gray-700">
               <div className="flex items-center justify-between p-4 md:p-5 rounded-t dark:border-gray-600">
                 <h3 className="text-xl text-text_white font-medium text-gray-900 dark:text-white">
-                  Select Your Destination
+                  {t("hero.set_destination_text")}
                 </h3>
                 <button
                   onClick={closeModal}
@@ -291,7 +296,7 @@ export default function MapModal({ rideName, formValues, onSubmitDestination, zo
                     onClick={onMapClick}
                   >
                     {/* Your existing map components */}
-                    {/* <Polygon
+                    <Polygon
                       paths={convertedCoords}
                       options={{
                         fillColor: "#4463F0",
@@ -300,7 +305,7 @@ export default function MapModal({ rideName, formValues, onSubmitDestination, zo
                         strokeOpacity: 1,
                         strokeWeight: 1,
                       }}
-                    /> */}
+                    />
                     {/* <Polygon
                       paths={[
                         { lat: 90, lng: -180 },
@@ -317,8 +322,8 @@ export default function MapModal({ rideName, formValues, onSubmitDestination, zo
                       }}
                     /> */}
 
-                    {selectedPickup && <Marker position={selectedPickup} label="Pickup" />}
-                    {selectedDropoff && <Marker position={selectedDropoff} label="dropoff" />}
+                    {selectedPickup && <Marker position={selectedPickup} label={t("hero.pickup_text")} />}
+                    {selectedDropoff && <Marker position={selectedDropoff} label={t("hero.dropoff_text")} />}
 
                     {/* Standalone Search Box */}
                     <StandaloneSearchBox
@@ -357,14 +362,14 @@ export default function MapModal({ rideName, formValues, onSubmitDestination, zo
                   type="button"
                   className="text-background_steel_blue border bg-text_white border-text_white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
                 >
-                  Confirm Your Destination
+                  {t("hero.confirm_destination_text")}
                 </button>
                 <button
                   onClick={closeModal}
                   type="button"
                   className="py-2.5 px-5 ms-3 text-sm font-medium rounded-lg border border-background_white text-background_white"
                 >
-                  Decline
+                  {t("hero.decline_text")}
                 </button>
               </div>
             </div>

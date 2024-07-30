@@ -1,0 +1,47 @@
+/* InputFieldSetting.css */
+.checkbox-custom {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  background-color: #fff;
+  border: 1px solid #ccc;
+  display: inline-block;
+  position: relative;
+  width: 20px; /* Increased size for better visibility */
+  height: 20px; /* Increased size for better visibility */
+  cursor: pointer;
+  border-radius: 4px; /* Optional: Adds rounded corners */
+  transition: background-color 0.3s, border-color 0.3s;
+}
+
+.checkbox-custom:checked {
+  background-color: #c3a58b;
+  border-color: #c3a58b;
+}
+
+.checkbox-custom:checked::before {
+  content: "";
+  position: absolute;
+  top: 45%;
+  left: 50%;
+  width: 10px; /* Size of the checkmark */
+  height: 5px; /* Size of the checkmark */
+  border: solid white;
+  border-width: 0 0 2px 2px;
+  transform: translate(-50%, -50%) rotate(-45deg);
+}
+
+/* Custom styles for Ant Design DatePicker and TimePicker icons */
+.ant-picker-suffix,
+.ant-picker-clear {
+  color: #c3a58b !important;
+}
+
+/* Custom style for Ant Design select dropdown arrow */
+.ant-select-arrow::after {
+  color: #c3a58b !important;
+}
+
+.ant-input-password{
+  display: flex !important;
+}

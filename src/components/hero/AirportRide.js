@@ -17,6 +17,7 @@ import { setLoading } from "../../redux/actions/loaderAction";
 import PaymentMethod from "./PaymentMethod";
 import axios from "axios";
 import { message } from "antd";
+import { useTranslation } from "react-i18next";
 
 export default function AirportRide(
   {
@@ -42,15 +43,20 @@ export default function AirportRide(
     phoneOtp,
     setPhoneOtp
   }) {
+
+
   const dispatch = useDispatch();
   const { cities } = useSelector((state) => state.cities);
   const { airports } = useSelector((state) => state.airports);
   const { vehicleTypes } = useSelector((state) => state.vehicleTypes);
   const services = "Airport Trip";
   const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
+  const language = useSelector((state) => state.auth.language);
 
   const zoneMap = useSelector((state) => state?.zone?.zone);
   const [map, setMap] = useState(null);
+
+  const [t, i18n] = useTranslation("global");
 
   useEffect(() => {
     setMap(zoneMap && zoneMap.length > 0 ? zoneMap[0].map : null)
@@ -67,8 +73,14 @@ export default function AirportRide(
   const [selectedPickup, setSelectedPickup] = useState(null);
   const [selectedDropoff, setSelectedDropoff] = useState(null);
   const [arrivalDates, setArrivalDates] = useState(null);
+
+  const rideTypeOptions = [
+    { value: t("hero.pickup_value_text"), label: t("hero.pickup_text") },
+    { value: t("hero.dropoff_value_text"), label: t("hero.dropoff_text") },
+  ];
   const [formValues, setFormValues] = useState({
     rideType: "",
+    // t("hero.pickup_value_text"), 
     arrivalCity: "",
     airportName: "",
     terminalNumber: "",
@@ -80,6 +92,7 @@ export default function AirportRide(
   });
   const [onChangeFormValues, setOnChangeFormValues] = useState({
     rideType: "",
+    // t("hero.pickup_value_text"), 
     arrivalCity: "",
     airportName: "",
     terminalNumber: "",
@@ -89,7 +102,7 @@ export default function AirportRide(
     arrivalTime: "",
     sharedRide: false,
   });
-
+  
   const API_BASE_URL = process.env.REACT_APP_BASE_URL_AMK_TEST;
   const [sharedRideValue, setSharedRideValue] = useState("");
   useEffect(() => {
@@ -98,7 +111,7 @@ export default function AirportRide(
       if (formValues.vehicleType !== "") {
         try {
           const response = await axios.get(
-            `${API_BASE_URL}/api/method/airport_transport.api.bookings.get_ride_discount?vehicle_type=${formValues.vehicleType}&language=${'en'}`
+            `${API_BASE_URL}/api/method/airport_transport.api.bookings.get_ride_discount?vehicle_type=${formValues.vehicleType}&language=${language ? language : 'eng'}`
           );
           if (response && response.status === 200) {
             setSharedRideValue(response.data.data)
@@ -145,15 +158,19 @@ export default function AirportRide(
     }
   }, [dispatch, cityName]);
 
-  const steps = useMemo(
-    () => [
-      { id: 1, text: "Ride Details" },
-      { id: 2, text: "Vehicle Details" },
-      { id: 3, text: "Additional Info" },
-      { id: 4, text: "Account Info" },
-    ],
-    []
-  );
+  const steps = useMemo(() => {
+    const baseSteps = [
+      { id: 1, text: t("hero.stepper_steps.ride_detail_text") },
+      { id: 2, text: t("hero.stepper_steps.vehicle_detail_text") },
+      { id: 3, text: t("hero.stepper_steps.additional_info_text") }
+    ];
+
+    if (!isLoggedIn) {
+      baseSteps.push({ id: 4, text: t("hero.stepper_steps.account_info_text") });
+    }
+
+    return baseSteps;
+  }, [isLoggedIn, t]);
 
   const validationSchema = Yup.object().shape({
     rideType: Yup.string().required("Ride type is required"),
@@ -182,11 +199,6 @@ export default function AirportRide(
     items?.map((item) => ({ value: item[valueKey], label: item[labelKey] })) ||
     [];
 
-  const rideTypeOptions = [
-    { value: "pickup", label: "Pick Up" },
-    { value: "dropoff", label: "Drop Off" },
-  ];
-
   const handleMapSubmit = (pickup, dropoff) => {
     setSelectedPickup(pickup);
     setSelectedDropoff(dropoff);
@@ -199,6 +211,47 @@ export default function AirportRide(
     dispatch(setLoading(false));
   };
 
+  useEffect(() => {
+    if(cities.data?.length > 0){
+      setFormValues((prevValues) => ({
+        ...prevValues,
+        "arrivalCity": cities.data[0],
+      }));
+      setOnChangeFormValues((prevValues) => ({
+        ...prevValues,
+        "arrivalCity": cities.data[0],
+      }));
+      setCityName(cities.data[0])
+    }
+  }, [cities])
+
+  useEffect(() => {
+    if(airports.data?.length > 0){
+      setFormValues((prevValues) => ({
+        ...prevValues,
+        "airportName": airports.data[0].airport,
+      }));
+      setOnChangeFormValues((prevValues) => ({
+        ...prevValues,
+        "airportName": airports.data[0].airport,
+      }));
+
+      setFormValues((prevValues) => ({
+        ...prevValues,
+        "terminalNumber": airports.data[0].terminals[0].terminal,
+      }));
+      setOnChangeFormValues((prevValues) => ({
+        ...prevValues,
+        "terminalNumber": airports.data[0].terminals[0].terminal,
+      }));
+
+      setSelectedPickup(airports.data[0].terminals[0].location)
+      setLocation(airports.data[0].terminals[0].location)
+
+    }
+  }, [airports])
+
+  // console.log(airports)
   return (
     <>
       <div>
@@ -214,7 +267,25 @@ export default function AirportRide(
 
         <div className="p-2 md:p-4">
           {showPaymentMethod ? (
-            <PaymentMethod formValues={formValues} price={price}/>
+            <PaymentMethod
+              formValues={formValues}
+              correctPrice={price}
+              selectedPickup={selectedPickup}
+              selectedDropoff={selectedDropoff}
+              location={location}
+              destination={destination}
+              sharedRideValue={sharedRideValue}
+              setSubTab={setSubTab}
+              setShowSignUp={setShowSignUp}
+              setShowAlreadyRegistered={setShowAlreadyRegistered}
+              setShowOTPScreen={setShowOTPScreen}
+              setHideCreateAccountButton={setHideCreateAccountButton}
+              setShowPhone={setShowPhone}
+              setHidePhoneCreateAccountButton={setHidePhoneCreateAccountButton}
+              setShowPhoneOTPScreen={setShowPhoneOTPScreen}
+              setShowPaymentMethod={setShowPaymentMethod}
+              rideName="airportRide"
+            />
 
           ) : showSignUp ? (
             <HomeEmailSignUp
@@ -248,13 +319,19 @@ export default function AirportRide(
               enableReinitialize={true}
               onSubmit={async (values, { setSubmitting }) => {
                 // if (!isLoggedIn) {
+                if (!location || !destination) {
+                  message.error(t("hero.errors.map_required"));
+                }
                 dispatch(setLoading(true));
                 try {
-                  const formattedDate = values.arrivalDate.toLocaleDateString('en-US', {
-                    year: 'numeric',
-                    month: 'short',
-                    day: 'numeric',
-                  });
+
+                  const getADATE = new Date(formValues.arrivalDate);
+
+                  const year = getADATE.getFullYear();
+                  const month = String(getADATE.getMonth() + 1).padStart(2, '0'); // Month is zero-indexed, so we add 1
+                  const day = String(getADATE.getDate()).padStart(2, '0');
+                  const formattedDate = `${year}-${month}-${day}`;
+
                   const data = {
                     location: location,
                     destination: destination,
@@ -263,25 +340,33 @@ export default function AirportRide(
                     arrival_date: formattedDate,
                     arrival_time: values.arrivalTime,
                     shared_discount: sharedRideValue,
-                    language: 'eng'
+                    language: language ? language : 'eng'
                   }
-console.log('sss', data)
+                  // console.log('sss', data)
                   const response = await axios.post(`${API_BASE_URL}/api/method/airport_transport.api.integrations.maps.get_price`, data);
                   if (response && response.status === 200) {
                     // console.log(response.data.data)
-                    setPrice(response.data.data.price)
-                    dispatch(setLoading(false));
-                    setSubTab(4)
-                    setShowSignUp(true);
+                    if (isLoggedIn) {
+                      setPrice(response.data.data.price)
+                      dispatch(setLoading(false));
+                      setShowPaymentMethod(true)
+                    } else {
+                      setPrice(response.data.data.price)
+                      dispatch(setLoading(false));
+                      setSubTab(4)
+                      setShowSignUp(true);
+                    }
+
                   }
                 }
                 catch (error) {
-                  if(error?.response?.data?.msg === 'The booking distance is very short, please modify the reservation locations'){
-                    message.error(`${error?.response?.data?.msg}`);
+                  if (error?.response?.data?.msg === 'The booking distance is very short, please modify the reservation locations') {
+                    message.error(`${t("hero.errors.short_distance")}`);
                   }
                   console.error('Error:', error);
                   dispatch(setLoading(false));
                 };
+                dispatch(setLoading(false))
 
                 // } else {
                 //   // const submitValues = {
@@ -325,7 +410,7 @@ console.log('sss', data)
                     {subTab === 1 && (
                       <>
                         <InputFieldFormik
-                          label="Ride Type"
+                          label={t("hero.ride_type_text")}
                           name="rideType"
                           type="select"
                           value={
@@ -342,7 +427,7 @@ console.log('sss', data)
                           required
                         />
                         <InputFieldFormik
-                          label="Arrival City"
+                          label={t("hero.arrival_city_text")}
                           name="arrivalCity"
                           type="select"
                           value={
@@ -371,7 +456,7 @@ console.log('sss', data)
                           required
                         />
                         <InputFieldFormik
-                          label="Airport Name"
+                          label={t("hero.airport_name_text")}
                           name="airportName"
                           type="select"
                           value={
@@ -394,7 +479,7 @@ console.log('sss', data)
                           required
                         />
                         <InputFieldFormik
-                          label="Terminal Number"
+                          label={t("hero.terminal_number_text")}
                           name="terminalNumber"
                           type="select"
                           value={
@@ -417,8 +502,8 @@ console.log('sss', data)
 
                         <Button
                           className="bg-background_steel_blue w-full text-text_white hover:bg-gray-100 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 mt-3"
-                          onClick={() => handleNext(2, isStep1Valid, values)}
-                          label="Next"
+                          onClick={() => { handleNext(2, isStep1Valid, values) }}
+                          label={t("next_text")}
                           type="button"
                           disabled={!isStep1Valid}
                         />
@@ -434,7 +519,7 @@ console.log('sss', data)
                         </div>
 
                         <InputFieldFormik
-                          label="Seat Number"
+                          label={t("hero.seat_number_text")}
                           name="seatNumber"
                           type="select"
                           value={
@@ -455,7 +540,7 @@ console.log('sss', data)
                           required
                         />
                         <InputFieldFormik
-                          label="Arrival Date"
+                          label={t("hero.arrival_date_text")}
                           name="arrivalDate"
                           type="arrivalDate"
                           value={values.arrivalDate || ""}
@@ -478,7 +563,7 @@ console.log('sss', data)
                           required
                         />
                         <InputFieldFormik
-                          label="Arrival Time"
+                          label={t("hero.arrival_time_text")}
                           name="arrivalTime"
                           type="arrivalTime"
                           value={values.arrivalTime || ""}
@@ -496,17 +581,17 @@ console.log('sss', data)
                           <Button
                             className="bg-bg_btn_back w-full text-text_white hover:bg-gray-100 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2"
                             onClick={() => handlePrevious(1, values)}
-                            label="Previous"
+                            label={t("previous_text")}
                             type="button"
                           />
                           <Button
                             className="bg-background_steel_blue w-full text-text_white hover:bg-gray-100 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2"
                             onClick={() => {
-                              console.log('aaaa', values)
+                              // console.log('aaaa', values)
                               values.vehicleType = vehicleTypeName;
                               handleNext(3, isStep2Valid, values);
                             }}
-                            label="Next"
+                            label={t("next_text")}
                             type="button"
                             disabled={!isStep2Valid}
                           />
@@ -516,7 +601,7 @@ console.log('sss', data)
                     {subTab === 3 && (
                       <>
                         <InputFieldFormik
-                          label="Shared Ride"
+                          label={t("hero.shared_ride_text")}
                           name="sharedRide"
                           type="checkbox"
                           percentageValue={sharedRideValue}
@@ -528,7 +613,7 @@ console.log('sss', data)
                         <div className="my-4 flex flex-col md:flex-row justify-between items-start">
                           <div className="w-full md:w-1/2">
                             <Heading
-                              title="Set Your Destination"
+                              title={t("hero.set_destination_text")}
                               className="text-xl text-text_black"
                             />
                           </div>
@@ -548,12 +633,12 @@ console.log('sss', data)
                           <Button
                             className="bg-bg_btn_back w-full text-text_white hover:bg-gray-100 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2"
                             onClick={() => handlePrevious(2, values)}
-                            label="Previous"
+                            label={t("previous_text")}
                             type="button"
                           />
                           <Button
                             className="bg-background_steel_blue w-full text-text_white hover:bg-gray-100 font-medium rounded-lg text-sm px-5 py-2.5 mb-2"
-                            label="Submit"
+                            label={t("submit_text")}
                             type="submit"
                           />
                         </div>
