@@ -236,6 +236,10 @@ export default function MapModal({ rideName, formValues, onSubmitDestination, zo
     }
   };
 
+  const handlePolygonClick = (event) => {
+    event.stop(); // Stops the event from propagating and triggering default behaviors.
+    // Add your custom behavior here.
+  };
 
   return (
     <>
@@ -305,6 +309,7 @@ export default function MapModal({ rideName, formValues, onSubmitDestination, zo
                         strokeOpacity: 1,
                         strokeWeight: 1,
                       }}
+                      onClick={handlePolygonClick}
                     />
                     {/* <Polygon
                       paths={[
