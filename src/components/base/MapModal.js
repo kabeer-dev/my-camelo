@@ -6,7 +6,6 @@ import { useDispatch } from "react-redux";
 import { useTranslation } from "react-i18next";
 
 export default function MapModal({ rideName, formValues, onSubmitDestination, zoneCoords, cityName, setLocation, setDestination }) {
-  console.log(rideName, formValues, 'aaa', cityName)
   const [t, i18n] = useTranslation("global")
   const containerStyle = {
     width: "100%",
@@ -90,26 +89,27 @@ export default function MapModal({ rideName, formValues, onSubmitDestination, zo
     setPickOrDrop()
   }, [rideName, cityName, formValues.rideType]);
 
-  const isPointInPolygon = (point, polygon) => {
-    const { lat, lng } = point;
-    let inside = false;
-    for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
-      const xi = polygon[i].lat,
-        yi = polygon[i].lng;
-      const xj = polygon[j].lat,
-        yj = polygon[j].lng;
+  // const isPointInPolygon = (point, polygon) => {
+  //   const { lat, lng } = point;
+  //   let inside = false;
+  //   for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
+  //     const xi = polygon[i].lat,
+  //       yi = polygon[i].lng;
+  //     const xj = polygon[j].lat,
+  //       yj = polygon[j].lng;
 
-      const intersect =
-        yi > lng !== yj > lng &&
-        lat < ((xj - xi) * (lng - yi)) / (yj - yi) + xi;
-      if (intersect) inside = !inside;
-    }
-    return inside;
-  };
+  //     const intersect =
+  //       yi > lng !== yj > lng &&
+  //       lat < ((xj - xi) * (lng - yi)) / (yj - yi) + xi;
+  //     if (intersect) inside = !inside;
+  //   }
+  //   return inside;
+  // };
   
   const onMapClick = async (event) => {
     const point = { lat: event.latLng.lat(), lng: event.latLng.lng() };
-    if (isPointInPolygon(point, convertedCoords)) {
+    // if (isPointInPolygon(point, convertedCoords)) {
+    //   console.log('poly')
     setError("");
     dispatch(setLoading(true))
     if (rideName === "airportRide") {
@@ -188,9 +188,9 @@ export default function MapModal({ rideName, formValues, onSubmitDestination, zo
       setSelectedPickup(point);
       // }
     }
-    } else {
-      setError("You cannot select a location outside the Dammam zone.");
-    }
+    // } else {
+    //   setError("You cannot select a location outside the Dammam zone.");
+    // }
     dispatch(setLoading(false))
   };
 
@@ -236,10 +236,6 @@ export default function MapModal({ rideName, formValues, onSubmitDestination, zo
     }
   };
 
-  const handlePolygonClick = (event) => {
-    event.stop(); // Stops the event from propagating and triggering default behaviors.
-    // Add your custom behavior here.
-  };
 
   return (
     <>
@@ -309,7 +305,6 @@ export default function MapModal({ rideName, formValues, onSubmitDestination, zo
                         strokeOpacity: 1,
                         strokeWeight: 1,
                       }}
-                      onClick={handlePolygonClick}
                     />
                     {/* <Polygon
                       paths={[

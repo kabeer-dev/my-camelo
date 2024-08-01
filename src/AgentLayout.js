@@ -20,21 +20,24 @@ export default function AgentLayout() {
   const dispatch = useDispatch();
   const agent = useSelector((state) => state.auth.agent);
   const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
-  const email = location.state?.email;
+  const email = useSelector((state) => state.auth.email);
+  // const email = location.state?.email;
   const API_BASE_URL = process.env.REACT_APP_BASE_URL_AMK_TEST;
   // if(agentValue){
   //   dispatch(agentChange('true'))
   // }
-  // console.log('ss', agent, isLoggedIn);
+  console.log('ss', agent, email, isLoggedIn);
 
   useEffect(() => {
     dispatch(setLoading(true))
-    if (email) {
+    if (email && isLoggedIn) {
       const checkAgent = async () => {
         try {
           const response = await axios.post(`${API_BASE_URL}/api/method/airport_transport.api.user.detect_email?email=${email}`);
           if (response && response.status === 200) {
-            if(response.data.msg === 'Transport User'){
+            console.log('ss', response.data.msg)
+            if(response.data.msg !== 'Agent User'){
+              console.log('yes')
               navigate('/')
             }
           }

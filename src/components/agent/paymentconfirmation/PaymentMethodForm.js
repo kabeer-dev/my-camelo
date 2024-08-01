@@ -91,7 +91,7 @@ const PaymentMethodForm = () => {
                             <div className="flex items-center justify-center min-h-screen">
                                 <div>
                                     <div className='flex justify-between' dir={language === 'ar' ? 'rtl' : 'ltr'}>
-                                        <Icon icon={language === 'ar' ? "ph:arrow-right" : "ph:arrow-left"} width="25px" height="25px" className="mb-3 cursor-pointer"
+                                        {/* <Icon icon={language === 'ar' ? "ph:arrow-right" : "ph:arrow-left"} width="25px" height="25px" className="mb-3 cursor-pointer"
                                             onClick={() => {
                                                 window.history.back();
                                                 localStorage.setItem('hasRefreshed', 'true');
@@ -100,7 +100,7 @@ const PaymentMethodForm = () => {
                                                 navigate('/agent', { state: { showPaymentMethod: true } })
                                             }
                                             }
-                                        />
+                                        /> */}
                                         <p className="mb-3 font-bold text-background_steel_blue"> {t("hero.price_text")}: {price} {t("hero.sar_text")}S</p>
                                     </div>
                                     <form

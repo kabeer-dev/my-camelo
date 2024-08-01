@@ -207,8 +207,8 @@ export default function VehicleSection() {
 
       <Slider className="solutionpage-first-slider"  {...settings}>
         {vehicleTypes &&
-          vehicleTypes.data &&
-          vehicleTypes.data.map((vehicle, index) => (
+          vehicleTypes.message &&
+          vehicleTypes.message.map((vehicle, index) => (
             <VehicleCard
               key={index}
               carName={vehicle.name}

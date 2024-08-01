@@ -559,7 +559,7 @@ export default function UserRegistration() {
                             </div>
                             <div>
                               <Recaptcha
-                                sitekey="6LfE3FEpAAAAAGkeBjkpPeNSqPNWtLPCma7EHVsr"
+                                sitekey="6LfJNx0qAAAAAE8-HroAfNWTreNYqqjnnJ9Sw-5J"
                                 onChange={(value) => {
                                   setRecaptchaToken(value);
                                 }}

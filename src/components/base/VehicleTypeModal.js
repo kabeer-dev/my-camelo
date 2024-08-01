@@ -5,7 +5,7 @@ import { useSelector } from "react-redux";
 import { Input } from "antd";
 import { useTranslation } from "react-i18next";
 
-export default function VehicleTypeModal({ vehicleTypeName, setVehicleTypeName }) {
+export default function VehicleTypeModal({VehicleTypeWithService, vehicleTypeName, setVehicleTypeName }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [hoveredIndex, setHoveredIndex] = useState(null);
   const [searchText, setSearchText] = useState("");
@@ -13,7 +13,7 @@ export default function VehicleTypeModal({ vehicleTypeName, setVehicleTypeName }
 
   const [t, i18n] = useTranslation("global")
   // const [vehicleTypeName, setVehicleTypeName] = useState(""); // State to store selected vehicle type name
-  const { vehicleTypes } = useSelector((state) => state.vehicleTypes);
+  // const { vehicleTypes } = useSelector((state) => state.vehicleTypes);
   // console.log("vehicleTypeName me kiya ha?", vehicleTypeName);
 
   function handleMouseEnter(index) {
@@ -38,7 +38,7 @@ export default function VehicleTypeModal({ vehicleTypeName, setVehicleTypeName }
     setIsModalOpen(false); // Close modal after selecting a vehicle type
   };
 
-  const filteredVehicleTypes = vehicleTypes?.data.filter((vehicle) =>
+  const filteredVehicleTypes = VehicleTypeWithService?.data.filter((vehicle) =>
     vehicle.name.toLowerCase().includes(searchText.toLowerCase())
   );
 

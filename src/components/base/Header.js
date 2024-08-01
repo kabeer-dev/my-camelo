@@ -5,7 +5,7 @@ import ServiceSection from "../services/ServiceSection";
 import VehicleSection from "../vehicleType/VehicleSection";
 import { CiGlobe } from "react-icons/ci";
 import Button from "../base/Button";
-import { useNavigate } from "react-router-dom";
+import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { DownOutlined } from "@ant-design/icons";
 import { Dropdown, message, Space } from "antd";
@@ -13,6 +13,7 @@ import { signOutRequest } from "../../redux/actions/authActions";
 // import Loader from "./components/loader/Loader";
 import { useTranslation } from "react-i18next";
 import { languageChange } from "../../redux/actions/authActions";
+import { emailChange } from "../../redux/actions/authActions";
 
 export default function Header() {
   const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
@@ -20,6 +21,7 @@ export default function Header() {
   const language = useSelector((state) => state.auth.language);
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const location = useLocation();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [activeSection, setActiveSection] = useState("home");
 
@@ -50,6 +52,12 @@ export default function Header() {
     };
   }, []);
 
+  useEffect(() => {
+    if(location.pathname === '/join-agent' || location.pathname === '/request-submit' || location.pathname === '/request-failed'){
+      setActiveSection('');
+    }
+  }, []);
+
   const handleSetActive = (to) => {
     setActiveSection(to);
   };
@@ -64,6 +72,7 @@ export default function Header() {
         break;
       case "3":
         message.success(`Logged out`);
+        dispatch(emailChange(null))
         dispatch(signOutRequest());
         navigate("/");
         break;
@@ -115,7 +124,7 @@ export default function Header() {
                       i18n.changeLanguage(language === 'eng' ? 'ar' : 'eng').then(
                         window.location.reload()
                       );
-                      
+
                     }
                     }
                     label={
@@ -159,7 +168,7 @@ export default function Header() {
                           onClick,
                           dir: language === 'ar' ? 'rtl' : 'ltr'
                         }}
-                        
+
                       >
                         <div
                           className="cursor-pointer hidden md:flex text-text_steel_blue bg-background_white border border-gray-300 focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-100 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:border-gray-600 dark:focus:ring-gray-700"
@@ -245,6 +254,12 @@ export default function Header() {
                       </Link>
                     </li>
                   ))}
+                  <NavLink
+                    to="/join-agent"
+                    className="text-text_white cursor-pointer block py-2 pr-4 pl-3 text-white rounded bg-primary-700 lg:bg-transparent lg:text-primary-700 lg:p-0 dark:text-white"
+                  >
+                    {t("join_agent_text")}
+                  </NavLink>
                 </ul>
               </div>
             </div>

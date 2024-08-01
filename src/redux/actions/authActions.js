@@ -69,4 +69,10 @@ export const agentChange = (agent) => ({
   payload: { agent },
 });
 
+export const EMAIL_CHANGE = "EMAIL_CHANGE";
+export const emailChange = (email) => ({
+  type: EMAIL_CHANGE,
+  payload: { email },
+});
+
 

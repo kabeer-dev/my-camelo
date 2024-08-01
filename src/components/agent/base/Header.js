@@ -14,6 +14,7 @@ import { signOutRequest } from "../../../redux/actions/authActions";
 import { useTranslation } from "react-i18next";
 import { languageChange } from "../../../redux/actions/authActions";
 import secureLocalStorage from "react-secure-storage";
+import { emailChange } from "../../../redux/actions/authActions";
 
 export default function Header() {
   const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
@@ -65,8 +66,10 @@ export default function Header() {
         break;
       case "2":
         message.success(`Logged out`);
-        dispatch(signOutRequest());
         secureLocalStorage.removeItem("agent");
+        secureLocalStorage.removeItem("email");
+        dispatch(emailChange(null))
+        dispatch(signOutRequest());
         navigate("/");
         break;
       default:
@@ -103,7 +106,7 @@ export default function Header() {
               >
                 <img
                   src="/assets/header/agentLogo.png"
-                  className="w-14 h-14 sm:h-14 my-2"
+                  className="w-18 h-14 sm:h-14 my-2"
                   alt="Camelo Logo"
                 />
               </button>

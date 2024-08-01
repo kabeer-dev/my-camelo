@@ -1,15 +1,14 @@
-
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom"; // Import useNavigate
-import axios from 'axios';
+import axios from "axios";
 import { setLoading } from "../../redux/actions/loaderAction";
 import { useTranslation } from "react-i18next";
 import { Icon } from "@iconify/react";
+import Button from "../base/Button";
 
 export default function PaymentMethod({
   formValues,
-  correctPrice,
   selectedPickup,
   selectedDropoff,
   location,
@@ -24,7 +23,7 @@ export default function PaymentMethod({
   setHidePhoneCreateAccountButton,
   setShowPhoneOTPScreen,
   setShowPaymentMethod,
-  rideName
+  rideName,
 }) {
   const navigate = useNavigate(); // Initialize useNavigate
   const dispatch = useDispatch();
@@ -32,43 +31,86 @@ export default function PaymentMethod({
   const username = useSelector((state) => state.auth.username);
   const token = useSelector((state) => state.auth.token);
   const language = useSelector((state) => state.auth.language);
-
-  const [t, i18n] = useTranslation("global");
-
-  const [userEmail, setUserEmail] = useState(null);
-
-  let price;
-  const getPrice = localStorage.getItem('price');
-  if (correctPrice) {
-    price = correctPrice
-  }
-  else {
-    price = parseInt(getPrice, 10);
-  }
-  console.log('ssss', price)
   const API_BASE_URL = process.env.REACT_APP_BASE_URL_AMK_TEST;
+  const [t, i18n] = useTranslation("global");
+  const [userEmail, setUserEmail] = useState(null);
+  const [getPaymentMethods, setGetPaymentMethods] = useState([]);
+  const [showPriceBtn, setShowPriceBtn] = useState(false);
+  const [selectedPaymentName, setSelectedPaymentName] = useState("");
+  const [calculatedPrice, setCalculatedPrice] = useState("");
+  const [proposal, setProposal] = useState("");
+  console.log("sss", getPaymentMethods);
+  // let price;
+  // const getPrice = localStorage.getItem('price');
+  // if (correctPrice) {
+  //   price = correctPrice
+  // }
+  // else {
+  //   price = parseInt(getPrice, 10);
+  // }
+  // console.log('ssss', price)
+
+  const arrivalDate = new Date(formValues.arrivalDate);
+  const year = arrivalDate.getFullYear();
+  const month = String(arrivalDate.getMonth() + 1).padStart(2, "0"); // Month is zero-indexed, so we add 1
+  const day = String(arrivalDate.getDate()).padStart(2, "0");
+  const formattedDate = `${year}-${month}-${day}`;
+
   useEffect(() => {
-    const geyUser = async () => {
+    dispatch(setLoading(true));
+    const getPaymentMethods = async () => {
+      const payData = {
+        arrival_date: formattedDate,
+        arrival_time: formValues.arrivalTime,
+        langauge: language,
+      };
+    //  console.log('ff', payData)
+      try {
+        const response = await axios.post(
+          `${API_BASE_URL}/api/method/airport_transport.api.bookings.get_payment_methods`,
+          payData,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        if (response && response.status === 200) {
+          setGetPaymentMethods(response.data.data);
+        }
+      } catch (error) {
+        console.log("Error", error);
+      }
+    };
+    getPaymentMethods();
+
+    dispatch(setLoading(false));
+  }, []);
+
+  useEffect(() => {
+    const getUser = async () => {
       dispatch(setLoading(true));
       try {
-        const response = await axios.get(`${API_BASE_URL}/api/method/airport_transport.api.user.get_user_info`, {
-          headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-            'Authorization': `Bearer ${token}`
-          },
-        });
+        const response = await axios.get(
+          `${API_BASE_URL}/api/method/airport_transport.api.user.get_user_info`,
+          {
+            headers: {
+              "Content-Type": "application/x-www-form-urlencoded",
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
         if (response && response.status === 200) {
-          setUserEmail(response.data.data.email)
+          setUserEmail(response.data.data.email);
           dispatch(setLoading(false));
         }
-      }
-      catch (error) {
-        console.error('Error:', error);
+      } catch (error) {
+        console.error("Error:", error);
         dispatch(setLoading(false));
-      };
-    }
-    geyUser()
-  }, [])
+      }
+    };
+    getUser();
+  }, []);
   // useEffect(() => {
   //   const hasRefreshed = localStorage.getItem('hasRefreshed');
   //   if (hasRefreshed) {
@@ -76,23 +118,72 @@ export default function PaymentMethod({
   //     window.location.reload();
   //   }
   // }, []);
+
+  const getRidePrice = async () => {
+    dispatch(setLoading(true));
+    const priceData = {
+      location: location,
+      destination: destination,
+      vehicle_type: formValues?.vehicleType ? formValues.vehicleType : "",
+      rider: formValues?.seatNumber ? formValues.seatNumber : 1,
+      arrival_date: formattedDate,
+      arrival_time: formValues?.arrivalTime ? formValues.arrivalTime : "",
+      shared_discount: sharedRideValue,
+      service_type: rideName,
+      payment_method: selectedPaymentName,
+      zone: formValues?.arrivalCity ? (formValues.arrivalCity === 'Dammam' || formValues.arrivalCity === 'الدمام' ? 'Dammam' : 'Riyadh') : '',
+      language: language,
+      hours:
+        rideName === "Book Vehicle In Hours" ? formValues?.bookingByHours : "",
+    };
+    console.log("fff", priceData);
+    try {
+      const response = await axios.post(
+        `${API_BASE_URL}/api/method/airport_transport.api.integrations.maps.get_price`,
+        priceData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      if (response && response.status === 200) {
+        console.log(response.data);
+        setCalculatedPrice(response.data.data.price)
+        setProposal(response.data.data.proposal)
+        setShowPriceBtn(false)
+      }
+    } catch (error) {
+      console.log("Error", error);
+    }
+    dispatch(setLoading(false));
+  };
+
   const getRandomDigit = () => Math.floor(Math.random() * 10);
   useEffect(() => {
     if (!isLoggedIn) {
-      window.location.href = '/';
+      window.location.href = "/";
     }
-  }, [isLoggedIn])
+  }, [isLoggedIn]);
   const paymentMethods = [
-    { id: 1, image: "/assets/paymentmethod/madapay.png", name: "mada", displayName: t("hero.mada_text") },
-    // { id: 2, image: "/assets/paymentmethod/paypal.png", name: "PayPal" },
-    // { id: 3, image: "/assets/paymentmethod/applepay.png", name: "Apple Pay" },
+    {
+      id: 1,
+      image: "/assets/paymentmethod/madapay.png",
+      name: "mada",
+      displayName: t("hero.mada_text"),
+    },
     {
       id: 4,
       image: "/assets/paymentmethod/creditcardpay.png",
       name: "Credit Card",
-      displayName: t("hero.credit_text")
+      displayName: t("hero.credit_text"),
     },
-    { id: 5, image: "/assets/paymentmethod/bankpay.png", name: "Pay By Link", displayName: t("hero.pay_link_text") },
+    {
+      id: 5,
+      image: "/assets/paymentmethod/bankpay.png",
+      name: "Pay By Link",
+      displayName: t("hero.pay_link_text"),
+    },
   ];
 
   const handlePaymentMethodClick = async (paymentMethodName) => {
@@ -101,12 +192,6 @@ export default function PaymentMethod({
     for (let i = 0; i < 10; i++) {
       randomDigits += getRandomDigit();
     }
-    const arrivalDate = new Date(formValues.arrivalDate);
-
-    const year = arrivalDate.getFullYear();
-    const month = String(arrivalDate.getMonth() + 1).padStart(2, '0'); // Month is zero-indexed, so we add 1
-    const day = String(arrivalDate.getDate()).padStart(2, '0');
-    const formattedDate = `${year}-${month}-${day}`;
 
     const bookingData = {
       ticket: randomDigits,
@@ -120,7 +205,7 @@ export default function PaymentMethod({
       arrival_time: formValues?.arrivalTime ? formValues.arrivalTime : '',
       vehicle_type: formValues?.vehicleType ? formValues.vehicleType : '',
       ride_discount: sharedRideValue,
-      price: price,
+      price: calculatedPrice,
       user: userEmail,
       language: language ? language : 'eng',
       location: location,
@@ -129,13 +214,14 @@ export default function PaymentMethod({
       drop_off: selectedDropoff ? `${selectedDropoff.lat}, ${selectedDropoff.lng}` : "",
       pick_up: selectedPickup ? `${selectedPickup.lat}, ${selectedPickup.lng}` : "",
       pickup: selectedPickup ? `${selectedPickup.lat}, ${selectedPickup.lng}` : "",
-      service_type: rideName
+      service_type: rideName,
+      ride_proposal: proposal,
+      booking_hours: formValues?.bookingByHours ? formValues.bookingByHours : '',
     }
 
-
-    if (paymentMethodName === 'mada' || paymentMethodName === 'Credit Card') {
+    if (paymentMethodName === 'Mada' || paymentMethodName === 'Credit Card') {
       let entryId;
-      if (paymentMethodName === 'mada') {
+      if (paymentMethodName === 'Mada') {
         entryId = '8ac7a4ca8c31c0ef018c3463d225039d'
       } else if (paymentMethodName === 'Credit Card') {
         entryId = '8ac7a4ca8c31c0ef018c34634bf30399'
@@ -143,7 +229,7 @@ export default function PaymentMethod({
       const url = 'https://eu-test.oppwa.com/v1/checkouts';
       const data = new URLSearchParams({
         'entityId': entryId,
-        'amount': price,
+        'amount': calculatedPrice,
         'currency': 'SAR',
         'paymentType': 'DB',
         // 'PaymentMethods': 'VISA, MASTER',
@@ -164,7 +250,7 @@ export default function PaymentMethod({
         localStorage.setItem('saveData', false);
         localStorage.setItem('paymentMethodName', paymentMethodName);
         const checkoutId = response.data.id
-        navigate('/payment-confirmation', { state: { checkoutId: checkoutId, paymentMethodName: paymentMethodName, formValues: formValues, price: price } })
+        navigate('/payment-confirmation', { state: { checkoutId: checkoutId, paymentMethodName: paymentMethodName, formValues: formValues, price: calculatedPrice } })
         dispatch(setLoading(false));
       } catch (error) {
         console.log("Error", error);
@@ -176,7 +262,7 @@ export default function PaymentMethod({
       const successUrl = `${baseUrl}/thank-you`;
       const payByLinkData = {
         "customer.email": userEmail,
-        "amount": price.toFixed(2),
+        "amount": calculatedPrice.toFixed(2),
         "currency": "SAR",
         "paymentType": "DB",
         "shopperResultUrl": successUrl,
@@ -196,9 +282,10 @@ export default function PaymentMethod({
           "shared_discount": sharedRideValue,
           "user": userEmail,
           // "hours": formValues?.bookingByHours ? formValues.bookingByHours: '',
-          "price": price,
+          "price": calculatedPrice,
           "service_type": rideName,
-          "language": language === 'ar' ? language : ""
+          "language": language === 'ar' ? language : "",
+          "ride_proposal": proposal,
         }
       }
 
@@ -235,12 +322,16 @@ export default function PaymentMethod({
     <>
       {isLoggedIn && (
         <>
-          <div className="flex flex-row justify-center items-center text-3xl pb-8 border-b border-border_color">
-            <Icon icon={language === 'ar' ? "ph:arrow-right" : "ph:arrow-left"} width="25px" height="25px" className="cursor-pointer"
+          <div className="flex flex-row items-center text-3xl pb-8 border-b border-border_color">
+            <Icon
+              icon={language === "ar" ? "ph:arrow-right" : "ph:arrow-left"}
+              width="25px"
+              height="25px"
+              className="cursor-pointer"
               onClick={() => {
-                if(rideName === 'airportRide' || rideName === 'scheduledRide'){
+                if (rideName === "Airport Trip" || rideName === "City Trip") {
                   setSubTab(3);
-                }else{
+                } else {
                   setSubTab(2);
                 }
                 setShowSignUp(false);
@@ -251,24 +342,34 @@ export default function PaymentMethod({
                 setHidePhoneCreateAccountButton(false);
                 setShowPhoneOTPScreen(false);
                 setShowPaymentMethod(false);
-              }
-              }
+              }}
             />
-            <div className="mx-2">{t("hero.your_cost_text")}</div>
-            <div className="mx-2 font-bold text-background_steel_blue">{price} {t("hero.sar_text")}</div>
+            {calculatedPrice && proposal && (
+              <div className="flex justify-center">
+                <div className="mx-2">{t("hero.your_cost_text")}</div>
+                <div className="mx-2 font-bold text-background_steel_blue">{calculatedPrice} {t("hero.sar_text")}</div>
+              </div>
+            )}
           </div>
 
-          {paymentMethods.map((method) => (
+          {getPaymentMethods.map((method) => (
             <div
               key={method.id}
               className="flex flex-row justify-between items-center py-3 border-b border-border_color cursor-pointer"
-              onClick={() => handlePaymentMethodClick(method.name)} // Add onClick event handler
+              // onClick={() => handlePaymentMethodClick(method.name)} // Add onClick event handler
+              onClick={() => {
+                dispatch(setLoading(true));
+                setSelectedPaymentName(method.payment_method);
+                setShowPriceBtn(true);
+                dispatch(setLoading(false));
+              }}
             >
               <div className="flex flex-row justify-between items-center">
                 <div className="mx-2">
-                  <img src={method.image} alt={method.name} />
+                  {/* <img src={method.image} alt={method.name} /> */}
                 </div>
-                <div className="mx-2">{method.displayName !== 'mada' && method.displayName !== 'مدى' ? method.displayName : ''}</div>
+                {/* <div className="mx-2">{method.displayName !== 'mada' && method.displayName !== 'مدى' ? method.displayName : ''}</div>*/}
+                <div className="mx-2">{method.payment_method}</div>
               </div>
               <div>
                 <Icon
@@ -281,6 +382,25 @@ export default function PaymentMethod({
             </div>
           ))}
 
+          {showPriceBtn && (
+            <div>
+              <Button
+                className="mt-3 bg-background_steel_blue w-full text-text_white hover:bg-gray-100 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2"
+                label={t("get_ride_price_text")}
+                onClick={() => getRidePrice()}
+              />
+            </div>
+          )}
+
+          {!showPriceBtn && selectedPaymentName !== "" && (
+            <div>
+              <Button
+                className="mt-3 bg-background_steel_blue w-full text-text_white hover:bg-gray-100 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2"
+                label={t("processed_text")}
+                onClick={() => handlePaymentMethodClick(selectedPaymentName)}
+              />
+            </div>
+          )}
         </>
       )}
     </>

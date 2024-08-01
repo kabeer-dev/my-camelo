@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Heading from "../base/Heading";
 import { Formik, Form } from "formik";
 import * as Yup from "yup";
@@ -21,8 +21,31 @@ export default function SignUp() {
   const [recaptchaToken, setRecaptchaToken] = useState(null);
   const recaptchaRef = React.createRef();
   const language = useSelector((state) => state.auth.language);
+  const email = useSelector((state) => state.auth.email);
+  const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
 
   const [t, i18n] = useTranslation("global");
+  const API_BASE_URL = process.env.REACT_APP_BASE_URL_AMK_TEST;
+
+  // useEffect(() => {
+  //   dispatch(setLoading(true))
+  //   if (email) {
+  //     const checkUser = async () => {
+  //       try {
+  //         const response = await axios.post(`${API_BASE_URL}/api/method/airport_transport.api.user.detect_email?email=${email}`);
+  //         if (response && response.status === 200) {
+  //           if(response.data.msg !== 'Agent User'){
+  //             navigate('/')
+  //           }
+  //         }
+  //       } catch (error) {
+  //         console.log('Error', error)
+  //       }
+  //     }
+  //     checkUser()
+  //   }
+  //   dispatch(setLoading(false))
+  // }, [email])
 
   const validationSchema = Yup.object().shape({
     email: Yup.string().email("Invalid email").required(t("errors.email_error")),
@@ -31,8 +54,6 @@ export default function SignUp() {
   const initialValues = {
     email: "",
   };
-
-  const API_BASE_URL = process.env.REACT_APP_BASE_URL_AMK_TEST;
 
   const onSubmit = async (values, { setSubmitting }) => {
     dispatch(setLoading(true))
@@ -126,7 +147,7 @@ export default function SignUp() {
                       <div dir={language === 'ar' ? 'rtl' : 'ltr'}>
                         <Recaptcha
                           recaptchaRef={recaptchaRef}
-                          sitekey="6LfE3FEpAAAAAGkeBjkpPeNSqPNWtLPCma7EHVsr"
+                          sitekey="6LfJNx0qAAAAAE8-HroAfNWTreNYqqjnnJ9Sw-5J"
                           onChange={(value) => {
                             setRecaptchaToken(value)
                           }}

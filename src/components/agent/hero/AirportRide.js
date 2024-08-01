@@ -62,10 +62,8 @@ export default function AirportRide(
   }, [zoneMap]);
 
   const [location, setLocation] = useState("")
-  const [destination, setDestination] = useState("");
-  const [price, setPrice] = useState("");
-
-  const [getUsers, setGetUsers] = useState([]);
+  const [destination, setDestination] = useState("")
+  const [getUsers, setGetUsers] = useState([])
 
   // const [subTab, setSubTab] = useState(1);
   const [cityName, setCityName] = useState();
@@ -106,6 +104,26 @@ export default function AirportRide(
   });
 
   const API_BASE_URL = process.env.REACT_APP_BASE_URL_AMK_TEST;
+
+  const [VehicleTypeWithService, setVehicleTypeWithService] = useState(null);
+  useEffect(() => {
+    dispatch(setLoading(true));
+    const getVechileTypes = async () => {
+      try {
+        const response = await axios.get(`${API_BASE_URL}/api/method/airport_transport.api.bookings.get_vehicle_types?language=${language ? language : 'eng'}&service=Airport Trip`);
+        if (response && response.status === 200) {
+          // console.log('hhh', response.data)
+          setVehicleTypeWithService(response.data)
+        }
+      } catch (error) {
+        console.log('Error', error)
+      }
+    }
+    getVechileTypes();
+    dispatch(setLoading(false));
+
+  }, []);
+
   const [sharedRideValue, setSharedRideValue] = useState("");
   useEffect(() => {
     const getSharedRideValue = async () => {
@@ -135,7 +153,7 @@ export default function AirportRide(
 
       try {
         const response = await axios.get(
-          `https://alsheikh.test.masarat-transport.com/api/method/airport_transport.api.agent.get_transport_users`,
+          `${API_BASE_URL}/api/method/airport_transport.api.agent.get_transport_users`,
           {
             headers: {
               // 'Content-Type': 'application/x-www-form-urlencoded',
@@ -167,7 +185,7 @@ export default function AirportRide(
   // console.log('vehicleTypes', vehicleTypes)
   useEffect(() => {
     if (vehicleTypeName !== "") {
-      const selectedVehicle = vehicleTypes.data.find(
+      const selectedVehicle = VehicleTypeWithService.data.find(
         (vehicle) => vehicle.name === vehicleTypeName
       );
       setSeatNumberOptions(
@@ -193,6 +211,48 @@ export default function AirportRide(
       dispatch(getZoneRequest(services, cityName));
     }
   }, [dispatch, cityName]);
+
+  useEffect(() => {
+    if (cities.data?.length > 0 && !cityName) {
+      setFormValues((prevValues) => ({
+        ...prevValues,
+        "arrivalCity": cities.data[0],
+      }));
+      setOnChangeFormValues((prevValues) => ({
+        ...prevValues,
+        "arrivalCity": cities.data[0],
+      }));
+
+      setCityName(cities.data[0])
+    }
+  }, [cities])
+
+  useEffect(() => {
+    if (airports.data?.length > 0) {
+      setFormValues((prevValues) => ({
+        ...prevValues,
+        "airportName": airports.data[0].airport,
+      }));
+      setOnChangeFormValues((prevValues) => ({
+        ...prevValues,
+        "airportName": airports.data[0].airport,
+      }));
+
+      setFormValues((prevValues) => ({
+        ...prevValues,
+        "terminalNumber": airports.data[0].terminals[0].terminal,
+      }));
+      setOnChangeFormValues((prevValues) => ({
+        ...prevValues,
+        "terminalNumber": airports.data[0].terminals[0].terminal,
+      }));
+      const terminals = airports.data[0].terminals.map((terminal) => terminal.terminal);
+      setTerminalOptions(terminals)
+      setSelectedPickup(airports.data[0].terminals[0].location)
+      setLocation(airports.data[0].terminals[0].location)
+
+    }
+  }, [airports, cityName])
 
   const steps = useMemo(() => {
     const baseSteps = [
@@ -249,45 +309,6 @@ export default function AirportRide(
     dispatch(setLoading(false));
   };
 
-  useEffect(() => {
-    if (cities.data?.length > 0) {
-      setFormValues((prevValues) => ({
-        ...prevValues,
-        "arrivalCity": cities.data[0],
-      }));
-      setOnChangeFormValues((prevValues) => ({
-        ...prevValues,
-        "arrivalCity": cities.data[0],
-      }));
-      setCityName(cities.data[0])
-    }
-  }, [cities])
-
-  useEffect(() => {
-    if (airports.data?.length > 0) {
-      setFormValues((prevValues) => ({
-        ...prevValues,
-        "airportName": airports.data[0].airport,
-      }));
-      setOnChangeFormValues((prevValues) => ({
-        ...prevValues,
-        "airportName": airports.data[0].airport,
-      }));
-
-      setFormValues((prevValues) => ({
-        ...prevValues,
-        "terminalNumber": airports.data[0].terminals[0].terminal,
-      }));
-      setOnChangeFormValues((prevValues) => ({
-        ...prevValues,
-        "terminalNumber": airports.data[0].terminals[0].terminal,
-      }));
-
-      setSelectedPickup(airports.data[0].terminals[0].location)
-      setLocation(airports.data[0].terminals[0].location)
-
-    }
-  }, [airports])
 
   return (
     <>
@@ -306,7 +327,6 @@ export default function AirportRide(
           {showPaymentMethod ? (
             <PaymentMethod
               formValues={formValues}
-              correctPrice={price}
               selectedPickup={selectedPickup}
               selectedDropoff={selectedDropoff}
               location={location}
@@ -321,7 +341,7 @@ export default function AirportRide(
               setHidePhoneCreateAccountButton={setHidePhoneCreateAccountButton}
               setShowPhoneOTPScreen={setShowPhoneOTPScreen}
               setShowPaymentMethod={setShowPaymentMethod}
-              rideName="airportRide"
+              rideName="Airport Trip"
             />
 
           ) : showSignUp ? (
@@ -355,64 +375,21 @@ export default function AirportRide(
               validationSchema={validationSchema}
               enableReinitialize={true}
               onSubmit={async (values, { setSubmitting }) => {
-                // if (!isLoggedIn) {
                 if (!location || !destination) {
                   message.error(t("hero.errors.map_required"));
                 }
                 dispatch(setLoading(true));
-                try {
 
-                  const getADATE = new Date(formValues.arrivalDate);
-
-                  const year = getADATE.getFullYear();
-                  const month = String(getADATE.getMonth() + 1).padStart(2, '0'); // Month is zero-indexed, so we add 1
-                  const day = String(getADATE.getDate()).padStart(2, '0');
-                  const formattedDate = `${year}-${month}-${day}`;
-
-                  const data = {
-                    location: location,
-                    destination: destination,
-                    vehicle_type: values.vehicleType,
-                    rider: values.seatNumber,
-                    arrival_date: formattedDate,
-                    arrival_time: values.arrivalTime,
-                    shared_discount: sharedRideValue,
-                    language: language ? language : 'eng'
-                  }
-                  // console.log('sss', data)
-                  const response = await axios.post(`${API_BASE_URL}/api/method/airport_transport.api.integrations.maps.get_price`, data);
-                  if (response && response.status === 200) {
-                    // console.log(response.data.data)
-                    if (isLoggedIn) {
-                      setPrice(response.data.data.price)
-                      dispatch(setLoading(false));
-                      setShowPaymentMethod(true)
-                    } else {
-                      setPrice(response.data.data.price)
-                      dispatch(setLoading(false));
-                      setSubTab(4)
-                      setShowSignUp(true);
-                    }
-                  }
-                }
-                catch (error) {
-                  if (error?.response?.data?.msg === 'The booking distance is very short, please modify the reservation locations') {
-                    message.error(`${t("hero.errors.short_distance")}`);
-                  }
-                  console.error('Error:', error);
+                if (isLoggedIn) {
                   dispatch(setLoading(false));
-                };
-                dispatch(setLoading(false))
+                  setShowPaymentMethod(true)
+                } else {
+                  dispatch(setLoading(false));
+                  setSubTab(4)
+                  setShowSignUp(true);
+                }
 
-                // } else {
-                //   // const submitValues = {
-                //   //   ...values,
-                //   //   pickupLocation: selectedPickup,
-                //   //   dropoffLocation: selectedDropoff,
-                //   // };
-                //   // console.log("Submitted values:", submitValues);
-                //   setShowPaymentMethod(true);
-                // }
+                dispatch(setLoading(false))
                 setSubmitting(false);
               }}
             >
@@ -456,6 +433,10 @@ export default function AirportRide(
                           options={getUsers}
                           onChange={({ fieldName, selectedValue }) => {
                             setFieldValue(fieldName, selectedValue);
+                            setFormValues((prevValues) => ({
+                              ...prevValues,
+                              [fieldName]: selectedValue,
+                            }));
                             setOnChangeFormValues((prevValues) => ({
                               ...prevValues,
                               [fieldName]: selectedValue,
@@ -474,6 +455,10 @@ export default function AirportRide(
                           options={rideTypeOptions}
                           onChange={({ fieldName, selectedValue }) => {
                             setFieldValue(fieldName, selectedValue);
+                            setFormValues((prevValues) => ({
+                              ...prevValues,
+                              [fieldName]: selectedValue,
+                            }));
                             setOnChangeFormValues((prevValues) => ({
                               ...prevValues,
                               [fieldName]: selectedValue,
@@ -503,6 +488,10 @@ export default function AirportRide(
                             setFieldValue("airportName", "");
                             setFieldValue("terminalNumber", "");
                             setTerminalOptions([]);
+                            setFormValues((prevValues) => ({
+                              ...prevValues,
+                              [fieldName]: selectedValue,
+                            }));
                             setOnChangeFormValues((prevValues) => ({
                               ...prevValues,
                               [fieldName]: selectedValue,
@@ -526,6 +515,10 @@ export default function AirportRide(
                           onChange={({ fieldName, selectedValue }) => {
                             setFieldValue(fieldName, selectedValue);
                             handleAirportChange(selectedValue, setFieldValue);
+                            setFormValues((prevValues) => ({
+                              ...prevValues,
+                              [fieldName]: selectedValue,
+                            }));
                             setOnChangeFormValues((prevValues) => ({
                               ...prevValues,
                               [fieldName]: selectedValue,
@@ -547,6 +540,10 @@ export default function AirportRide(
                           }))}
                           onChange={({ fieldName, selectedValue }) => {
                             setFieldValue(fieldName, selectedValue);
+                            setFormValues((prevValues) => ({
+                              ...prevValues,
+                              [fieldName]: selectedValue,
+                            }));
                             setOnChangeFormValues((prevValues) => ({
                               ...prevValues,
                               [fieldName]: selectedValue,
@@ -568,6 +565,7 @@ export default function AirportRide(
                       <>
                         <div>
                           <VehicleTypeModal
+                            VehicleTypeWithService={VehicleTypeWithService}
                             vehicleTypeName={vehicleTypeName}
                             setVehicleTypeName={setVehicleTypeName}
                           />

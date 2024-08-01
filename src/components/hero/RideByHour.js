@@ -43,7 +43,7 @@ export default function RideByHour({
 }) {
   const dispatch = useDispatch();
   const { cities } = useSelector((state) => state.cities);
-  const { vehicleTypes } = useSelector((state) => state.vehicleTypes);
+  // const { vehicleTypes } = useSelector((state) => state.vehicleTypes);
   const zoneMap = useSelector((state) => state?.zone?.zone);
   const [map, setMap] = useState(null);
 
@@ -79,10 +79,28 @@ export default function RideByHour({
   const [vehicleTypeName, setVehicleTypeName] = useState("");
 
   const [location, setLocation] = useState("")
-  const [destination, setDestination] = useState("");
-  const [price, setPrice] = useState("");
+  const [destination, setDestination] = useState("")
 
   const API_BASE_URL = process.env.REACT_APP_BASE_URL_AMK_TEST;
+
+  const [VehicleTypeWithService, setVehicleTypeWithService] = useState(null);
+  useEffect(() => {
+    dispatch(setLoading(true));
+    const getVechileTypes = async () => {
+      try {
+        const response = await axios.get(`${API_BASE_URL}/api/method/airport_transport.api.bookings.get_vehicle_types?language=${language ? language : 'eng'}&service=Book Vehicle In Hours`);
+        if (response && response.status === 200) {
+          // console.log('hhh', response.data)
+          setVehicleTypeWithService(response.data)
+        }
+      } catch (error) {
+        console.log('Error', error)
+      }
+    }
+    getVechileTypes();
+    dispatch(setLoading(false));
+
+  }, []);
 
   useEffect(() => {
     if (vehicleTypeName !== "") {
@@ -111,13 +129,12 @@ export default function RideByHour({
   useEffect(() => {
     dispatch(fetchCitiesRequest());
     dispatch(fetchVehicleTypesRequest());
-    console.log('aa', cityName)
     const expectedCityName = cityName ? cityName : 'Dammam';
     dispatch(getZoneRequest(services, expectedCityName));
   }, [dispatch, cityName]);
 
   useEffect(() => {
-    if(cities.data?.length > 0 && !cityName){
+    if (cities.data?.length > 0 && !cityName) {
       setFormValues((prevValues) => ({
         ...prevValues,
         "arrivalCity": cities.data[0],
@@ -166,59 +183,16 @@ export default function RideByHour({
     if (vehicleTypeName !== '') {
       values.vehicleType = vehicleTypeName;
       dispatch(setLoading(true))
-      // if (!isLoggedIn) {
 
-      try {
-        const getADATE = new Date(formValues.arrivalDate);
-        const year = getADATE.getFullYear();
-        const month = String(getADATE.getMonth() + 1).padStart(2, '0'); // Month is zero-indexed, so we add 1
-        const day = String(getADATE.getDate()).padStart(2, '0');
-        const formattedDate = `${year}-${month}-${day}`;
-
-        const data = {
-          location: location,
-          destination: `${values.arrivalCity}`,
-          vehicle_type: values.vehicleType,
-          rider: values.bookingByHours,
-          arrival_date: formattedDate,
-          arrival_time: values.arrivalTime,
-          shared_discount: 0,
-          language: language ? language : 'eng'
-        }
-        const response = await axios.post(`${API_BASE_URL}/api/method/airport_transport.api.integrations.maps.get_price`, data);
-        if (response && response.status === 200) {
-          // console.log(response.data.data)
-          if (isLoggedIn) {
-            setPrice(response.data.data.price)
-            dispatch(setLoading(false));
-            setShowPaymentMethod(true)
-          } else {
-            setPrice(response.data.data.price)
-            dispatch(setLoading(false));
-            setSubTab(4)
-            setShowSignUp(true);
-          }
-        }
-      }
-      catch (error) {
-        if (error?.response?.data?.msg === 'The booking distance is very short, please modify the reservation locations') {
-          message.error(`${t("hero.errors.short_distance")}`);
-        }
-        console.error('Error:', error);
+      if (isLoggedIn) {
         dispatch(setLoading(false));
-      };
+        setShowPaymentMethod(true)
+      } else {
+        dispatch(setLoading(false));
+        setSubTab(4)
+        setShowSignUp(true);
+      }
 
-      // } else {
-      //   setShowPaymentMethod(true)
-      //   // console.log("Submitted values:", values); // Log form values
-      //   // const submitValues = {
-      //   //   // Add latlong data to the form values
-      //   //   ...values,
-      //   //   pickupLocation: selectedPickup,
-      //   //   dropoffLocation: selectedDropoff,
-      //   // };
-      //   // console.log("Submitted values:", submitValues);
-      // }
       setSubmitting(false);
       dispatch(setLoading(false))
     }
@@ -243,7 +217,7 @@ export default function RideByHour({
     setSelectedPickup(pickup);
     setSelectedDropoff(dropoff);
   };
-  
+
 
   return (
     <>
@@ -263,7 +237,6 @@ export default function RideByHour({
             {showPaymentMethod ? (
               <PaymentMethod
                 formValues={formValues}
-                correctPrice={price}
                 selectedPickup={selectedPickup}
                 selectedDropoff={selectedDropoff}
                 location={location}
@@ -278,7 +251,7 @@ export default function RideByHour({
                 setHidePhoneCreateAccountButton={setHidePhoneCreateAccountButton}
                 setShowPhoneOTPScreen={setShowPhoneOTPScreen}
                 setShowPaymentMethod={setShowPaymentMethod}
-                 rideName="rideByHour"
+                rideName="Book Vehicle In Hours"
               />
 
             ) :
@@ -483,6 +456,7 @@ export default function RideByHour({
                            </div> */}
                               <div>
                                 <VehicleTypeModal
+                                  VehicleTypeWithService={VehicleTypeWithService}
                                   vehicleTypeName={vehicleTypeName}
                                   setVehicleTypeName={setVehicleTypeName}
                                 />
@@ -491,7 +465,7 @@ export default function RideByHour({
                               <div className="my-4 flex flex-col md:flex-row justify-between items-start">
                                 <div className="w-full md:w-1/2 mx-0 md:mx-1">
                                   <Heading
-                                    label={t("hero.set_destination_text")}
+                                    title={t("hero.set_destination_text")}
                                     className={"text-xl text-text_black"}
                                   />
                                 </div>

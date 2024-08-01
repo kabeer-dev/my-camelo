@@ -18,9 +18,9 @@ export default function PaymentSuccess() {
 
   useEffect(() => {
     if (!isLoggedIn) {
-      window.location.href = '/';
+      window.location.href = "/";
     }
-  }, [isLoggedIn])
+  }, [isLoggedIn]);
 
   // const formValues = location.state?.formValues;
   const language = useSelector((state) => state.auth.language);
@@ -30,29 +30,70 @@ export default function PaymentSuccess() {
 
   const paymentMethodName = localStorage.getItem("paymentMethodName");
   const saveData = localStorage.getItem("saveData");
+  var bookingValues = localStorage.getItem("bookingValues");
+  var josnbookingValues = JSON.parse(bookingValues);
+  // console.log('ggg', josnbookingValues)
+  const newBookingData = {
+    airport: josnbookingValues.airport,
+    rider: josnbookingValues.rider,
+    location: josnbookingValues.location,
+    city: josnbookingValues.city,
+    terminal: josnbookingValues?.terminal ? josnbookingValues.terminal : "",
+    arrival_date: josnbookingValues.arrival_date,
+    arrival_time: josnbookingValues.arrival_time,
+    vehicle_type: josnbookingValues.vehicle_type,
+    shared_discount: josnbookingValues.ride_discount,
+    price: josnbookingValues.price,
+    ride_proposal: josnbookingValues.ride_proposal,
+    zone: josnbookingValues?.city
+      ? josnbookingValues.city === "الدمام" ||
+        josnbookingValues.city === "Dammam"
+        ? "Dammam"
+        : "Riyadh"
+      : "",
+    pick_up: josnbookingValues.pick_up,
+    language: language,
+    destination: josnbookingValues.destination_name,
+    service_type: josnbookingValues.service_type,
+    payment_method: paymentMethodName,
+    booking_hours:
+      josnbookingValues.service_type === "Book Vehicle In Hours"
+        ? josnbookingValues.booking_hours
+        : "",
+  };
+
+  const currentUrl = window.location.href;
+  const urlObject = new URL(currentUrl);
+  const searchParams = urlObject.searchParams;
+  const id = searchParams.get("id");
+  // const extractedId = id.split(".")[0];
+  const resourcePath = searchParams.get("resourcePath");
+  newBookingData.hyperpay_id = id;
 
   useEffect(() => {
-    var bookingValues = localStorage.getItem("bookingValues");
-    var josnbookingValues = JSON.parse(bookingValues);
+    Events.scrollEvent.register("begin", function (to, element) {});
+    Events.scrollEvent.register("end", function (to, element) {});
 
-    dispatch(setLoading(true))
-    if (paymentMethodName === 'mada' || paymentMethodName === 'Credit Card') {
-      const currentUrl = window.location.href;
-      const urlObject = new URL(currentUrl);
-      const searchParams = urlObject.searchParams;
-      const id = searchParams.get("id");
-      // const extractedId = id.split(".")[0];
-      const resourcePath = searchParams.get("resourcePath");
-      josnbookingValues.hyperpay_id = id;
+    scrollSpy.update();
+    return () => {
+      Events.scrollEvent.remove("begin");
+      Events.scrollEvent.remove("end");
+    };
+  }, []);
 
-      console.log('t', josnbookingValues)
+  useEffect(() => {
+    console.log("booking data is here:", newBookingData);
+    dispatch(setLoading(true));
+    if (saveData === "false" && newBookingData) {
+      if (paymentMethodName === "Mada" || paymentMethodName === "Credit Card") {
+        // console.log('t', newBookingData)
 
-      const createMadaBooking = async () => {
-        if (saveData === "false") {
+        const createMadaBooking = async () => {
+          // if (saveData === "false") {
           try {
             const response = await axios.post(
-              `${API_BASE_URL}/api/method/airport_transport.api.bookings.user_booking?language=${language ? language : 'eng'}`,
-              josnbookingValues,
+              `${API_BASE_URL}/api/method/airport_transport.api.bookings.user_booking`,
+              newBookingData,
               {
                 headers: {
                   Authorization: `Bearer ${token}`,
@@ -67,58 +108,47 @@ export default function PaymentSuccess() {
           } catch (error) {
             console.error("Error:", error);
           }
-        }
-      };
-      createMadaBooking();
-    } else {
-      const currentUrl = window.location.href;
-      const urlObject = new URL(currentUrl);
-      const searchParams = urlObject.searchParams;
-      const id = searchParams.get("id");
-      const checkoutId = searchParams.get("checkoutId");
-      // const extractedId = checkoutId.split(".")[0];
-      // console.log(id, extractedId);
-      josnbookingValues.hyperpay_id = id;
+          // }
+        };
+        createMadaBooking();
+      }
+      // else {
+      //   const currentUrl = window.location.href;
+      //   const urlObject = new URL(currentUrl);
+      //   const searchParams = urlObject.searchParams;
+      //   const id = searchParams.get("id");
+      //   const checkoutId = searchParams.get("checkoutId");
+      //   // const extractedId = checkoutId.split(".")[0];
+      //   // console.log(id, extractedId);
+      //   newBookingData.hyperpay_id = id;
 
-      const createPayByLinkBooking = async () => {
-        if (saveData === "false") {
-          try {
-            const response = await axios.post(
-              `${API_BASE_URL}/api/method/airport_transport.api.bookings.user_booking?language=${language ? language : 'eng'}`,
-              josnbookingValues,
-              {
-                headers: {
-                  Authorization: `Bearer ${token}`,
-                },
-              }
-            );
-            if (response && response.status === 200) {
-              console.log('jjj', response.data);
-              message.success(response.data.msg);
-              localStorage.setItem("saveData", true);
-            }
-          } catch (error) {
-            console.error("Error:", error);
-          }
-        }
-      };
-      createPayByLinkBooking();
+      //   const createPayByLinkBooking = async () => {
+      //     // if (saveData === "false") {
+      //     try {
+      //       const response = await axios.post(
+      //         `${API_BASE_URL}/api/method/airport_transport.api.bookings.user_booking?language=${language ? language : 'eng'}`,
+      //         newBookingData,
+      //         {
+      //           headers: {
+      //             Authorization: `Bearer ${token}`,
+      //           },
+      //         }
+      //       );
+      //       if (response && response.status === 200) {
+      //         console.log('jjj', response.data);
+      //         message.success(response.data.msg);
+      //         localStorage.setItem("saveData", true);
+      //       }
+      //     } catch (error) {
+      //       console.error("Error:", error);
+      //     }
+      //     // }
+      //   };
+      //   createPayByLinkBooking();
+      // }
     }
-    dispatch(setLoading(false))
+    dispatch(setLoading(false));
   }, []);
-
-  useEffect(() => {
-    Events.scrollEvent.register("begin", function (to, element) { });
-    Events.scrollEvent.register("end", function (to, element) { });
-
-    scrollSpy.update();
-
-    return () => {
-      Events.scrollEvent.remove("begin");
-      Events.scrollEvent.remove("end");
-    };
-  }, []);
-
 
   return (
     <>
@@ -126,7 +156,7 @@ export default function PaymentSuccess() {
         <div>
           <Header />
 
-          <main className="mt-20" dir={language === 'ar' ? 'rtl' : 'ltr' }>
+          <main className="mt-20" dir={language === "ar" ? "rtl" : "ltr"}>
             <div className="container mx-auto p-4">
               <div className="grid grid-cols-1 gap-3">
                 <div className="mx-auto">
@@ -175,6 +205,7 @@ export default function PaymentSuccess() {
 
           <Footer />
         </div>
-      )}</>
+      )}
+    </>
   );
 }

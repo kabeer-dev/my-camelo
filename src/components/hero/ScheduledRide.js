@@ -43,7 +43,7 @@ export default function ScheduledRide({
 }) {
   const dispatch = useDispatch();
   const { cities } = useSelector((state) => state.cities);
-  const { vehicleTypes } = useSelector((state) => state.vehicleTypes);
+  // const { vehicleTypes } = useSelector((state) => state.vehicleTypes);
   const language = useSelector((state) => state.auth.language);
   const zoneMap = useSelector((state) => state?.zone?.zone);
   const [map, setMap] = useState(null);
@@ -81,11 +81,28 @@ export default function ScheduledRide({
 
   const [location, setLocation] = useState("")
   const [destination, setDestination] = useState("");
-  const [price, setPrice] = useState("");
+
+  const [VehicleTypeWithService, setVehicleTypeWithService] = useState(null);
+  useEffect(() => {
+    dispatch(setLoading(true));
+    const getVechileTypes = async () => {
+      try {
+        const response = await axios.get(`${API_BASE_URL}/api/method/airport_transport.api.bookings.get_vehicle_types?language=${language ? language : 'eng'}&service=City Trip`);
+        if (response && response.status === 200) {
+          setVehicleTypeWithService(response.data)
+        }
+      } catch (error) {
+        console.log('Error', error)
+      }
+    }
+    getVechileTypes();
+    dispatch(setLoading(false));
+
+  }, []);
 
   useEffect(() => {
     if (vehicleTypeName !== "") {
-      const selectedVehicle = vehicleTypes.data.find(
+      const selectedVehicle = VehicleTypeWithService.data.find(
         (vehicle) => vehicle.name === vehicleTypeName
       );
       setSeatNumberOptions(
@@ -109,13 +126,12 @@ export default function ScheduledRide({
   useEffect(() => {
     dispatch(fetchCitiesRequest());
     dispatch(fetchVehicleTypesRequest());
-    console.log('aa', cityName)
     const expectedCityName = cityName ? cityName : 'Dammam';
     dispatch(getZoneRequest(services, expectedCityName));
   }, [dispatch, cityName]);
 
   useEffect(() => {
-    if(cities.data?.length > 0 && !cityName){
+    if (cities.data?.length > 0 && !cityName) {
       setFormValues((prevValues) => ({
         ...prevValues,
         "arrivalCity": cities.data[0],
@@ -181,61 +197,16 @@ export default function ScheduledRide({
     if (!location || !destination) {
       message.error(t("hero.errors.map_required"));
     }
-    dispatch(setLoading(true))
-    // if (!isLoggedIn) {
-    try {
-      const getADATE = new Date(formValues.arrivalDate);
+    dispatch(setLoading(true));
 
-      const year = getADATE.getFullYear();
-      const month = String(getADATE.getMonth() + 1).padStart(2, '0'); // Month is zero-indexed, so we add 1
-      const day = String(getADATE.getDate()).padStart(2, '0');
-      const formattedDate = `${year}-${month}-${day}`;
-
-      const data = {
-        location: location,
-        destination: destination,
-        vehicle_type: values.vehicleType,
-        rider: values.seatNumber,
-        arrival_date: formattedDate,
-        arrival_time: values.arrivalTime,
-        shared_discount: sharedRideValue,
-        language: language ? language : 'eng'
-      }
-      // console.log('hh', data)
-      const response = await axios.post(`${API_BASE_URL}/api/method/airport_transport.api.integrations.maps.get_price`, data);
-      if (response && response.status === 200) {
-        // console.log(response.data.data)
-        if (isLoggedIn) {
-          setPrice(response.data.data.price)
-          dispatch(setLoading(false));
-          setShowPaymentMethod(true)
-        } else {
-          setPrice(response.data.data.price)
-          dispatch(setLoading(false));
-          setSubTab(4)
-          setShowSignUp(true);
-        }
-      }
-    }
-    catch (error) {
-      if (error?.response?.data?.msg === 'The booking distance is very short, please modify the reservation locations') {
-        message.error(`${t("hero.errors.short_distance")}`);
-      }
-      console.error('Error:', error);
+    if (isLoggedIn) {
       dispatch(setLoading(false));
-    };
-
-    // } else {
-    //   setShowPaymentMethod(true)
-    //   // console.log("Submitted values:", values); // Log form values
-    //   // const submitValues = {
-    //   //   // Add latlong data to the form values
-    //   //   ...values,
-    //   //   pickupLocation: selectedPickup,
-    //   //   dropoffLocation: selectedDropoff,
-    //   // };
-    //   // console.log("Submitted values:", submitValues);
-    // }
+      setShowPaymentMethod(true)
+    } else {
+      dispatch(setLoading(false));
+      setSubTab(4)
+      setShowSignUp(true);
+    }
     setSubmitting(false);
     dispatch(setLoading(false))
   };
@@ -263,7 +234,6 @@ export default function ScheduledRide({
             {showPaymentMethod ? (
               <PaymentMethod
                 formValues={formValues}
-                correctPrice={price}
                 selectedPickup={selectedPickup}
                 selectedDropoff={selectedDropoff}
                 location={location}
@@ -278,7 +248,7 @@ export default function ScheduledRide({
                 setHidePhoneCreateAccountButton={setHidePhoneCreateAccountButton}
                 setShowPhoneOTPScreen={setShowPhoneOTPScreen}
                 setShowPaymentMethod={setShowPaymentMethod}
-                rideName="scheduledRide"
+                rideName="City Trip"
               />
 
             ) :
@@ -434,6 +404,7 @@ export default function ScheduledRide({
                           <>
                             <div>
                               <VehicleTypeModal
+                                VehicleTypeWithService={VehicleTypeWithService}
                                 vehicleTypeName={vehicleTypeName}
                                 setVehicleTypeName={setVehicleTypeName}
                               />

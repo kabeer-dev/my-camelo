@@ -20,6 +20,10 @@ import PhoneSignUp from "./components/signup/PhoneSignUp";
 import PaymentMethodForm from "./components/paymentconfirmation/PaymentMethodForm";
 import EmailSentPage from "./components/paymentconfirmation/EmailSentPage";
 import ThankYou from "./components/paymentconfirmation/ThankYou";
+//join agent
+import JoinAgent from "./components/joinagent/JoinAgent";
+import RequestSubmit from "./components/joinagent/RequestSubmit";
+import RequestFailed from "./components/joinagent/RequestFailed";
 
 //agents
 import AgentLayout from "./AgentLayout";
@@ -60,6 +64,10 @@ function App() {
         <Route path="/payment-failed" element={<PaymentFailed />} />
         <Route path="/email-sent" element={<EmailSentPage />} />
         <Route path="/thank-you" element={<ThankYou />} />
+
+        <Route path="/join-agent" element={<JoinAgent />} />
+        <Route path="/request-submit" element={<RequestSubmit />} />
+        <Route path="/request-failed" element={<RequestFailed />} />
 
         {/* Agent routes */}
         <Route path="/agent" element={<AgentLayout />} />

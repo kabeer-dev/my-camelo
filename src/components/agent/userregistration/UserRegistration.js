@@ -22,6 +22,8 @@ export default function UserRegistration() {
   const location = useLocation();
   const email = location.state?.email;
   const phone = location.state?.phone;
+  const token = useSelector((state) => state.auth.token);
+  
   const language = useSelector((state) => state.auth.language);
   const recaptchaRef = React.createRef();
 
@@ -167,7 +169,9 @@ export default function UserRegistration() {
       const headers = {
         "Content-Type": "application/json",
         recaptchaToken: recaptchaToken,
+        Authorization: `Bearer ${token}`,
       };
+      console.log('gg', token, values)
       try {
         const response = await axios.post(
           `${API_BASE_URL}/api/method/airport_transport.api.user.register`,
@@ -465,7 +469,7 @@ export default function UserRegistration() {
 
                             <div>
                               <Recaptcha
-                                sitekey="6LfE3FEpAAAAAGkeBjkpPeNSqPNWtLPCma7EHVsr"
+                                sitekey="6LfJNx0qAAAAAE8-HroAfNWTreNYqqjnnJ9Sw-5J"
                                 onChange={(value) => {
                                   setRecaptchaToken(value);
                                 }}
@@ -599,7 +603,7 @@ export default function UserRegistration() {
                             </div>
                             <div>
                               <Recaptcha
-                                sitekey="6LfE3FEpAAAAAGkeBjkpPeNSqPNWtLPCma7EHVsr"
+                                sitekey="6LfJNx0qAAAAAE8-HroAfNWTreNYqqjnnJ9Sw-5J"
                                 onChange={(value) => {
                                   setRecaptchaToken(value);
                                 }}

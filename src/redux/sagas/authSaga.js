@@ -46,15 +46,20 @@ function* signInSaga(action) {
           navigate("/");
         }
       } else {
+        const agentData = {
+          usr: email,
+          pwd: password
+        }
         const agentResponse = yield axios.post(
-          `https://alsheikh.test.masarat-transport.com/api/method/airport_transport.api.agent.login?usr=${email}&pwd=${password}`);
+          `${API_BASE_URL}/api/method/airport_transport.api.agent.login`, agentData);
+          // console.log('aaa', agentResponse)
           const { token, username } = agentResponse.data.data;
           const getEmail = agentResponse.data.data.email
           yield put(signInSuccess(token, username, getEmail));
         secureLocalStorage.setItem("agent", true);
         yield put(setLoading(false));
         if (navigate) {
-          navigate("/agent", {state: {email: email}});
+          navigate("/agent");
         }
       }
     }

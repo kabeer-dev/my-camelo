@@ -12,6 +12,7 @@ import { Icon } from "@iconify/react";
 import creditCardType from "credit-card-type";
 import { useTranslation } from "react-i18next";
 import { useSelector } from "react-redux";
+import TextArea from "antd/es/input/TextArea";
 
 dayjs.extend(customParseFormat);
 
@@ -21,9 +22,9 @@ const InputFieldFormik = ({
   label,
   options = [],
   value,
-  onChange = () => {},
+  onChange = () => { },
   arrivalDates = null,
-  setArrivalDates = () => {},
+  setArrivalDates = () => { },
   percentageValue,
 }) => {
   const [timeError, setTimeError] = useState("");
@@ -207,9 +208,23 @@ const InputFieldFormik = ({
       )}
 
       {["text", "email", "number", "tel"].includes(type) && (
-        <Field direction={language === 'ar' ? 'rtl' : 'ltr'} name={name} > 
+        <Field direction={language === 'ar' ? 'rtl' : 'ltr'} name={name} >
           {({ field }) => (
             <Input
+              size="large"
+              {...field}
+              type={type}
+              onKeyPress={handleKeyPress}
+              {...commonProps}
+            />
+          )}
+        </Field>
+      )}
+
+      {["description"].includes(type) && (
+        <Field direction={language === 'ar' ? 'rtl' : 'ltr'} name={name} >
+          {({ field }) => (
+            <TextArea
               size="large"
               {...field}
               type={type}

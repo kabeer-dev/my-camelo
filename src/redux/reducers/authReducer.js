@@ -11,7 +11,8 @@ import {
   SIGN_UP_SUCCESS,
   SIGN_UP_FAILURE,
   LANGUAGE_CHANGE,
-  AGENT_CHANGE
+  AGENT_CHANGE,
+  EMAIL_CHANGE
 } from "../actions/authActions";
 import secureLocalStorage from "react-secure-storage";
 
@@ -115,6 +116,15 @@ const authReducer = (state = initialState, action) => {
       return {
         ...state,
         agent: agent,
+      };
+
+      case EMAIL_CHANGE:
+      const gemail = action.payload.email; // Correctly access language from payload
+      secureLocalStorage.setItem("email", gemail);
+      // console.log('kkk', language); // Corrected typo 'language'
+      return {
+        ...state,
+        email: gemail,
       };
     default:
       return state;
