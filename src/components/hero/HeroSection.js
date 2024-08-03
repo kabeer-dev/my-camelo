@@ -12,13 +12,13 @@ import { useTranslation } from "react-i18next";
 
 export default function HeroSection() {
   const dispatch = useDispatch();
-  // const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
   const location = useLocation();
+  // const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
+  const language = useSelector((state) => state.auth.language);
+  const [t, i18n] = useTranslation("global");
+
   const [activeTab, setActiveTab] = useState("airport");
   const [subTab, setSubTab] = useState(1);
-  const language = useSelector((state) => state.auth.language);
-
-  const [t, i18n] = useTranslation("global")
 
   const [showSignUp, setShowSignUp] = useState(false);
   const [showAlreadyRegistered, setShowAlreadyRegistered] = useState(false);

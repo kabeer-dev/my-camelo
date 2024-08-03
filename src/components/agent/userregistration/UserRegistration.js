@@ -171,10 +171,10 @@ export default function UserRegistration() {
         recaptchaToken: recaptchaToken,
         Authorization: `Bearer ${token}`,
       };
-      console.log('gg', token, values)
+      // console.log('gg', token, values)
       try {
         const response = await axios.post(
-          `${API_BASE_URL}/api/method/airport_transport.api.user.register`,
+          `${API_BASE_URL}/api/method/airport_transport.api.user.register?language=${language}`,
           values,
           { headers: headers }
         );
@@ -245,6 +245,7 @@ export default function UserRegistration() {
                     state: "",
                     postcode: "",
                     street: "",
+                    language: language === 'ar' ? language : "",
                     password: "",
                     confirmPassword: "",
                   }}
@@ -469,7 +470,7 @@ export default function UserRegistration() {
 
                             <div>
                               <Recaptcha
-                                sitekey="6Lc5Ox0qAAAAACrLPd-D6YsLP2ykc8U_axXhQpP1"
+                                sitekey="6LfE3FEpAAAAAGkeBjkpPeNSqPNWtLPCma7EHVsr"
                                 onChange={(value) => {
                                   setRecaptchaToken(value);
                                 }}
@@ -603,7 +604,7 @@ export default function UserRegistration() {
                             </div>
                             <div>
                               <Recaptcha
-                                sitekey="6Lc5Ox0qAAAAACrLPd-D6YsLP2ykc8U_axXhQpP1"
+                                sitekey="6LfE3FEpAAAAAGkeBjkpPeNSqPNWtLPCma7EHVsr"
                                 onChange={(value) => {
                                   setRecaptchaToken(value);
                                 }}

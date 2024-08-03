@@ -202,6 +202,7 @@
   "feature_details_text": "تفاصيل الميزة",
   "get_ride_price_text": "احصل على سعر الرحلة",
   "processed_text": "تمت معالجتها",
+  "pending_text": "قيد الانتظار",
   "errors": {
     "rider_name_error": "الإسم الأول مطلوب",
     "last_name_error": "إسم العائلة مطلوب",

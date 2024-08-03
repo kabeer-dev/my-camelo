@@ -250,7 +250,7 @@ export default function HomePhoneSignUp({
                 <div>
                   <Recaptcha
                     recaptchaRef={recaptchaRef}
-                    sitekey="6Lc5Ox0qAAAAACrLPd-D6YsLP2ykc8U_axXhQpP1"
+                    sitekey="6LfE3FEpAAAAAGkeBjkpPeNSqPNWtLPCma7EHVsr"
                     onChange={(value) => {
                       setRecaptchaToken(value);
                     }}
@@ -261,7 +261,7 @@ export default function HomePhoneSignUp({
                 <div>
                   <Recaptcha
                     recaptchaRef={recaptchaRef}
-                    sitekey="6Lc5Ox0qAAAAACrLPd-D6YsLP2ykc8U_axXhQpP1"
+                    sitekey="6LfE3FEpAAAAAGkeBjkpPeNSqPNWtLPCma7EHVsr"
                     onChange={(value) => {
                       setRecaptchaToken(value);
                     }}
@@ -338,7 +338,7 @@ export default function HomePhoneSignUp({
                     <div>
                       <Recaptcha
                         recaptchaRef={recaptchaRef}
-                        sitekey="6Lc5Ox0qAAAAACrLPd-D6YsLP2ykc8U_axXhQpP1"
+                        sitekey="6LfE3FEpAAAAAGkeBjkpPeNSqPNWtLPCma7EHVsr"
                         onChange={(value) => {
                           setRecaptchaToken(value);
                         }}

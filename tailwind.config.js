@@ -13,6 +13,7 @@ module.exports = {
       background_steel_blue: "#C3A58B",
       background_white: "#ffffff",
       background_grey: "#F6F6F6",
+      background_darkgrey: "#E7E7E7",
       text_white: "#ffffff",
       text_black: "#000000",
       text_lightdark_grey: "#5D5D5D",

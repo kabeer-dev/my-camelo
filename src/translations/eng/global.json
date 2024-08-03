@@ -202,6 +202,7 @@
     "feature_details_text": "Feature Details",
     "get_ride_price_text": "Get Ride Price",
     "processed_text": "Processed",
+    "pending_text": "Pending",
     "errors": {
         "rider_name_error": "First Name is required",
         "last_name_error": "Last Name is required",

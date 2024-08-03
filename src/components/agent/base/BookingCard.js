@@ -7,17 +7,17 @@ export default function BookingCard({ booking }) {
 
   return (
     <div className="mt-5">
-      {" "}
+      {console.log('ss', booking.status)}
       <div className="bg-text_white rounded-md px-5 py-7 flex flex-col justify-center items-center mb-4">
         <div className="my-1">
           <img
-            src={`/assets/mybooking/${booking.status === 'Non-Payment Cancellation' ? 'Cancelled': booking.status}.png`}
+            src={`/assets/mybooking/${booking.status === 'Non-Payment Cancellation' ? 'Cancelled': (booking.status === 'Booked' ? 'Completed' : 'Booked')}.png`}
             alt="ride-completed"
             className="w-20 h-20"
           />
         </div>
         <div className="text-text_black font-semibold text-lg border-dashed border-b w-full text-center my-3 pb-4">
-          {booking.status === "Non-Payment Cancellation" ? t("my_booking.cancelled_text") : (booking.status === 'Booked' ? t("my_booking.booked_text"): '')}
+          {booking.status === "Non-Payment Cancellation" ? t("my_booking.cancelled_text") : (booking.status === 'Booked' ? t("my_booking.booked_text"): t("pending_text"))}
         </div>
         <div className="w-full flex flow-row justify-between items-center my-1">
           <div className="text-text_lightdark_grey font-light">{t("my_booking.booking_id_text")}</div>

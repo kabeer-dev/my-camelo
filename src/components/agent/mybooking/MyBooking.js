@@ -21,29 +21,33 @@ export default function MyBooking() {
     dispatch(setLoading(true));
     const getUserDetails = async () => {
       try {
-        const response = await axios.get(`${API_BASE_URL}/api/method/airport_transport.api.bookings.my_bookings?page=1&language=${language ? language : 'eng'}`, {
-          headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-            'Authorization': `Bearer ${token}`
-          },
-        });
+        const response = await axios.get(
+          `${API_BASE_URL}/api/method/airport_transport.api.agent.get_bookings?page=1&language=${
+            language ? language : "eng"
+          }`,
+          {
+            headers: {
+              "Content-Type": "application/x-www-form-urlencoded",
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
         if (response && response.status === 200) {
-          const data = response.data.data;
-          // console.log('aaa', data)
+          const data = response.data.data.data;
+          console.log("is data me kiya ha?", data);
           // if(data.length > 0){
-          setFilteredBookings(data)
+          setFilteredBookings(data);
           // }
 
           dispatch(setLoading(false));
         }
-      }
-      catch (error) {
-        console.error('Error:', error);
+      } catch (error) {
+        console.error("Error:", error);
         dispatch(setLoading(false));
-      };
-    }
+      }
+    };
     getUserDetails();
-  }, [token])
+  }, [token]);
 
   // const testBookings = [
   //   {
@@ -122,10 +126,9 @@ export default function MyBooking() {
 
   const [filteredBookings, setFilteredBookings] = useState([]);
 
-
   useEffect(() => {
-    Events.scrollEvent.register("begin", function (to, element) { });
-    Events.scrollEvent.register("end", function (to, element) { });
+    Events.scrollEvent.register("begin", function (to, element) {});
+    Events.scrollEvent.register("end", function (to, element) {});
 
     scrollSpy.update();
 
@@ -141,20 +144,24 @@ export default function MyBooking() {
       setSearchText(value);
       dispatch(setLoading(true));
       try {
-        const response = await axios.get(`${API_BASE_URL}/api/method/airport_transport.api.bookings.my_bookings?page=1&language=${language ? language : 'eng'}`, {
-          headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-            'Authorization': `Bearer ${token}`
-          },
-        });
+        const response = await axios.get(
+          `${API_BASE_URL}/api/method/airport_transport.api.agent.get_bookings?page=1&language=${
+            language ? language : "eng"
+          }`,
+          {
+            headers: {
+              "Content-Type": "application/x-www-form-urlencoded",
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
         if (response && response.status === 200) {
-          const data = response.data.data;
-          setFilteredBookings(data)
+          const data = response.data.data.data;
+          setFilteredBookings(data);
         }
+      } catch (error) {
+        console.error("Error:", error);
       }
-      catch (error) {
-        console.error('Error:', error);
-      };
       dispatch(setLoading(false));
     } else {
       const value = e.target.value.toLowerCase();
@@ -165,12 +172,12 @@ export default function MyBooking() {
       setFilteredBookings(filtered);
     }
   };
-console.log('ss', filteredBookings)
+  console.log("ss", filteredBookings);
   return (
     <div>
       <Header />
 
-      <div className="pt-20 lg:pt-20" dir={language === 'ar' ? 'rtl' : 'ltr'}>
+      <div className="pt-20 lg:pt-20" dir={language === "ar" ? "rtl" : "ltr"}>
         <div className="px-14 py-7 border-t border-text_white bg-background_steel_blue">
           <div>
             <Input.Search
@@ -189,11 +196,13 @@ console.log('ss', filteredBookings)
               ))}
           </div>
           {filteredBookings.length === 0 && (
-            <p className="text-text_white text-center mt-10 mb-10">{t("my_booking.no_booking_text")}</p>
+            <p className="text-text_white text-center mt-10 mb-10">
+              {t("my_booking.no_booking_text")}
+            </p>
           )}
         </div>
       </div>
-      
+
       <Footer />
     </div>
   );

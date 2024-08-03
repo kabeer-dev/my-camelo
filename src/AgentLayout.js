@@ -26,7 +26,7 @@ export default function AgentLayout() {
   // if(agentValue){
   //   dispatch(agentChange('true'))
   // }
-  console.log('ss', agent, email, isLoggedIn);
+  // console.log('ss', agent, email, isLoggedIn);
 
   useEffect(() => {
     dispatch(setLoading(true))
@@ -81,7 +81,7 @@ export default function AgentLayout() {
           <div>
             <Header />
 
-            <div className="pt-20 lg:pt-20">
+            <div className="lg:pt-20">
               {" "}
               {/* Add padding to offset the fixed header */}
               {/* Render corresponding component based on menu item */}

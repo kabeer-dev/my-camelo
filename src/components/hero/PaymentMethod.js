@@ -39,7 +39,8 @@ export default function PaymentMethod({
   const [selectedPaymentName, setSelectedPaymentName] = useState("");
   const [calculatedPrice, setCalculatedPrice] = useState("");
   const [proposal, setProposal] = useState("");
-  console.log("sss", getPaymentMethods);
+  // console.log("sss", formValues);
+  // console.log("ddd", getPaymentMethods);
   // let price;
   // const getPrice = localStorage.getItem('price');
   // if (correctPrice) {
@@ -64,7 +65,7 @@ export default function PaymentMethod({
         arrival_time: formValues.arrivalTime,
         langauge: language,
       };
-    //  console.log('ff', payData)
+      //  console.log('ff', payData)
       try {
         const response = await axios.post(
           `${API_BASE_URL}/api/method/airport_transport.api.bookings.get_payment_methods`,
@@ -136,7 +137,7 @@ export default function PaymentMethod({
       hours:
         rideName === "Book Vehicle In Hours" ? formValues?.bookingByHours : "",
     };
-    console.log("fff", priceData);
+    // console.log("fff", priceData);
     try {
       const response = await axios.post(
         `${API_BASE_URL}/api/method/airport_transport.api.integrations.maps.get_price`,
@@ -148,7 +149,7 @@ export default function PaymentMethod({
         }
       );
       if (response && response.status === 200) {
-        console.log(response.data);
+        // console.log(response.data);
         setCalculatedPrice(response.data.data.price)
         setProposal(response.data.data.proposal)
         setShowPriceBtn(false)
@@ -269,27 +270,32 @@ export default function PaymentMethod({
         "doc": {
           "ticket": randomDigits,
           "airport": formValues?.airportName ? formValues.airportName : '',
-          "rider": formValues?.seatNumber ? formValues.seatNumber : '',
           "destination": selectedDropoff ? `${selectedDropoff.lat}, ${selectedDropoff.lng}` : destination,
           "destination_name": destination,
-          "location": location,
           "city": formValues?.arrivalCity,
           "terminal": formValues?.terminalNumber ? formValues.terminalNumber : '',
-          "arrival_date": formattedDate,
-          "arrival_time": formValues?.arrivalTime ? formValues.arrivalTime : '',
-          "vehicle_type": formValues?.vehicleType ? formValues.vehicleType : '',
           "booking_hours": formValues?.bookingByHours ? formValues.bookingByHours : '',
           "shared_discount": sharedRideValue,
-          "user": userEmail,
-          // "hours": formValues?.bookingByHours ? formValues.bookingByHours: '',
+          // "user": userEmail,
           "price": calculatedPrice,
           "service_type": rideName,
-          "language": language === 'ar' ? language : "",
-          "ride_proposal": proposal,
+          // "ride_proposal": proposal,
+          "location": location,
+          "vehicle_type": formValues?.vehicleType ? formValues.vehicleType : "",
+          "rider": formValues?.seatNumber ? formValues.seatNumber : 1,
+          "arrival_date": formattedDate,
+          "arrival_time": formValues?.arrivalTime ? formValues.arrivalTime : "",
+          "shared_discount": sharedRideValue,
+          "service_type": rideName,
+          "payment_method": selectedPaymentName,
+          "zone": formValues?.arrivalCity ? (formValues.arrivalCity === 'Dammam' || formValues.arrivalCity === 'الدمام' ? 'Dammam' : 'Riyadh') : '',
+          "language": language,
+          "hours":
+            rideName === "Book Vehicle In Hours" ? formValues?.bookingByHours : "",
         }
       }
 
-      console.log('sss', payByLinkData)
+      // console.log('sss', payByLinkData)
 
       try {
         const response = await axios.post(
@@ -307,6 +313,7 @@ export default function PaymentMethod({
           var bookingValues = JSON.stringify(bookingData);
           localStorage.setItem('bookingValues', bookingValues);
           localStorage.setItem('saveData', false);
+          localStorage.setItem("savePaymentStatus", false);
           localStorage.setItem('paymentMethodName', paymentMethodName);
           navigate('/email-sent', { state: { paymentLink: payByLinkPaymentLink } })
         }

@@ -65,7 +65,7 @@ export default function Layout() {
       <div>
         <Header />
 
-        <div className="pt-20 lg:pt-20">
+        <div className="lg:pt-20">
           {" "}
           {/* Add padding to offset the fixed header */}
           {/* Render corresponding component based on menu item */}

@@ -41,7 +41,7 @@ export default function PaymentMethod({
   const [selectedPaymentName, setSelectedPaymentName] = useState("");
   const [calculatedPrice, setCalculatedPrice] = useState("");
   const [proposal, setProposal] = useState("");
-  console.log("sss", getPaymentMethods);
+  console.log("sss", email);
   // let price;
   // const getPrice = localStorage.getItem('price');
   // if (correctPrice) {
@@ -66,7 +66,7 @@ export default function PaymentMethod({
         arrival_time: formValues.arrivalTime,
         langauge: language,
       };
-     console.log('ff', payData)
+    //  console.log('ff', payData)
       try {
         const response = await axios.post(
           `${API_BASE_URL}/api/method/airport_transport.api.bookings.get_payment_methods`,
@@ -139,7 +139,7 @@ export default function PaymentMethod({
         rideName === "Book Vehicle In Hours" ? formValues?.bookingByHours : "",
       user: formValues?.agentUser ? formValues.agentUser : ''
     };
-    console.log("fff", priceData);
+    // console.log("fff", priceData);
     try {
       const response = await axios.post(
         `${API_BASE_URL}/api/method/airport_transport.api.integrations.maps.get_price`,
@@ -222,7 +222,7 @@ export default function PaymentMethod({
       service_type: rideName,
       ride_proposal: proposal,
       booking_hours: formValues?.bookingByHours ? formValues.bookingByHours : '',
-      user: formValues?.agentUser ? formValues.agentUser : '' 
+      user: formValues?.agentUser ? formValues.agentUser : ''  
     }
 
     console.log('ttt', bookingData)
@@ -257,6 +257,7 @@ export default function PaymentMethod({
         localStorage.setItem('bookingValues', bookingValues);
         localStorage.setItem('saveData', false);
         localStorage.setItem('paymentMethodName', paymentMethodName);
+        localStorage.setItem('paymentMethodName', paymentMethodName);
         const checkoutId = response.data.id
         navigate('/agent/payment-confirmation', { state: { checkoutId: checkoutId, paymentMethodName: paymentMethodName, formValues: formValues, price: calculatedPrice } })
         dispatch(setLoading(false));
@@ -269,7 +270,7 @@ export default function PaymentMethod({
       const baseUrl = window.location.protocol + '//' + window.location.host
       const successUrl = `${baseUrl}/agent/thank-you`;
       const payByLinkData = {
-        "customer.email": email,
+        "customer.email": formValues?.agentUser ? formValues.agentUser : '',
         "amount": calculatedPrice.toFixed(2),
         "currency": "SAR",
         "paymentType": "DB",
@@ -277,23 +278,29 @@ export default function PaymentMethod({
         "doc": {
           "ticket": randomDigits,
           "airport": formValues?.airportName ? formValues.airportName : '',
-          "rider": formValues?.seatNumber ? formValues.seatNumber : '',
           "destination": selectedDropoff ? `${selectedDropoff.lat}, ${selectedDropoff.lng}` : destination,
           "destination_name": destination,
-          "location": location,
           "city": formValues?.arrivalCity,
           "terminal": formValues?.terminalNumber ? formValues.terminalNumber : '',
-          "arrival_date": formattedDate,
-          "arrival_time": formValues?.arrivalTime ? formValues.arrivalTime : '',
-          "vehicle_type": formValues?.vehicleType ? formValues.vehicleType : '',
           "booking_hours": formValues?.bookingByHours ? formValues.bookingByHours : '',
           "shared_discount": sharedRideValue,
-          "user": email,
-          // "hours": formValues?.bookingByHours ? formValues.bookingByHours: '',
+          // "user": userEmail,
           "price": calculatedPrice,
           "service_type": rideName,
-          "language": language === 'ar' ? language : "",
-          "ride_proposal": proposal,
+          // "ride_proposal": proposal,
+          "location": location,
+          "vehicle_type": formValues?.vehicleType ? formValues.vehicleType : "",
+          "rider": formValues?.seatNumber ? formValues.seatNumber : 1,
+          "arrival_date": formattedDate,
+          "arrival_time": formValues?.arrivalTime ? formValues.arrivalTime : "",
+          "shared_discount": sharedRideValue,
+          "service_type": rideName,
+          "payment_method": selectedPaymentName,
+          "zone": formValues?.arrivalCity ? (formValues.arrivalCity === 'Dammam' || formValues.arrivalCity === 'الدمام' ? 'Dammam' : 'Riyadh') : '',
+          "language": language,
+          "hours":
+            rideName === "Book Vehicle In Hours" ? formValues?.bookingByHours : "",
+            "user": formValues?.agentUser ? formValues.agentUser : '',
         }
       }
 
