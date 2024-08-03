@@ -300,7 +300,7 @@ export default function MapModal({ rideName, formValues, onSubmitDestination, zo
                       paths={convertedCoords}
                       options={{
                         // fillColor: "#4463F0",
-                        fillOpacity: 0.3,
+                        // fillOpacity: 0.3,
                         strokeColor: "#355E3B",
                         strokeOpacity: 1,
                         strokeWeight: 1,
