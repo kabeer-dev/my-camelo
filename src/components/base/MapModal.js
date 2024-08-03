@@ -298,18 +298,11 @@ export default function MapModal({ rideName, formValues, onSubmitDestination, zo
                     {/* Your existing map components */}
                     <Polygon
                       paths={convertedCoords}
-                      // options={{
-                      //   fillColor: "#4463F0",
-                      //   fillOpacity: 0.3,
-                      //   strokeColor: "#355E3B",
-                      //   strokeOpacity: 1,
-                      //   strokeWeight: 1,
-                      // }}
                       options={{
-                        fillColor: "#000000",
-                        fillOpacity: 0.5,
+                        // fillColor: "#4463F0",
+                        fillOpacity: 0.3,
                         strokeColor: "#355E3B",
-                        strokeOpacity: 0.5,
+                        strokeOpacity: 1,
                         strokeWeight: 1,
                       }}
                     />
