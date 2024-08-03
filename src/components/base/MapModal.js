@@ -304,6 +304,7 @@ export default function MapModal({ rideName, formValues, onSubmitDestination, zo
                         strokeColor: "#355E3B",
                         strokeOpacity: 1,
                         strokeWeight: 1,
+                        clickable: true,
                       }}
                     />
                     {/* <Polygon
