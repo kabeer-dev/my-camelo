@@ -310,6 +310,7 @@ export default function MapModal({ rideName, formValues, onSubmitDestination, zo
                         zIndex: 1
                         
                       }}
+                      onClick={onMapClick}
                     />
                     {/* <Polygon
                       paths={[
