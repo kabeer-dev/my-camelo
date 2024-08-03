@@ -299,16 +299,11 @@ export default function MapModal({ rideName, formValues, onSubmitDestination, zo
                     <Polygon
                       paths={convertedCoords}
                       options={{
-                        // fillColor: "#4463F0",
-                        // fillOpacity: 0.3,
+                        fillColor: "#4463F0",
+                        fillOpacity: 0.3,
                         strokeColor: "#355E3B",
                         strokeOpacity: 1,
                         strokeWeight: 1,
-                        clickable: true,
-                        editable: true,
-                        geodesic: true,
-                        zIndex: 1
-                        
                       }}
                       onClick={onMapClick}
                     />
