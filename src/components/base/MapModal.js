@@ -297,13 +297,19 @@ export default function MapModal({ rideName, formValues, onSubmitDestination, zo
                   >
                     {/* Your existing map components */}
                     <Polygon
-                    className="cursor-crosshair"
                       paths={convertedCoords}
+                      // options={{
+                      //   fillColor: "#4463F0",
+                      //   fillOpacity: 0.3,
+                      //   strokeColor: "#355E3B",
+                      //   strokeOpacity: 1,
+                      //   strokeWeight: 1,
+                      // }}
                       options={{
-                        fillColor: "#4463F0",
-                        fillOpacity: 0.3,
+                        fillColor: "#000000",
+                        fillOpacity: 0.5,
                         strokeColor: "#355E3B",
-                        strokeOpacity: 1,
+                        strokeOpacity: 0.5,
                         strokeWeight: 1,
                       }}
                     />
