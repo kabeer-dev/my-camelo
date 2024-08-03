@@ -305,6 +305,10 @@ export default function MapModal({ rideName, formValues, onSubmitDestination, zo
                         strokeOpacity: 1,
                         strokeWeight: 1,
                         clickable: true,
+                        editable: true,
+                        geodesic: true,
+                        zIndex: 1
+                        
                       }}
                     />
                     {/* <Polygon
