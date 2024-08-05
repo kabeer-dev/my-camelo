@@ -311,7 +311,7 @@ export default function MapModal({ rideName, formValues, onSubmitDestination, zo
                     onClick={onMapClick}
                   >
                     {/* Your existing map components */}
-                    {convertedCoords.map((convertedCod) => (
+                    {convertedCoords.map((convertedCod, index) => (
                       <Polygon
                         paths={convertedCod}
                         options={{
