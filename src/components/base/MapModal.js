@@ -104,14 +104,14 @@ export default function MapModal({ rideName, formValues, onSubmitDestination, zo
     setPickOrDrop()
   }, [rideName, cityName, formValues.rideType]);
 
-  const isPointInPolygon = (point, polygon) => {
+  const isPointInPolygon = (point, polygon, index) => {
     const { lat, lng } = point;
     let inside = false;
-    for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
-      const xi = polygon[i].lat,
-        yi = polygon[i].lng;
-      const xj = polygon[j].lat,
-        yj = polygon[j].lng;
+    for (let i = 0, j = polygon[index].length - 1; i < polygon[index].length; j = i++) {
+      const xi = polygon[index][i].lat,
+        yi = polygon[index][i].lng;
+      const xj = polygon[index][j].lat,
+        yj = polygon[index][j].lng;
 
       const intersect =
         yi > lng !== yj > lng &&
@@ -121,9 +121,9 @@ export default function MapModal({ rideName, formValues, onSubmitDestination, zo
     return inside;
   };
 
-  const onMapClick = async (event) => {
+  const onMapClick = async (event, index) => {
     const point = { lat: event.latLng.lat(), lng: event.latLng.lng() };
-    if (isPointInPolygon(point, convertedCoords)) {
+    if (isPointInPolygon(point, convertedCoords, index)) {
       console.log('poly')
       setError("");
       dispatch(setLoading(true))
