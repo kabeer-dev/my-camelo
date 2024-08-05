@@ -321,7 +321,7 @@ export default function MapModal({ rideName, formValues, onSubmitDestination, zo
                           strokeOpacity: 1,
                           strokeWeight: 1,
                         }}
-                        onClick={onMapClick}
+                        onClick={(event) => onMapClick(event, index)}
                       />
                     ))}
 
