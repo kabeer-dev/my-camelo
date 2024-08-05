@@ -239,16 +239,12 @@ export default function AirportRide(
   }, [isLoggedIn, t]);
 
   const validationSchema = Yup.object().shape({
+    agentUser: Yup.string().required("Agent User is required"),
     rideType: Yup.string().required("Ride type is required"),
     arrivalCity: Yup.string().required("Arrival City is required"),
     airportName: Yup.string().required("Airport Name is required"),
     terminalNumber: Yup.string().required("Terminal Number is required"),
     vehicleType: Yup.string().required("Vehicle Type is required"),
-    seatNumber: Yup.string().when('sharedRide', {
-      is: true, // When sharedRide is true
-      then: Yup.string().required("Seat Number is required"),
-      otherwise: Yup.string(), // Otherwise, seatNumber is not required
-    }),
     arrivalDate: Yup.string().required("Arrival Date is required"),
     arrivalTime: Yup.string().required("Arrival Time is required"),
     sharedRide: Yup.bool(),
