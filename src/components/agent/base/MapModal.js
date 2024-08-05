@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { GoogleMap, LoadScript, Marker, Polygon, StandaloneSearchBox } from "@react-google-maps/api";
 import axios from "axios";
-import { setLoading } from "../../redux/actions/loaderAction";
+import { setLoading } from "../../../redux/actions/loaderAction";
 import { useDispatch } from "react-redux";
 import { useTranslation } from "react-i18next";
 
