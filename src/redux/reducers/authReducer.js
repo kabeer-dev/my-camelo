@@ -21,6 +21,7 @@ const tokenDetails = secureLocalStorage.getItem("token");
 const usernameDetails = secureLocalStorage.getItem("username");
 const userEmail = secureLocalStorage.getItem("userEmail");
 const agent = secureLocalStorage.getItem("agent");
+const agentPhoto = secureLocalStorage.getItem("agentPhoto");
 
 const initialState = {
   language: (language && language) || 'eng',
@@ -29,6 +30,7 @@ const initialState = {
   username: usernameDetails || null,
   email: userEmail || null,
   agent: agent || false,
+  agentPhoto: agentPhoto || "",
   error: null,
 };
 
@@ -40,17 +42,22 @@ const authReducer = (state = initialState, action) => {
         error: null,
       };
     case SIGN_IN_SUCCESS:
-      const { token, username, email } = action.payload;
+      const { token, username, email, photo } = action.payload;
       console.log('token', token)
       secureLocalStorage.setItem("token", token);
       secureLocalStorage.setItem("username", username);
       secureLocalStorage.setItem("userEmail", email);
+      {
+        action.payload.photo &&
+        secureLocalStorage.setItem("agentPhoto", action.payload.photo);
+      }
       return {
         ...state,
         isLoggedIn: true,
         token,
         username,
         email,
+        agentPhoto: photo,
         error: null,
       };
     case SIGN_IN_FAILURE:
@@ -118,7 +125,7 @@ const authReducer = (state = initialState, action) => {
         agent: agent,
       };
 
-      case EMAIL_CHANGE:
+    case EMAIL_CHANGE:
       const gemail = action.payload.email; // Correctly access language from payload
       secureLocalStorage.setItem("email", gemail);
       // console.log('kkk', language); // Corrected typo 'language'

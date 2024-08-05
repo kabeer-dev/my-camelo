@@ -154,10 +154,10 @@ export default function ScheduledRide({
   useEffect(() => {
     const getSharedRideValue = async () => {
       dispatch(setLoading(true))
-      if (formValues.vehicleType !== "") {
+      if (vehicleTypeName !== "") {
         try {
           const response = await axios.get(
-            `${API_BASE_URL}/api/method/airport_transport.api.bookings.get_ride_discount?vehicle_type=${formValues.vehicleType}&language=${language}`
+            `${API_BASE_URL}/api/method/airport_transport.api.bookings.get_ride_discount?vehicle_type=${vehicleTypeName}&language=${language}`
           );
           if (response && response.status === 200) {
             setSharedRideValue(response.data.data)
@@ -171,7 +171,7 @@ export default function ScheduledRide({
       dispatch(setLoading(false))
     }
     getSharedRideValue()
-  }, [formValues]);
+  }, [vehicleTypeName]);
 
   useEffect(() => {
     const getUsers = async () => {
@@ -228,7 +228,7 @@ export default function ScheduledRide({
     arrivalDate: Yup.string().required("Arrival Date is required"),
     arrivalTime: Yup.string().required("Arrival Time is required"),
     vehicleType: Yup.string().required("vehicle Type is required"),
-    seatNumber: Yup.string().required("Seat Number is required"),
+    // seatNumber: Yup.string().required("Seat Number is required"),
     sharedRide: Yup.bool(),
   });
 
@@ -333,7 +333,7 @@ export default function ScheduledRide({
                       values.arrivalTime;
                     const isStep2Valid =
                       // values.vehicleType &&
-                      values.seatNumber &&
+                      // values.seatNumber &&
                       values.arrivalDate &&
                       values.arrivalTime;
 
@@ -472,6 +472,31 @@ export default function ScheduledRide({
 
                             <div>
                               <InputFieldFormik
+                                label={t("hero.shared_ride_text")}
+                                name="sharedRide"
+                                type="checkbox"
+                                percentageValue={sharedRideValue}
+                                onChange={({ fieldName, selectedValue }) => {
+
+                                  setFieldValue(fieldName, selectedValue);
+                                  setFormValues((prevValues) => ({
+                                    ...prevValues,
+                                    [fieldName]: selectedValue,
+                                  }));
+                                  setOnChangeFormValues((prevValues) => ({
+                                    ...prevValues,
+                                    [fieldName]: selectedValue,
+                                  }));
+                                }
+
+                                }
+                                required
+                              />
+                            </div>
+
+                            {formValues.sharedRide && (
+                            <div>
+                              <InputFieldFormik
                                 label={t("hero.seat_number_text")}
                                 name="seatNumber"
                                 type="select"
@@ -494,6 +519,7 @@ export default function ScheduledRide({
                                 required
                               />
                             </div>
+                            )}
 
                             <div className="mt-3 flex flex-col md:flex-row justify-between items-center">
                               <div className="w-full md:w-1/2 mx-0 md:mx-1">
@@ -530,7 +556,7 @@ export default function ScheduledRide({
 
                         {subTab === 3 && (
                           <>
-                            <div className="border-b border-gray-300">
+                            {/* <div className="border-b border-gray-300">
                               <InputFieldFormik
                                 label={t("hero.shared_ride_text")}
                                 name="sharedRide"
@@ -544,7 +570,7 @@ export default function ScheduledRide({
                                 }}
                                 required
                               />
-                            </div>
+                            </div> */}
 
                             <div className="my-4 flex flex-col md:flex-row justify-between items-start">
                               <div className="w-full md:w-1/2 mx-0 md:mx-1">

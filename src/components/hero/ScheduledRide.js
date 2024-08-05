@@ -78,6 +78,8 @@ export default function ScheduledRide({
   });
 
   const [vehicleTypeName, setVehicleTypeName] = useState("");
+  const API_BASE_URL = process.env.REACT_APP_BASE_URL_AMK_TEST;
+  const [sharedRideValue, setSharedRideValue] = useState("");
 
   const [location, setLocation] = useState("")
   const [destination, setDestination] = useState("");
@@ -117,6 +119,28 @@ export default function ScheduledRide({
     }
   }, [vehicleTypeName]);
 
+  useEffect(() => {
+    const getSharedRideValue = async () => {
+      dispatch(setLoading(true))
+      if (vehicleTypeName !== "") {
+        try {
+          const response = await axios.get(
+            `${API_BASE_URL}/api/method/airport_transport.api.bookings.get_ride_discount?vehicle_type=${vehicleTypeName}&language=${language}`
+          );
+          if (response && response.status === 200) {
+            setSharedRideValue(response.data.data)
+            dispatch(setLoading(false))
+          }
+        } catch (error) {
+          console.log('Error', error);
+          dispatch(setLoading(false))
+        }
+      }
+      dispatch(setLoading(false))
+    }
+    getSharedRideValue()
+  }, [vehicleTypeName]);
+
   const handlePrevious = (step, values) => {
     dispatch(setLoading(true))
     setFormValues(values);
@@ -143,30 +167,7 @@ export default function ScheduledRide({
       setCityName(cities.data[0])
     }
   }, [cities])
-
-  const API_BASE_URL = process.env.REACT_APP_BASE_URL_AMK_TEST;
-  const [sharedRideValue, setSharedRideValue] = useState("");
-  useEffect(() => {
-    const getSharedRideValue = async () => {
-      dispatch(setLoading(true))
-      if (formValues.vehicleType !== "") {
-        try {
-          const response = await axios.get(
-            `${API_BASE_URL}/api/method/airport_transport.api.bookings.get_ride_discount?vehicle_type=${formValues.vehicleType}&language=${language}`
-          );
-          if (response && response.status === 200) {
-            setSharedRideValue(response.data.data)
-            dispatch(setLoading(false))
-          }
-        } catch (error) {
-          console.log('Error', error);
-          dispatch(setLoading(false))
-        }
-      }
-      dispatch(setLoading(false))
-    }
-    getSharedRideValue()
-  }, [formValues]);
+  
 
   const steps = useMemo(() => {
     const baseSteps = [
@@ -189,7 +190,7 @@ export default function ScheduledRide({
     arrivalDate: Yup.string().required("Arrival Date is required"),
     arrivalTime: Yup.string().required("Arrival Time is required"),
     vehicleType: Yup.string().required("vehicle Type is required"),
-    seatNumber: Yup.string().required("Seat Number is required"),
+    // seatNumber: Yup.string().required("Seat Number is required"),
     sharedRide: Yup.bool(),
   });
 
@@ -292,7 +293,7 @@ export default function ScheduledRide({
                       values.arrivalTime;
                     const isStep2Valid =
                       // values.vehicleType &&
-                      values.seatNumber &&
+                      // values.seatNumber &&
                       values.arrivalDate &&
                       values.arrivalTime;
 
@@ -412,28 +413,54 @@ export default function ScheduledRide({
 
                             <div>
                               <InputFieldFormik
-                                label={t("hero.seat_number_text")}
-                                name="seatNumber"
-                                type="select"
-                                options={seatNumberOptions.map((number) => ({
-                                  value: number,
-                                  label: number,
-                                }))}
-                                value={
-                                  formValues.seatNumber ||
-                                  onChangeFormValues.seatNumber
-                                }
-                                onChange={(valueObj) => {
-                                  const { fieldName, selectedValue } = valueObj;
+                                label={t("hero.shared_ride_text")}
+                                name="sharedRide"
+                                type="checkbox"
+                                percentageValue={sharedRideValue}
+                                onChange={({ fieldName, selectedValue }) => {
+
                                   setFieldValue(fieldName, selectedValue);
+                                  setFormValues((prevValues) => ({
+                                    ...prevValues,
+                                    [fieldName]: selectedValue,
+                                  }));
                                   setOnChangeFormValues((prevValues) => ({
                                     ...prevValues,
                                     [fieldName]: selectedValue,
                                   }));
-                                }}
+                                }
+
+                                }
                                 required
                               />
                             </div>
+
+                            {formValues.sharedRide && (
+                              <div>
+                                <InputFieldFormik
+                                  label={t("hero.seat_number_text")}
+                                  name="seatNumber"
+                                  type="select"
+                                  options={seatNumberOptions.map((number) => ({
+                                    value: number,
+                                    label: number,
+                                  }))}
+                                  value={
+                                    formValues.seatNumber ||
+                                    onChangeFormValues.seatNumber
+                                  }
+                                  onChange={(valueObj) => {
+                                    const { fieldName, selectedValue } = valueObj;
+                                    setFieldValue(fieldName, selectedValue);
+                                    setOnChangeFormValues((prevValues) => ({
+                                      ...prevValues,
+                                      [fieldName]: selectedValue,
+                                    }));
+                                  }}
+                                  required
+                                />
+                              </div>
+                            )}
 
                             <div className="mt-3 flex flex-col md:flex-row justify-between items-center">
                               <div className="w-full md:w-1/2 mx-0 md:mx-1">
@@ -470,7 +497,7 @@ export default function ScheduledRide({
 
                         {subTab === 3 && (
                           <>
-                            <div className="border-b border-gray-300">
+                            {/* <div className="border-b border-gray-300">
                               <InputFieldFormik
                                 label={t("hero.shared_ride_text")}
                                 name="sharedRide"
@@ -484,7 +511,7 @@ export default function ScheduledRide({
                                 }}
                                 required
                               />
-                            </div>
+                            </div> */}
 
                             <div className="my-4 flex flex-col md:flex-row justify-between items-start">
                               <div className="w-full md:w-1/2 mx-0 md:mx-1">

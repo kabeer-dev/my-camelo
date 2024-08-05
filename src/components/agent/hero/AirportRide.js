@@ -106,6 +106,8 @@ export default function AirportRide(
   const API_BASE_URL = process.env.REACT_APP_BASE_URL_AMK_TEST;
 
   const [VehicleTypeWithService, setVehicleTypeWithService] = useState(null);
+  const [vehicleTypeName, setVehicleTypeName] = useState("");
+  
   useEffect(() => {
     dispatch(setLoading(true));
     const getVechileTypes = async () => {
@@ -128,10 +130,10 @@ export default function AirportRide(
   useEffect(() => {
     const getSharedRideValue = async () => {
       dispatch(setLoading(true))
-      if (formValues.vehicleType !== "") {
+      if (vehicleTypeName !== "") {
         try {
           const response = await axios.get(
-            `${API_BASE_URL}/api/method/airport_transport.api.bookings.get_ride_discount?vehicle_type=${formValues.vehicleType}&language=${language ? language : 'eng'}`
+            `${API_BASE_URL}/api/method/airport_transport.api.bookings.get_ride_discount?vehicle_type=${vehicleTypeName}&language=${language ? language : 'eng'}`
           );
           if (response && response.status === 200) {
             setSharedRideValue(response.data.data)
@@ -145,7 +147,7 @@ export default function AirportRide(
       dispatch(setLoading(false))
     }
     getSharedRideValue()
-  }, [formValues]);
+  }, [vehicleTypeName]);
 
   useEffect(() => {
     const getUsers = async () => {
@@ -181,7 +183,7 @@ export default function AirportRide(
     getUsers()
   }, [formValues]);
 
-  const [vehicleTypeName, setVehicleTypeName] = useState("");
+  
   // console.log('vehicleTypes', vehicleTypes)
   useEffect(() => {
     if (vehicleTypeName !== "") {
@@ -275,7 +277,7 @@ export default function AirportRide(
     airportName: Yup.string().required("Airport Name is required"),
     terminalNumber: Yup.string().required("Terminal Number is required"),
     vehicleType: Yup.string().required("Vehicle Type is required"),
-    seatNumber: Yup.string().required("Seat Number is required"),
+    // seatNumber: Yup.string().required("Seat Number is required"),
     arrivalDate: Yup.string().required("Arrival Date is required"),
     arrivalTime: Yup.string().required("Arrival Time is required"),
     sharedRide: Yup.bool(),
@@ -403,7 +405,7 @@ export default function AirportRide(
                 ].every((field) => values[field]);
                 const isStep2Valid = [
                   // "vehicleType",
-                  "seatNumber",
+                  // "seatNumber",
                   "arrivalDate",
                   "arrivalTime",
                 ].every((field) => values[field]);
@@ -571,6 +573,31 @@ export default function AirportRide(
                           />
                         </div>
 
+                        <div>
+                          <InputFieldFormik
+                            label={t("hero.shared_ride_text")}
+                            name="sharedRide"
+                            type="checkbox"
+                            percentageValue={sharedRideValue}
+                            onChange={({ fieldName, selectedValue }) => {
+
+                              setFieldValue(fieldName, selectedValue);
+                              setFormValues((prevValues) => ({
+                                ...prevValues,
+                                [fieldName]: selectedValue,
+                              }));
+                              setOnChangeFormValues((prevValues) => ({
+                                ...prevValues,
+                                [fieldName]: selectedValue,
+                              }));
+                            }
+
+                            }
+                            required
+                          />
+                        </div>
+
+                        {formValues.sharedRide && (
                         <InputFieldFormik
                           label={t("hero.seat_number_text")}
                           name="seatNumber"
@@ -592,6 +619,8 @@ export default function AirportRide(
                           }}
                           required
                         />
+                        )}
+
                         <InputFieldFormik
                           label={t("hero.arrival_date_text")}
                           name="arrivalDate"
@@ -653,7 +682,7 @@ export default function AirportRide(
                     )}
                     {subTab === 3 && (
                       <>
-                        <InputFieldFormik
+                        {/* <InputFieldFormik
                           label={t("hero.shared_ride_text")}
                           name="sharedRide"
                           type="checkbox"
@@ -662,7 +691,7 @@ export default function AirportRide(
                             setFieldValue(fieldName, selectedValue)
                           }
                           required
-                        />
+                        /> */}
                         <div className="my-4 flex flex-col md:flex-row justify-between items-start">
                           <div className="w-full md:w-1/2">
                             <Heading

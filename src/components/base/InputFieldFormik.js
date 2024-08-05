@@ -196,11 +196,12 @@ const InputFieldFormik = ({
           <TimePicker
             size="large"
             onChange={handleTimeChange}
-            value={value ? moment(value, "HH:mm:ss") : null}
+            value={value ? moment(value, "HH:mm") : null}
             defaultOpenValue={
-              value ? dayjs(value, "HH:mm:ss") : dayjs("00:00:00", "HH:mm:ss")
+              value ? dayjs(value, "HH:mm") : dayjs("00:00", "HH:mm")
             }
             {...commonProps}
+            format="HH:mm"
           />
           {timeError && renderErrorMessage(timeError)}
           <ErrorMessage name={name} render={renderErrorMessage} />

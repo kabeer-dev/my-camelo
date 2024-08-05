@@ -22,6 +22,7 @@ export default function Header() {
   const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
   const username = useSelector((state) => state.auth.username);
   const language = useSelector((state) => state.auth.language);
+  const agentPhoto = useSelector((state) => state.auth.agentPhoto);
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -126,11 +127,23 @@ export default function Header() {
               <div className="flex items-center ml-5">
                 <button
                   onClick={() => navigate("/")}
+                  className="flex items-center"
                 >
                   <img
-                    src="/assets/header/agentLogo.png"
-                    className="w-16 h-8"
+                    src="/assets/header/cameloLogo.png"
+                    className="w-18 h-14 sm:h-14 my-2"
                     alt="Camelo Logo"
+                  />
+                  <img
+                    src="/assets/header/xLogo.png"
+                    className="w-18 h-3 my-2 ml-2"
+                    alt="X Logo"
+                  />
+                  <img
+                    // src="/assets/header/agentLogo.png"
+                    src={agentPhoto}
+                    className="w-18 h-14 sm:h-14 my-2 ml-3"
+                    alt="Agent Logo"
                   />
                 </button>
               </div>
@@ -317,9 +330,20 @@ export default function Header() {
                   className="flex items-center"
                 >
                   <img
-                    src="/assets/header/agentLogo.png"
+                    src="/assets/header/cameloLogo.png"
                     className="w-18 h-14 sm:h-14 my-2"
                     alt="Camelo Logo"
+                  />
+                  <img
+                    src="/assets/header/xLogo.png"
+                    className="w-18 h-10 sm:h-4 my-2 ml-2"
+                    alt="X Logo"
+                  />
+                  <img
+                    // src="/assets/header/agentLogo.png"
+                    src={agentPhoto}
+                    className="w-18 h-14 sm:h-14 my-2 ml-3"
+                    alt="Agent Logo"
                   />
                 </button>
                 <div className="flex flex-row justify-center items-baseline lg:order-2">

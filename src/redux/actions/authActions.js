@@ -9,9 +9,9 @@ export const signInRequest = (email, password, recaptchaToken, navigate) => ({
   payload: { email, password, recaptchaToken, navigate }
 });
 
-export const signInSuccess = (token, username, email) => ({
+export const signInSuccess = (token, username, email, photo) => ({
   type: SIGN_IN_SUCCESS,
-  payload: { token, username, email },
+  payload: { token, username, email, photo },
 });
 
 export const signInFailure = (error) => ({

@@ -39,7 +39,8 @@ function* signInSaga(action) {
         );
         const { token, username } = signinResponse.data.data;
         const getEmail = signinResponse.data.data.email
-        yield put(signInSuccess(token, username, getEmail));
+        let photo = ""
+        yield put(signInSuccess(token, username, getEmail, photo));
         yield put(setLoading(false));
         // Navigate to the home page on successful sign-in
         if (navigate) {
@@ -52,10 +53,11 @@ function* signInSaga(action) {
         }
         const agentResponse = yield axios.post(
           `${API_BASE_URL}/api/method/airport_transport.api.agent.login`, agentData);
-          // console.log('aaa', agentResponse)
-          const { token, username } = agentResponse.data.data;
-          const getEmail = agentResponse.data.data.email
-          yield put(signInSuccess(token, username, getEmail));
+        // console.log('aaa', agentResponse)
+        const { token, username } = agentResponse.data.data;
+        const getEmail = agentResponse.data.data.email
+        const photo = agentResponse.data.data.photo
+        yield put(signInSuccess(token, username, getEmail, photo));
         secureLocalStorage.setItem("agent", true);
         yield put(setLoading(false));
         if (navigate) {

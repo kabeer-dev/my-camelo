@@ -7,7 +7,6 @@ export default function BookingCard({ booking }) {
 
   return (
     <div className="mt-5">
-      {console.log('ss', booking.status)}
       <div className="bg-text_white rounded-md px-5 py-7 flex flex-col justify-center items-center mb-4">
         <div className="my-1">
           <img

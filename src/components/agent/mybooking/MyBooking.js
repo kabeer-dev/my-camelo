@@ -15,6 +15,10 @@ export default function MyBooking() {
   const [searchText, setSearchText] = useState("");
   const language = useSelector((state) => state.auth.language);
   const [t, i18n] = useTranslation("global");
+  const [totalPages, setTotalPages] = useState([])
+  const [currentPage, setCurrentPage] = useState(1)
+  const [filteredBookings, setFilteredBookings] = useState([]);
+  const [filteredPageBookings, setFilteredPageBookings] = useState([]);
 
   const API_BASE_URL = process.env.REACT_APP_BASE_URL_AMK_TEST;
   useEffect(() => {
@@ -22,8 +26,7 @@ export default function MyBooking() {
     const getUserDetails = async () => {
       try {
         const response = await axios.get(
-          `${API_BASE_URL}/api/method/airport_transport.api.agent.get_bookings?page=1&language=${
-            language ? language : "eng"
+          `${API_BASE_URL}/api/method/airport_transport.api.agent.get_bookings?page=1&language=${language ? language : "eng"
           }`,
           {
             headers: {
@@ -34,11 +37,18 @@ export default function MyBooking() {
         );
         if (response && response.status === 200) {
           const data = response.data.data.data;
-          console.log("is data me kiya ha?", data);
-          // if(data.length > 0){
-          setFilteredBookings(data);
+          // console.log('daa', data)
+          const totalLength = data.length;
+          const divide = totalLength / 9;
+          const roundNumber = Math.ceil(divide);
+        
+          const listArray = Array.from({ length: roundNumber }, (_, index) => ({
+            id: index + 1
+          }));
+          // console.log(listArray)
+          setTotalPages(listArray)
+          setFilteredBookings(data)
           // }
-
           dispatch(setLoading(false));
         }
       } catch (error) {
@@ -124,11 +134,10 @@ export default function MyBooking() {
   //   },
   // ];
 
-  const [filteredBookings, setFilteredBookings] = useState([]);
 
   useEffect(() => {
-    Events.scrollEvent.register("begin", function (to, element) {});
-    Events.scrollEvent.register("end", function (to, element) {});
+    Events.scrollEvent.register("begin", function (to, element) { });
+    Events.scrollEvent.register("end", function (to, element) { });
 
     scrollSpy.update();
 
@@ -138,6 +147,7 @@ export default function MyBooking() {
     };
   }, []);
 
+
   const handleSearch = async (e) => {
     if (e.target.value === "") {
       const value = e.target.value.toLowerCase();
@@ -145,8 +155,7 @@ export default function MyBooking() {
       dispatch(setLoading(true));
       try {
         const response = await axios.get(
-          `${API_BASE_URL}/api/method/airport_transport.api.agent.get_bookings?page=1&language=${
-            language ? language : "eng"
+          `${API_BASE_URL}/api/method/airport_transport.api.agent.get_bookings?page=1&language=${language ? language : "eng"
           }`,
           {
             headers: {
@@ -172,7 +181,17 @@ export default function MyBooking() {
       setFilteredBookings(filtered);
     }
   };
-  console.log("ss", filteredBookings);
+
+  useEffect(() => {
+    dispatch(setLoading(true))
+    let start_index = (currentPage - 1) * 9
+    let end_index = start_index + 9
+    const showArray = filteredBookings.slice(start_index, end_index);
+    setFilteredPageBookings(showArray)
+    // console.log('sss', showArray)
+    dispatch(setLoading(false))
+  }, [filteredBookings, currentPage])
+
   return (
     <div>
       <Header />
@@ -190,16 +209,83 @@ export default function MyBooking() {
           {/* card content should be here */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-x-10 gap-y-0">
             {/* card of booking */}
-            {filteredBookings &&
-              filteredBookings.map((booking) => (
+            {filteredPageBookings &&
+              filteredPageBookings.map((booking) => (
                 <BookingCard key={booking.id} booking={booking} />
               ))}
           </div>
-          {filteredBookings.length === 0 && (
+          {filteredPageBookings.length === 0 && (
             <p className="text-text_white text-center mt-10 mb-10">
               {t("my_booking.no_booking_text")}
             </p>
           )}
+
+          <div className="flex justify-end mt-3">
+
+
+            {/* <nav aria-label="Page navigation example">
+  <ul class="flex items-center -space-x-px h-8 text-sm">
+    <li>
+      <a href="#" class="flex items-center justify-center px-3 h-8 ms-0 leading-tight text-text_white bg-white border border-e-0 border-gray-300 rounded-s-lg hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white">
+        <span class="sr-only">Previous</span>
+        <svg class="w-2.5 h-2.5 rtl:rotate-180" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 6 10">
+          <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 1 1 5l4 4" />
+        </svg>
+      </a>
+    </li>
+    <li>
+      <a href="#" class="flex items-center justify-center px-3 h-8 leading-tight text-text_white bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white">1</a>
+    </li>
+    <li>
+      <a href="#" class="flex items-center justify-center px-3 h-8 leading-tight text-text_white bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white">2</a>
+    </li>
+    <li>
+      <a href="#" aria-current="page" class="z-10 flex items-center justify-center px-3 h-8 leading-tight text-blue-600 border border-blue-300 bg-blue-50 hover:bg-blue-100 hover:text-blue-700 dark:border-gray-700 dark:bg-gray-700 dark:text-white">3</a>
+    </li>
+    <li>
+      <a href="#" class="flex items-center justify-center px-3 h-8 leading-tight text-text_white bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white">4</a>
+    </li>
+    <li>
+      <a href="#" class="flex items-center justify-center px-3 h-8 leading-tight text-text_white bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white">5</a>
+    </li>
+    <li>
+      <a href="#" class="flex items-center justify-center px-3 h-8 leading-tight text-text_white bg-white border border-gray-300 rounded-e-lg hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white">
+        <span class="sr-only">Next</span>
+        <svg class="w-2.5 h-2.5 rtl:rotate-180" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 6 10">
+          <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 9 4-4-4-4" />
+        </svg>
+      </a>
+    </li>
+  </ul>
+</nav> */}
+            <nav aria-label="Page navigation example">
+              <ul className="flex items-center -space-x-px h-10 text-base">
+                <li onClick={() => { currentPage > 1 ? setCurrentPage(currentPage - 1) : setCurrentPage(currentPage) }}>
+                  <a className="flex items-center justify-center cursor-pointer px-4 h-10 ms-0 leading-tight text-text_steel_blue bg-background_white border border-e-0 border-gray-300 rounded-s-lg hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white">
+                    <span className="sr-only">Previous</span>
+                    <svg className="w-3 h-3 rtl:rotate-180" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 6 10">
+                      <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 1 1 5l4 4" />
+                    </svg>
+                  </a>
+                </li>
+                {totalPages.map((data, index) => (
+                  <li onClick={() => setCurrentPage(data.id)}>
+                    <a className={`flex items-center justify-center cursor-pointer px-4 h-10 leading-tight ${currentPage === data.id ? 'text-text_white bg-background_steel_blue' : 'text-text_steel_blue bg-background_white'} border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white`}>{data.id}</a>
+                  </li>
+                ))}
+
+                <li onClick={() => { currentPage <= filteredPageBookings.length ? setCurrentPage(currentPage + 1) : setCurrentPage(currentPage) }}>
+                  <a className="flex items-center justify-center cursor-pointer px-4 h-10 leading-tight text-text_steel_blue bg-background_white border border-gray-300 rounded-e-lg hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white">
+                    <span className="sr-only">Next</span>
+                    <svg className="w-3 h-3 rtl:rotate-180" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 6 10">
+                      <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 9 4-4-4-4" />
+                    </svg>
+                  </a>
+                </li>
+              </ul>
+            </nav>
+
+          </div>
         </div>
       </div>
 

@@ -55,13 +55,21 @@ export default function AirportRide(
 
   const zoneMap = useSelector((state) => state?.zone?.zone);
   const [map, setMap] = useState(null);
+  const [map2, setMap2] = useState(null);
 
   const [t, i18n] = useTranslation("global");
   // const [vehicleTypes, setVehicleTpes] = useState([])
 
   useEffect(() => {
-    setMap(zoneMap && zoneMap.length > 0 ? zoneMap[0].map : null)
+    if (cityName === t("hero.dammam_text")) {
+      setMap(zoneMap && zoneMap.length > 0 ? zoneMap[0].map : null)
+    }else{
+      setMap2(zoneMap && zoneMap.length > 0 ? zoneMap[1].map : null)
+    }
+    
   }, [zoneMap]);
+
+  console.log('zzz', zoneMap)
 
   const [location, setLocation] = useState("")
   const [destination, setDestination] = useState("");
@@ -103,7 +111,7 @@ export default function AirportRide(
     arrivalTime: "",
     sharedRide: false,
   });
-
+  const [vehicleTypeName, setVehicleTypeName] = useState("");
   const API_BASE_URL = process.env.REACT_APP_BASE_URL_AMK_TEST;
 
   const [VehicleTypeWithService, setVehicleTypeWithService] = useState(null);
@@ -126,29 +134,7 @@ export default function AirportRide(
   }, [])
 
   const [sharedRideValue, setSharedRideValue] = useState("");
-  useEffect(() => {
-    const getSharedRideValue = async () => {
-      dispatch(setLoading(true))
-      if (formValues.vehicleType !== "") {
-        try {
-          const response = await axios.get(
-            `${API_BASE_URL}/api/method/airport_transport.api.bookings.get_ride_discount?vehicle_type=${formValues.vehicleType}&language=${language ? language : 'eng'}`
-          );
-          if (response && response.status === 200) {
-            setSharedRideValue(response.data.data)
-            dispatch(setLoading(false))
-          }
-        } catch (error) {
-          console.log('Error', error);
-          dispatch(setLoading(false))
-        }
-      }
-      dispatch(setLoading(false))
-    }
-    getSharedRideValue()
-  }, [formValues]);
 
-  const [vehicleTypeName, setVehicleTypeName] = useState("");
   // console.log('vehicleTypes', vehicleTypes)
   useEffect(() => {
     if (vehicleTypeName !== "") {
@@ -165,6 +151,29 @@ export default function AirportRide(
         ["vehicleType"]: vehicleTypeName,
       }));
     }
+  }, [vehicleTypeName]);
+
+  useEffect(() => {
+    const getSharedRideValue = async () => {
+      dispatch(setLoading(true))
+      if (vehicleTypeName !== "") {
+        try {
+          const response = await axios.get(
+            `${API_BASE_URL}/api/method/airport_transport.api.bookings.get_ride_discount?vehicle_type=${vehicleTypeName}&language=${language ? language : 'eng'}`
+          );
+          if (response && response.status === 200) {
+            setSharedRideValue(response.data.data)
+            // console.log('qqq', response.data.data)
+            dispatch(setLoading(false))
+          }
+        } catch (error) {
+          console.log('Error', error);
+          dispatch(setLoading(false))
+        }
+      }
+      dispatch(setLoading(false))
+    }
+    getSharedRideValue()
   }, [vehicleTypeName]);
 
   useEffect(() => {
@@ -241,7 +250,7 @@ export default function AirportRide(
     airportName: Yup.string().required("Airport Name is required"),
     terminalNumber: Yup.string().required("Terminal Number is required"),
     vehicleType: Yup.string().required("Vehicle Type is required"),
-    seatNumber: Yup.string().required("Seat Number is required"),
+    // seatNumber: Yup.string().required("Seat Number is required"),
     arrivalDate: Yup.string().required("Arrival Date is required"),
     arrivalTime: Yup.string().required("Arrival Time is required"),
     sharedRide: Yup.bool(),
@@ -369,7 +378,7 @@ export default function AirportRide(
                 ].every((field) => values[field]);
                 const isStep2Valid = [
                   // "vehicleType",
-                  "seatNumber",
+                  // "seatNumber",
                   "arrivalDate",
                   "arrivalTime",
                 ].every((field) => values[field]);
@@ -519,27 +528,54 @@ export default function AirportRide(
                           />
                         </div>
 
-                        <InputFieldFormik
-                          label={t("hero.seat_number_text")}
-                          name="seatNumber"
-                          type="select"
-                          value={
-                            formValues.seatNumber ||
-                            onChangeFormValues.seatNumber
-                          }
-                          options={seatNumberOptions.map((seatNumber) => ({
-                            value: seatNumber,
-                            label: seatNumber,
-                          }))}
-                          onChange={({ fieldName, selectedValue }) => {
-                            setFieldValue(fieldName, selectedValue);
-                            setOnChangeFormValues((prevValues) => ({
-                              ...prevValues,
-                              [fieldName]: selectedValue,
-                            }));
-                          }}
-                          required
-                        />
+                        <div>
+                          <InputFieldFormik
+                            label={t("hero.shared_ride_text")}
+                            name="sharedRide"
+                            type="checkbox"
+                            percentageValue={sharedRideValue}
+                            onChange={({ fieldName, selectedValue }) => {
+
+                              setFieldValue(fieldName, selectedValue);
+                              setFormValues((prevValues) => ({
+                                ...prevValues,
+                                [fieldName]: selectedValue,
+                              }));
+                              setOnChangeFormValues((prevValues) => ({
+                                ...prevValues,
+                                [fieldName]: selectedValue,
+                              }));
+                            }
+
+                            }
+                            required
+                          />
+                        </div>
+
+                        {formValues.sharedRide && (
+                          <InputFieldFormik
+                            label={t("hero.seat_number_text")}
+                            name="seatNumber"
+                            type="select"
+                            value={
+                              formValues.seatNumber ||
+                              onChangeFormValues.seatNumber
+                            }
+                            options={seatNumberOptions.map((seatNumber) => ({
+                              value: seatNumber,
+                              label: seatNumber,
+                            }))}
+                            onChange={({ fieldName, selectedValue }) => {
+                              setFieldValue(fieldName, selectedValue);
+                              setOnChangeFormValues((prevValues) => ({
+                                ...prevValues,
+                                [fieldName]: selectedValue,
+                              }));
+                            }}
+                            required
+                          />
+                        )}
+
                         <InputFieldFormik
                           label={t("hero.arrival_date_text")}
                           name="arrivalDate"
@@ -601,16 +637,7 @@ export default function AirportRide(
                     )}
                     {subTab === 3 && (
                       <>
-                        <InputFieldFormik
-                          label={t("hero.shared_ride_text")}
-                          name="sharedRide"
-                          type="checkbox"
-                          percentageValue={sharedRideValue}
-                          onChange={({ fieldName, selectedValue }) =>
-                            setFieldValue(fieldName, selectedValue)
-                          }
-                          required
-                        />
+
                         <div className="my-4 flex flex-col md:flex-row justify-between items-start">
                           <div className="w-full md:w-1/2">
                             <Heading
@@ -624,6 +651,7 @@ export default function AirportRide(
                               formValues={formValues}
                               onSubmitDestination={handleMapSubmit}
                               zoneCoords={map}
+                              zoneCoords2={map2}
                               cityName={values.arrivalCity}
                               setLocation={setLocation}
                               setDestination={setDestination}
