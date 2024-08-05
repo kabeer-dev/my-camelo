@@ -49,7 +49,7 @@ export default function ScheduledRide({
   const zoneMap = useSelector((state) => state?.zone?.zone);
   const [map, setMap] = useState(null);
   useEffect(() => {
-    setMap(zoneMap && zoneMap.length > 0 ? zoneMap[0].map : null)
+    setMap(zoneMap && zoneMap.length > 0 ? zoneMap : null)
   }, [zoneMap])
   const services = "City Trip";
   const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);

@@ -1,12 +1,13 @@
 import React, { useState, useRef, useEffect } from "react";
 import { GoogleMap, LoadScript, Marker, Polygon, StandaloneSearchBox } from "@react-google-maps/api";
 import axios from "axios";
-import { setLoading } from "../../../redux/actions/loaderAction";
+import { setLoading } from "../../redux/actions/loaderAction";
 import { useDispatch } from "react-redux";
 import { useTranslation } from "react-i18next";
 
 export default function MapModal({ rideName, formValues, onSubmitDestination, zoneCoords, cityName, setLocation, setDestination }) {
   const [t, i18n] = useTranslation("global")
+
   const containerStyle = {
     width: "100%",
     height: "400px",
@@ -41,10 +42,24 @@ export default function MapModal({ rideName, formValues, onSubmitDestination, zo
     setError("");
   };
 
-  const convertedCoords = zoneCoords.map((coord) => ({
-    lat: coord[0],
-    lng: coord[1],
-  }));
+
+  const convertedCoords = zoneCoords.map((coord) => ((
+    coord.map.map((coo) => ({
+      lat: coo[0],
+      lng: coo[1],
+    }))
+
+  )));
+
+  console.log('qqq', convertedCoords)
+
+  // let convertedCoords2 = null;
+  // if (zoneCoords2 !== null) {
+  //   convertedCoords2 = zoneCoords.map((coord) => ({
+  //     lat: coord[0],
+  //     lng: coord[1],
+  //   }));
+  // }
 
   useEffect(() => {
     const setPickOrDrop = async () => {
@@ -89,14 +104,14 @@ export default function MapModal({ rideName, formValues, onSubmitDestination, zo
     setPickOrDrop()
   }, [rideName, cityName, formValues.rideType]);
 
-  const isPointInPolygon = (point, polygon) => {
+  const isPointInPolygon = (point, polygon, index) => {
     const { lat, lng } = point;
     let inside = false;
-    for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
-      const xi = polygon[i].lat,
-        yi = polygon[i].lng;
-      const xj = polygon[j].lat,
-        yj = polygon[j].lng;
+    for (let i = 0, j = polygon[index].length - 1; i < polygon[index].length; j = i++) {
+      const xi = polygon[index][i].lat,
+        yi = polygon[index][i].lng;
+      const xj = polygon[index][j].lat,
+        yj = polygon[index][j].lng;
 
       const intersect =
         yi > lng !== yj > lng &&
@@ -106,9 +121,10 @@ export default function MapModal({ rideName, formValues, onSubmitDestination, zo
     return inside;
   };
 
-  const onMapClick = async (event) => {
+  const onMapClick = async (event, index) => {
     const point = { lat: event.latLng.lat(), lng: event.latLng.lng() };
-    if (isPointInPolygon(point, convertedCoords)) {
+    if (isPointInPolygon(point, convertedCoords, index)) {
+      console.log('poly')
       setError("");
       dispatch(setLoading(true))
       if (rideName === "airportRide") {
@@ -294,9 +310,24 @@ export default function MapModal({ rideName, formValues, onSubmitDestination, zo
                     onLoad={onLoad}
                     onClick={onMapClick}
                   >
+                    {/* Your existing map components */}
+                    {convertedCoords.map((convertedCod, index) => (
+                      <Polygon
+                        paths={convertedCod}
+                        options={{
+                          fillColor: "#4463F0",
+                          fillOpacity: 0.3,
+                          strokeColor: "#355E3B",
+                          strokeOpacity: 1,
+                          strokeWeight: 1,
+                        }}
+                        onClick={(event) => onMapClick(event, index)}
+                      />
+                    ))}
 
-                    <Polygon
-                      paths={convertedCoords}
+
+                    {/* <Polygon
+                      paths={convertedCoords2}
                       options={{
                         fillColor: "#4463F0",
                         fillOpacity: 0.3,
@@ -305,18 +336,8 @@ export default function MapModal({ rideName, formValues, onSubmitDestination, zo
                         strokeWeight: 1,
                       }}
                       onClick={onMapClick}
-                    />
-                    {/* Your existing map components */}
-                    {/* <Polygon
-                      paths={convertedCoords}
-                      options={{
-                        fillColor: "#4463F0",
-                        fillOpacity: 0.3,
-                        strokeColor: "#355E3B",
-                        strokeOpacity: 1,
-                        strokeWeight: 1,
-                      }}
                     /> */}
+
                     {/* <Polygon
                       paths={[
                         { lat: 90, lng: -180 },

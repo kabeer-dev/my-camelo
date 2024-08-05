@@ -64,7 +64,6 @@ export default function AirportRide(
     setMap(zoneMap && zoneMap.length > 0 ? zoneMap : null)
   }, [zoneMap]);
 
-  console.log('zzz', zoneMap)
 
   const [location, setLocation] = useState("")
   const [destination, setDestination] = useState("");

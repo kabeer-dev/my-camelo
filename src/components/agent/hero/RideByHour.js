@@ -51,7 +51,7 @@ export default function RideByHour({
   const language = useSelector((state) => state.auth.language);
 
   useEffect(() => {
-    setMap(zoneMap && zoneMap.length > 0 ? zoneMap[0].map : null)
+    setMap(zoneMap && zoneMap.length > 0 ? zoneMap : null)
   }, [zoneMap])
   const services = "Book Vehicle In Hours";
   const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);

@@ -58,7 +58,7 @@ export default function AirportRide(
   const [t, i18n] = useTranslation("global");
 
   useEffect(() => {
-    setMap(zoneMap && zoneMap.length > 0 ? zoneMap[0].map : null)
+    setMap(zoneMap && zoneMap.length > 0 ? zoneMap : null)
   }, [zoneMap]);
 
   const [location, setLocation] = useState("")
