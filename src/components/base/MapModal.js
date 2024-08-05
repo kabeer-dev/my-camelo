@@ -5,9 +5,9 @@ import { setLoading } from "../../redux/actions/loaderAction";
 import { useDispatch } from "react-redux";
 import { useTranslation } from "react-i18next";
 
-export default function MapModal({ rideName, formValues, onSubmitDestination, zoneCoords, zoneCoords2, cityName, setLocation, setDestination }) {
+export default function MapModal({ rideName, formValues, onSubmitDestination, zoneCoords, cityName, setLocation, setDestination }) {
   const [t, i18n] = useTranslation("global")
-  console.log('sss', zoneCoords)
+
   const containerStyle = {
     width: "100%",
     height: "400px",
@@ -48,14 +48,13 @@ export default function MapModal({ rideName, formValues, onSubmitDestination, zo
     lng: coord[1],
   }));
 
-  let convertedCoords2 = null;
-  if (zoneCoords2 !== null) {
-    convertedCoords2 = zoneCoords.map((coord) => ({
-      lat: coord[0],
-      lng: coord[1],
-    }));
-  }
-  console.log('www', convertedCoords2)
+  // let convertedCoords2 = null;
+  // if (zoneCoords2 !== null) {
+  //   convertedCoords2 = zoneCoords.map((coord) => ({
+  //     lat: coord[0],
+  //     lng: coord[1],
+  //   }));
+  // }
 
   useEffect(() => {
     const setPickOrDrop = async () => {
@@ -319,7 +318,7 @@ export default function MapModal({ rideName, formValues, onSubmitDestination, zo
                       onClick={onMapClick}
                     />
 
-                    <Polygon
+                    {/* <Polygon
                       paths={convertedCoords2}
                       options={{
                         fillColor: "#4463F0",
@@ -329,7 +328,7 @@ export default function MapModal({ rideName, formValues, onSubmitDestination, zo
                         strokeWeight: 1,
                       }}
                       onClick={onMapClick}
-                    />
+                    /> */}
 
                     {/* <Polygon
                       paths={[

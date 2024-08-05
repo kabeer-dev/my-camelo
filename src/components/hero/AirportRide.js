@@ -61,11 +61,11 @@ export default function AirportRide(
   // const [vehicleTypes, setVehicleTpes] = useState([])
 
   useEffect(() => {
-    if (cityName === t("hero.dammam_text")) {
+    // if (cityName === t("hero.dammam_text")) {
       setMap(zoneMap && zoneMap.length > 0 ? zoneMap[0].map : null)
-    }else{
-      setMap2(zoneMap && zoneMap.length > 0 ? zoneMap[1].map : null)
-    }
+    // }else{
+    //   setMap2(zoneMap && zoneMap.length > 0 ? zoneMap[1].map : null)
+    // }
     
   }, [zoneMap]);
 
@@ -651,7 +651,7 @@ export default function AirportRide(
                               formValues={formValues}
                               onSubmitDestination={handleMapSubmit}
                               zoneCoords={map}
-                              zoneCoords2={map2}
+                              // zoneCoords2={map2}
                               cityName={values.arrivalCity}
                               setLocation={setLocation}
                               setDestination={setDestination}
