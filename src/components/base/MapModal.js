@@ -43,10 +43,15 @@ export default function MapModal({ rideName, formValues, onSubmitDestination, zo
   };
 
 
-  const convertedCoords = zoneCoords.map((coord) => ({
-    lat: coord[0],
-    lng: coord[1],
-  }));
+  const convertedCoords = zoneCoords.map((coord) => ((
+    coord.map.map((coo) => ({
+      lat: coo[0],
+      lng: coo[1],
+    }))
+
+  )));
+
+  console.log('qqq', convertedCoords)
 
   // let convertedCoords2 = null;
   // if (zoneCoords2 !== null) {
@@ -306,17 +311,20 @@ export default function MapModal({ rideName, formValues, onSubmitDestination, zo
                     onClick={onMapClick}
                   >
                     {/* Your existing map components */}
-                    <Polygon
-                      paths={convertedCoords}
-                      options={{
-                        fillColor: "#4463F0",
-                        fillOpacity: 0.3,
-                        strokeColor: "#355E3B",
-                        strokeOpacity: 1,
-                        strokeWeight: 1,
-                      }}
-                      onClick={onMapClick}
-                    />
+                    {convertedCoords.map((convertedCod) => (
+                      <Polygon
+                        paths={convertedCod}
+                        options={{
+                          fillColor: "#4463F0",
+                          fillOpacity: 0.3,
+                          strokeColor: "#355E3B",
+                          strokeOpacity: 1,
+                          strokeWeight: 1,
+                        }}
+                        onClick={onMapClick}
+                      />
+                    ))}
+
 
                     {/* <Polygon
                       paths={convertedCoords2}

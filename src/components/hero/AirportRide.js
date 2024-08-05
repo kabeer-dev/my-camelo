@@ -61,12 +61,7 @@ export default function AirportRide(
   // const [vehicleTypes, setVehicleTpes] = useState([])
 
   useEffect(() => {
-    // if (cityName === t("hero.dammam_text")) {
-      setMap(zoneMap && zoneMap.length > 0 ? zoneMap[0].map : null)
-    // }else{
-    //   setMap2(zoneMap && zoneMap.length > 0 ? zoneMap[1].map : null)
-    // }
-    
+    setMap(zoneMap && zoneMap.length > 0 ? zoneMap : null)
   }, [zoneMap]);
 
   console.log('zzz', zoneMap)
