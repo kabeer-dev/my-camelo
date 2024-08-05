@@ -42,20 +42,20 @@ export default function MapModal({ rideName, formValues, onSubmitDestination, zo
     setError("");
   };
 
-  
+
   const convertedCoords = zoneCoords.map((coord) => ({
     lat: coord[0],
     lng: coord[1],
   }));
 
   let convertedCoords2 = null;
-  if(zoneCoords2 !== null){
+  if (zoneCoords2 !== null) {
     convertedCoords2 = zoneCoords.map((coord) => ({
       lat: coord[0],
       lng: coord[1],
     }));
   }
- 
+  console.log('www', convertedCoords2)
 
   useEffect(() => {
     const setPickOrDrop = async () => {
@@ -116,15 +116,75 @@ export default function MapModal({ rideName, formValues, onSubmitDestination, zo
     }
     return inside;
   };
-  
+
   const onMapClick = async (event) => {
     const point = { lat: event.latLng.lat(), lng: event.latLng.lng() };
     if (isPointInPolygon(point, convertedCoords)) {
       console.log('poly')
-    setError("");
-    dispatch(setLoading(true))
-    if (rideName === "airportRide") {
-      if (formValues.rideType === t("hero.dropoff_value_text")) {
+      setError("");
+      dispatch(setLoading(true))
+      if (rideName === "airportRide") {
+        if (formValues.rideType === t("hero.dropoff_value_text")) {
+          const apiKey = "AIzaSyBMTLXpuXtkEfbgChZzsj7LPYlpGxHI9iU";
+          const url = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${point.lat},${point.lng}&key=${apiKey}`;
+
+          try {
+            const response = await axios.get(url);
+            const location = response.data.results[0].formatted_address;
+            // console.log('Location:', location);
+            setLocation(`${location} Saudi Arabia`);
+          } catch (error) {
+            console.error('Error fetching location:', error.message);
+          }
+          setSelectedPickup(point);
+        } else {
+          const apiKey = "AIzaSyBMTLXpuXtkEfbgChZzsj7LPYlpGxHI9iU";
+          const url = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${point.lat},${point.lng}&key=${apiKey}`;
+
+          try {
+            const response = await axios.get(url);
+            const location = response.data.results[0].formatted_address;
+            // console.log('Location:', location);
+
+            setDestination(`${location} Saudi Arabia`);
+          } catch (error) {
+            console.error('Error fetching location:', error.message);
+          }
+          setSelectedDropoff(point);
+        }
+
+      } else if (rideName === "scheduledRide") {
+        if (!selectedPickup) {
+          const apiKey = "AIzaSyBMTLXpuXtkEfbgChZzsj7LPYlpGxHI9iU";
+          const url = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${point.lat},${point.lng}&key=${apiKey}`;
+
+          try {
+            const response = await axios.get(url);
+            const location = response.data.results[0].formatted_address;
+            // console.log('Location:', location);
+            setLocation(`${location} Saudi Arabia`);
+            setSelectedPickup(point);
+          } catch (error) {
+            console.error('Error fetching location:', error.message);
+          }
+
+        } else {
+          const apiKey = "AIzaSyBMTLXpuXtkEfbgChZzsj7LPYlpGxHI9iU";
+          const url = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${point.lat},${point.lng}&key=${apiKey}`;
+
+          try {
+            const response = await axios.get(url);
+            const location = response.data.results[0].formatted_address;
+            // console.log('Location:', location);
+            setDestination(`${location} Saudi Arabia`);
+            setSelectedDropoff(point);
+          } catch (error) {
+            console.error('Error fetching location:', error.message);
+          }
+
+        }
+      } else {
+        // if (!selectedPickup) {
         const apiKey = "AIzaSyBMTLXpuXtkEfbgChZzsj7LPYlpGxHI9iU";
         const url = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${point.lat},${point.lng}&key=${apiKey}`;
 
@@ -137,68 +197,8 @@ export default function MapModal({ rideName, formValues, onSubmitDestination, zo
           console.error('Error fetching location:', error.message);
         }
         setSelectedPickup(point);
-      } else {
-        const apiKey = "AIzaSyBMTLXpuXtkEfbgChZzsj7LPYlpGxHI9iU";
-        const url = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${point.lat},${point.lng}&key=${apiKey}`;
-
-        try {
-          const response = await axios.get(url);
-          const location = response.data.results[0].formatted_address;
-          // console.log('Location:', location);
-          
-          setDestination(`${location} Saudi Arabia`);
-        } catch (error) {
-          console.error('Error fetching location:', error.message);
-        }
-        setSelectedDropoff(point);
+        // }
       }
-
-    } else if (rideName === "scheduledRide") {
-      if (!selectedPickup) {
-        const apiKey = "AIzaSyBMTLXpuXtkEfbgChZzsj7LPYlpGxHI9iU";
-        const url = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${point.lat},${point.lng}&key=${apiKey}`;
-
-        try {
-          const response = await axios.get(url);
-          const location = response.data.results[0].formatted_address;
-          // console.log('Location:', location);
-          setLocation(`${location} Saudi Arabia`);
-          setSelectedPickup(point);
-        } catch (error) {
-          console.error('Error fetching location:', error.message);
-        }
-        
-      } else {
-        const apiKey = "AIzaSyBMTLXpuXtkEfbgChZzsj7LPYlpGxHI9iU";
-        const url = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${point.lat},${point.lng}&key=${apiKey}`;
-
-        try {
-          const response = await axios.get(url);
-          const location = response.data.results[0].formatted_address;
-          // console.log('Location:', location);
-          setDestination(`${location} Saudi Arabia`);
-          setSelectedDropoff(point);
-        } catch (error) {
-          console.error('Error fetching location:', error.message);
-        }
-        
-      }
-    } else {
-      // if (!selectedPickup) {
-      const apiKey = "AIzaSyBMTLXpuXtkEfbgChZzsj7LPYlpGxHI9iU";
-      const url = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${point.lat},${point.lng}&key=${apiKey}`;
-
-      try {
-        const response = await axios.get(url);
-        const location = response.data.results[0].formatted_address;
-        // console.log('Location:', location);
-        setLocation(`${location} Saudi Arabia`);
-      } catch (error) {
-        console.error('Error fetching location:', error.message);
-      }
-      setSelectedPickup(point);
-      // }
-    }
     } else {
       setError("You cannot select a location outside the Dammam zone.");
     }
@@ -318,8 +318,8 @@ export default function MapModal({ rideName, formValues, onSubmitDestination, zo
                       }}
                       onClick={onMapClick}
                     />
-                    {convertedCoords2 && (
-                      <Polygon
+
+                    <Polygon
                       paths={convertedCoords2}
                       options={{
                         fillColor: "#4463F0",
@@ -330,7 +330,7 @@ export default function MapModal({ rideName, formValues, onSubmitDestination, zo
                       }}
                       onClick={onMapClick}
                     />
-                    )}
+
                     {/* <Polygon
                       paths={[
                         { lat: 90, lng: -180 },
