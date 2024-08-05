@@ -51,8 +51,6 @@ export default function MapModal({ rideName, formValues, onSubmitDestination, zo
 
   )));
 
-  console.log('qqq', convertedCoords)
-
   // let convertedCoords2 = null;
   // if (zoneCoords2 !== null) {
   //   convertedCoords2 = zoneCoords.map((coord) => ({
@@ -107,25 +105,42 @@ export default function MapModal({ rideName, formValues, onSubmitDestination, zo
   const isPointInPolygon = (point, polygon, index) => {
     const { lat, lng } = point;
     let inside = false;
-    for (let i = 0, j = polygon[index].length - 1; i < polygon[index].length; j = i++) {
-      const xi = polygon[index][i].lat,
-        yi = polygon[index][i].lng;
-      const xj = polygon[index][j].lat,
-        yj = polygon[index][j].lng;
-
-      const intersect =
-        yi > lng !== yj > lng &&
-        lat < ((xj - xi) * (lng - yi)) / (yj - yi) + xi;
-      if (intersect) inside = !inside;
+    if(index){
+      for (let i = 0, j = polygon[index].length - 1; i < polygon[index].length; j = i++) {
+        const xi = polygon[index][i].lat,
+          yi = polygon[index][i].lng;
+        const xj = polygon[index][j].lat,
+          yj = polygon[index][j].lng;
+  
+        const intersect =
+          yi > lng !== yj > lng &&
+          lat < ((xj - xi) * (lng - yi)) / (yj - yi) + xi;
+        if (intersect) inside = !inside;
+      }
+      return inside;
+    }else{
+      for (let i = 0, j = polygon[0].length - 1; i < polygon[0].length; j = i++) {
+        const xi = polygon[0][i].lat,
+          yi = polygon[0][i].lng;
+        const xj = polygon[0][j].lat,
+          yj = polygon[0][j].lng;
+  
+        const intersect =
+          yi > lng !== yj > lng &&
+          lat < ((xj - xi) * (lng - yi)) / (yj - yi) + xi;
+        if (intersect) inside = !inside;
+      }
+      return inside;
     }
-    return inside;
+    
   };
 
   const onMapClick = async (event, index) => {
-    if (index) {
+   
+    // if (index) {
       const point = { lat: event.latLng.lat(), lng: event.latLng.lng() };
       if (isPointInPolygon(point, convertedCoords, index)) {
-        console.log('poly')
+        
         setError("");
         dispatch(setLoading(true))
         if (rideName === "airportRide") {
@@ -207,9 +222,10 @@ export default function MapModal({ rideName, formValues, onSubmitDestination, zo
       } else {
         setError("You cannot select a location outside the Dammam zone.");
       }
-    }else {
-      setError("You cannot select a location outside the Dammam zone.");
-    }
+    // }
+    // else {
+    //   setError("You cannot select a location outside the Dammam zone.");
+    // }
     dispatch(setLoading(false))
   };
 

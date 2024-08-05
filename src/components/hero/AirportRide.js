@@ -244,7 +244,11 @@ export default function AirportRide(
     airportName: Yup.string().required("Airport Name is required"),
     terminalNumber: Yup.string().required("Terminal Number is required"),
     vehicleType: Yup.string().required("Vehicle Type is required"),
-    // seatNumber: Yup.string().required("Seat Number is required"),
+    seatNumber: Yup.string().when('sharedRide', {
+      is: true, // When sharedRide is true
+      then: Yup.string().required("Seat Number is required"),
+      otherwise: Yup.string(), // Otherwise, seatNumber is not required
+    }),
     arrivalDate: Yup.string().required("Arrival Date is required"),
     arrivalTime: Yup.string().required("Arrival Time is required"),
     sharedRide: Yup.bool(),
@@ -529,7 +533,7 @@ export default function AirportRide(
                             type="checkbox"
                             percentageValue={sharedRideValue}
                             onChange={({ fieldName, selectedValue }) => {
-
+console.log(fieldName, selectedValue)
                               setFieldValue(fieldName, selectedValue);
                               setFormValues((prevValues) => ({
                                 ...prevValues,
