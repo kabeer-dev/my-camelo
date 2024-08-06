@@ -334,6 +334,7 @@ export default function ScheduledRide({
                     const isStep2Valid =
                       // values.vehicleType &&
                       // values.seatNumber &&
+                      // formValues.sharedRide === true ? values.seatNumber : '' &&
                       values.arrivalDate &&
                       values.arrivalTime;
 

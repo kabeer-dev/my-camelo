@@ -372,7 +372,7 @@ export default function AirportRide(
                 ].every((field) => values[field]);
                 const isStep2Valid = [
                   // "vehicleType",
-                  // "seatNumber",
+                  // formValues.sharedRide ? "seatNumber" : '',
                   "arrivalDate",
                   "arrivalTime",
                 ].every((field) => values[field]);
