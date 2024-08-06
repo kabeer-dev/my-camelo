@@ -15,16 +15,30 @@ export default function MapModal({ rideName, formValues, onSubmitDestination, zo
 
   let center;
   if (cityName === t("hero.dammam_text")) {
-    center = {
-      lat: 26.3927,
-      lng: 49.9777,
-    };
+    if(selectedPickup){
+      center = selectedPickup
+    }else if(selectedDropoff){
+      center = selectedDropoff
+    }else{
+      center = {
+        lat: 26.3927,
+        lng: 49.9777,
+      };
+    }
+    
   }
   if (cityName === t("hero.riyadh_text")) {
-    center = {
-      lng: 46.6753,
-      lat: 24.7136
+    if(selectedPickup){
+      center = selectedPickup
+    }else if(selectedDropoff){
+      center = selectedDropoff
+    }else{
+      center = {
+        lng: 46.6753,
+        lat: 24.7136
+      }
     }
+    
   }
 
   const dispatch = useDispatch();
