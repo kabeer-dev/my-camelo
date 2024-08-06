@@ -7,6 +7,14 @@ import { useTranslation } from "react-i18next";
 
 export default function MapModal({ rideName, formValues, onSubmitDestination, zoneCoords, cityName, setLocation, setDestination }) {
   const [t, i18n] = useTranslation("global")
+  const dispatch = useDispatch();
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedPickup, setSelectedPickup] = useState(null);
+  const [selectedDropoff, setSelectedDropoff] = useState(null);
+  const [error, setError] = useState("");
+  const [searchBox, setSearchBox] = useState(null); // State to hold the StandaloneSearchBox instance
+
+  const mapRef = useRef(null);
 
   const containerStyle = {
     width: "100%",
@@ -40,15 +48,6 @@ export default function MapModal({ rideName, formValues, onSubmitDestination, zo
     }
     
   }
-
-  const dispatch = useDispatch();
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedPickup, setSelectedPickup] = useState(null);
-  const [selectedDropoff, setSelectedDropoff] = useState(null);
-  const [error, setError] = useState("");
-  const [searchBox, setSearchBox] = useState(null); // State to hold the StandaloneSearchBox instance
-
-  const mapRef = useRef(null);
 
   const openModal = () => setIsModalOpen(true);
   const closeModal = () => {
