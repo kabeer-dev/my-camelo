@@ -9,16 +9,18 @@ import { setLoading } from "../../../redux/actions/loaderAction";
 import { useDispatch, useSelector } from "react-redux";
 import { useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import { fetchServicesListRequest } from "../../../redux/actions/servicesListActions";
 
 export default function HeroSection() {
   const dispatch = useDispatch();
-  // const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
   const location = useLocation();
-  const [activeTab, setActiveTab] = useState("airport");
-  const [subTab, setSubTab] = useState(1);
+  // const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
+  const { servicesList } = useSelector((state) => state.servicesList);
   const language = useSelector((state) => state.auth.language);
+  const [t, i18n] = useTranslation("global");
 
-  const [t, i18n] = useTranslation("global")
+  const [activeTab, setActiveTab] = useState('');
+  const [subTab, setSubTab] = useState(1);
 
   const [showSignUp, setShowSignUp] = useState(false);
   const [showAlreadyRegistered, setShowAlreadyRegistered] = useState(false);
@@ -31,6 +33,18 @@ export default function HeroSection() {
   const recaptchaRef = React.createRef();
   const [otp, setOtp] = useState("");
   const [phoneOtp, setPhoneOtp] = useState("");
+
+  useEffect(() => {
+    dispatch(fetchServicesListRequest());
+  }, [dispatch]);
+
+  useEffect(() => {
+    dispatch(setLoading(true))
+    if (servicesList && servicesList.data?.length > 0) {
+      setActiveTab(servicesList.data[0].id)
+    }
+    dispatch(setLoading(false))
+  }, [servicesList])
 
   useEffect(() => {
     if (location.state?.showPaymentMethod) {
@@ -62,7 +76,7 @@ export default function HeroSection() {
       setShowPaymentMethod(false)
       setSubTab(1)
     }
-    if (tabName === "airport" || tabName === "scheduled") {
+    if (tabName === "Airport Trip" || tabName === "City Trip") {
       if (subTab === 4 && showSignUp && !showAlreadyRegistered && !showOTPScreen && !showPhone && !showPhoneOTPScreen && !showPaymentMethod) {
         setSubTab(1)
         setShowSignUp(false)
@@ -111,113 +125,70 @@ export default function HeroSection() {
   return (
     <>
       <div
-        className={`${activeTab === "airport"
+        className={`${activeTab === "Airport Trip"
           ? "bg-airport_ride_bg"
-          : activeTab === "scheduled"
+          : activeTab === "City Trip"
             ? "bg-scheduled_ride_bg"
             : "bg-by_hour_bg"
           } transition-all duration-300 mx-auto h-auto bg-cover bg-fixed bg-start bg-no-repeat`}
-          dir={language === 'ar' ? 'rtl' : 'ltr'}
+        dir={language === 'ar' ? 'rtl' : 'ltr'}
       >
         <div className="py-5 md:py-10 px-10 md:px-20 flex flex-col md:flex-col lg:flex-row justify-between items-center">
           <div className="md:w-[592px]">
             <div className="my-4">
-              {activeTab === "airport" ? (
-                <Heading
-                  title={t("hero.airport.title")}
-                  className="text-2xl md:text-5xl lg:text-5xl text-text_white"
-                />
-              ) : null}
-              {activeTab === "scheduled" ? (
-                <Heading
-                  title={t("hero.schedule.title")}
-                  className="text-2xl md:text-5xl lg:text-5xl text-text_white"
-                />
-              ) : null}
-              {activeTab === "hour" ? (
-                <Heading
-                  title={t("hero.ride.title")}
-                  className="text-2xl md:text-5xl lg:text-5xl text-text_white"
-                />
-              ) : null}
-            </div>
-            <div className="my-4 w-11/12">
-              {activeTab === "airport" ? (
-                <Paragraph
-                  title={t("hero.airport.paragraph")}
-                  className="text-normal md:text-lg  lg:text-lg  text-text_white"
-                />
-              ) : null}
-              {activeTab === "scheduled" ? (
-                <Paragraph
-                  title={t("hero.schedule.paragraph")}
-                  className="text-normal md:text-lg  lg:text-lg  text-text_white"
-                />
-              ) : null}
-              {activeTab === "hour" ? (
-                <Paragraph
-                  title={t("hero.ride.paragraph")}
-                  className="text-normal md:text-lg  lg:text-lg  text-text_white"
-                />
-              ) : null}
+              {servicesList.data && servicesList.data.map((service) => (
+                <>
+                  {activeTab === service.id && (
+                    <>
+                      <div>
+                        <Heading
+                          title={service.service_name}
+                          className="text-2xl md:text-5xl lg:text-5xl text-text_white"
+                        />
+                      </div>
+                      <div className="my-4 w-11/12">
+                        <Paragraph
+                          title={service.service_desc}
+                          className="text-normal md:text-lg  lg:text-lg  text-text_white"
+                        />
+                      </div>
+                    </>
+
+                  )}
+                </>
+              ))}
             </div>
           </div>
 
           <div className="md:w-[592px]">
             {/* tabs code is here */}
             <div className="bg-background_white py-2 px-4 flex flex-row justify-between items-center rounded transition-all duration-300">
-              <div
-                className={`py-1 px-5 md:py-2 md:px-10 flex flex-col items-center cursor-pointer rounded transition-all duration-300 ${activeTab === "airport"
-                  ? "bg-background_steel_blue text-text_white"
-                  : ""
-                  }`}
-                onClick={() => handleTabChange("airport")}
-              >
-                <div className="py-1">
-                  <Icon icon="icons8:airport" width="28px" height="28px" />
-                </div>
-                <div className="py-1 text-sm md:text-normal text-center">
-                  {t("hero.airport.title")}
-                </div>
-              </div>
-              <div
-                className={`py-1 px-5 md:py-2 md:px-10 flex flex-col items-center cursor-pointer rounded transition-all duration-300 ${activeTab === "scheduled"
-                  ? "bg-background_steel_blue text-text_white"
-                  : ""
-                  }`}
-                onClick={() => handleTabChange("scheduled")}
-              >
-                <div className="py-1">
-                  <Icon
-                    icon="mdi:invoice-text-scheduled-outline"
-                    width="28px"
-                    height="28px"
-                  />
-                </div>
-                <div className="py-1 text-sm md:text-normal text-center">
-                  {t("hero.schedule.title")}
-                </div>
-              </div>
-              <div
-                className={`py-1 px-5 md:py-2 md:px-10 flex flex-col items-center cursor-pointer rounded transition-all duration-300 ${activeTab === "hour"
-                  ? "bg-background_steel_blue text-text_white"
-                  : ""
-                  }`}
-                onClick={() => handleTabChange("hour")}
-              >
-                <div className="py-1">
-                  <Icon icon="mingcute:hours-line" width="28px" height="28px" />
-                </div>
-                <div className="py-1 text-sm md:text-normal text-center">
-                  {t("hero.ride.title")}
-                </div>
-              </div>
+              {servicesList.data && servicesList.data.map((service) => (
+                <>
+                  <div
+                    className={`py-1 px-5 md:py-2 md:px-10 flex flex-col items-center cursor-pointer rounded transition-all duration-300 ${activeTab === service.id
+                      ? "bg-background_steel_blue text-text_white"
+                      : ""
+                      }`}
+                    onClick={() => handleTabChange(service.id)}
+                  >
+                    <div className="py-1">
+                      <img src={service.icon} alt={service.id} />
+                      {/* <Icon icon="icons8:airport" width="28px" height="28px" /> */}
+                    </div>
+                    <div className="py-1 text-sm md:text-normal text-center">
+                      {service.service_name}
+                    </div>
+                  </div>
+                </>
+              ))}
+
             </div>
             {/* tabs code is here */}
 
             {/* content is here */}
             <div className="mt-1 bg-background_white p-2 md:p-6 flex flex-row justify-between items-center rounded transition-all duration-300">
-              {activeTab === "airport" && (
+              {activeTab === "Airport Trip" && (
                 <div className="w-full transition-all duration-300">
                   <AirportRide
                     subTab={subTab}
@@ -246,7 +217,7 @@ export default function HeroSection() {
                   />
                 </div>
               )}
-              {activeTab === "scheduled" && (
+              {activeTab === "City Trip" && (
                 <div className="w-full transition-all duration-300">
                   <ScheduledRide
                     subTab={subTab}
@@ -275,7 +246,7 @@ export default function HeroSection() {
                   />
                 </div>
               )}
-              {activeTab === "hour" && (
+              {activeTab === "Book Vehicle In Hours" && (
                 <div className="w-full transition-all duration-300">
                   <RideByHour
                     subTab={subTab}

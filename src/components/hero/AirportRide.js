@@ -239,7 +239,6 @@ export default function AirportRide(
   }, [isLoggedIn, t]);
 
   const validationSchema = Yup.object().shape({
-    agentUser: Yup.string().required("Agent User is required"),
     rideType: Yup.string().required("Ride type is required"),
     arrivalCity: Yup.string().required("Arrival City is required"),
     airportName: Yup.string().required("Airport Name is required"),
