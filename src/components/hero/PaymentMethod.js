@@ -389,6 +389,12 @@ export default function PaymentMethod({
             </div>
           ))}
 
+          {getPaymentMethods.length <= 0 && (
+            <div>
+              <p className="text-center mt-5">{t("payment_not_available_text")}</p>
+            </div>
+          )}
+
           {showPriceBtn && (
             <div>
               <Button

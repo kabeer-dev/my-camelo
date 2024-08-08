@@ -21,9 +21,9 @@ const InputFieldFormik = ({
   label,
   options = [],
   value,
-  onChange = () => {},
+  onChange = () => { },
   arrivalDates = null,
-  setArrivalDates = () => {},
+  setArrivalDates = () => { },
   percentageValue,
 }) => {
   const [timeError, setTimeError] = useState("");
@@ -55,22 +55,27 @@ const InputFieldFormik = ({
   };
 
   const handleTimeChange = (time, timeString) => {
-    if (arrivalDates === currentDate) {
-      const currentTime = dayjs();
-      const selectedTime = dayjs(timeString, "HH:mm");
+    if (arrivalDates) {
+      if (arrivalDates === currentDate) {
+        const currentTime = dayjs();
+        const selectedTime = dayjs(timeString, "HH:mm");
 
-      if (selectedTime.isBefore(currentTime.add(2, "hour"))) {
-        setTimeError(
-          t("errors.hour_2_error")
-        );
-        helpers.setValue("");
-        return;
+        if (selectedTime.isBefore(currentTime.add(8, "hour"))) {
+          setTimeError(
+            t("errors.hour_2_error")
+          );
+          helpers.setValue("");
+          return;
+        }
       }
+
+      setTimeError("");
+      onChange?.({ fieldName: name, selectedValue: timeString });
+      helpers.setValue(timeString);
+    } else {
+      setTimeError(t("errors.date_first_error"));
     }
 
-    setTimeError("");
-    onChange?.({ fieldName: name, selectedValue: timeString });
-    helpers.setValue(timeString);
   };
 
   const renderErrorMessage = (msg) => (
@@ -208,7 +213,7 @@ const InputFieldFormik = ({
       )}
 
       {["text", "email", "number", "tel"].includes(type) && (
-        <Field direction={language === 'ar' ? 'rtl' : 'ltr'} name={name} > 
+        <Field direction={language === 'ar' ? 'rtl' : 'ltr'} name={name} >
           {({ field }) => (
             <Input
               size="large"

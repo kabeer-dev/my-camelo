@@ -196,45 +196,47 @@ export default function MyProfile() {
         <main className="mt-20" dir={language === 'ar' ? 'rtl' : 'ltr'}>
           {/* Form Section */}
           <div className="container mx-auto p-4">
-            <Formik
-              initialValues={{
-                rider_name: formValues.rider_name,
-                // lastName: formValues.lastName,
-                day: formValues.day,
-                month: formValues.month,
-                year: formValues.year,
-                nationality: formValues.nationality,
-                email: formValues.email,
-                mobile_number: formValues.mobile_number,
-                city: formValues.city,
-                state: formValues.state,
-                street: formValues.street,
-                // password: formValues.password,
-                // confirmPassword: formValues.confirmPassword,
-              }}
-              validationSchema={validationSchema}
-              onSubmit={onSubmit}
-            >
-              {({ values, isSubmitting, setFieldValue }) => (
-                <Form className="space-y-3">
-                  <div className="grid grid-cols-1 md:grid-cols-1 gap-3">
-                    <div>
-                      <InputFieldFormik
-                        label={t("my_profile.first_name_text")}
-                        name="rider_name"
-                        type="text"
-                        placeholder="Enter your first name"
-                        value={formValues.rider_name}
-                        onChange={(e) => {
-                          values.rider_name = e.target.value;
-                          setFormValues((prevformValues) => ({
-                            ...prevformValues,
-                            rider_name: e.target.value,
-                          }));
-                        }}
-                      />
-                    </div>
-                    {/* <div>
+            <div className="grid md:grid-cols-2 sm:grid-cols-1 gap-4">
+              <div>
+                <Formik
+                  initialValues={{
+                    rider_name: formValues.rider_name,
+                    // lastName: formValues.lastName,
+                    day: formValues.day,
+                    month: formValues.month,
+                    year: formValues.year,
+                    nationality: formValues.nationality,
+                    email: formValues.email,
+                    mobile_number: formValues.mobile_number,
+                    city: formValues.city,
+                    state: formValues.state,
+                    street: formValues.street,
+                    // password: formValues.password,
+                    // confirmPassword: formValues.confirmPassword,
+                  }}
+                  validationSchema={validationSchema}
+                  onSubmit={onSubmit}
+                >
+                  {({ values, isSubmitting, setFieldValue }) => (
+                    <Form className="space-y-3">
+                      <div className="grid grid-cols-1 md:grid-cols-1 gap-3">
+                        <div>
+                          <InputFieldFormik
+                            label={t("my_profile.first_name_text")}
+                            name="rider_name"
+                            type="text"
+                            placeholder="Enter your first name"
+                            value={formValues.rider_name}
+                            onChange={(e) => {
+                              values.rider_name = e.target.value;
+                              setFormValues((prevformValues) => ({
+                                ...prevformValues,
+                                rider_name: e.target.value,
+                              }));
+                            }}
+                          />
+                        </div>
+                        {/* <div>
                       <InputFieldFormik
                         label={t("my_profile.last_name_text")}
                         name="lastName"
@@ -250,153 +252,153 @@ export default function MyProfile() {
                         }}
                       />
                     </div> */}
-                  </div>
+                      </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                    <div>
-                      <InputFieldFormik
-                        label={t("my_profile.day_text")}
-                        name="day"
-                        type="text"
-                        placeholder="DD"
-                        value={formValues.day}
-                        onChange={(e) => {
-                          values.day = e.target.value;
-                          setFormValues((prevformValues) => ({
-                            ...prevformValues,
-                            day: e.target.value,
-                          }));
-                        }}
-                      />
-                    </div>
-                    <div>
-                      <InputFieldFormik
-                        label={t("my_profile.month_text")}
-                        name="month"
-                        type="text"
-                        placeholder="MM"
-                        value={formValues.month}
-                        onChange={(e) => {
-                          values.month = e.target.value;
-                          setFormValues((prevformValues) => ({
-                            ...prevformValues,
-                            month: e.target.value,
-                          }));
-                        }}
-                      />
-                    </div>
-                    <div>
-                      <InputFieldFormik
-                        label={t("my_profile.year_text")}
-                        name="year"
-                        type="text"
-                        placeholder="YYYY"
-                        value={formValues.year}
-                        onChange={(e) => {
-                          values.year = e.target.value;
-                          setFormValues((prevformValues) => ({
-                            ...prevformValues,
-                            year: e.target.value,
-                          }));
-                        }}
-                      />
-                    </div>
-                  </div>
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                        <div>
+                          <InputFieldFormik
+                            label={t("my_profile.day_text")}
+                            name="day"
+                            type="text"
+                            placeholder="DD"
+                            value={formValues.day}
+                            onChange={(e) => {
+                              values.day = e.target.value;
+                              setFormValues((prevformValues) => ({
+                                ...prevformValues,
+                                day: e.target.value,
+                              }));
+                            }}
+                          />
+                        </div>
+                        <div>
+                          <InputFieldFormik
+                            label={t("my_profile.month_text")}
+                            name="month"
+                            type="text"
+                            placeholder="MM"
+                            value={formValues.month}
+                            onChange={(e) => {
+                              values.month = e.target.value;
+                              setFormValues((prevformValues) => ({
+                                ...prevformValues,
+                                month: e.target.value,
+                              }));
+                            }}
+                          />
+                        </div>
+                        <div>
+                          <InputFieldFormik
+                            label={t("my_profile.year_text")}
+                            name="year"
+                            type="text"
+                            placeholder="YYYY"
+                            value={formValues.year}
+                            onChange={(e) => {
+                              values.year = e.target.value;
+                              setFormValues((prevformValues) => ({
+                                ...prevformValues,
+                                year: e.target.value,
+                              }));
+                            }}
+                          />
+                        </div>
+                      </div>
 
-                  <div className="grid grid-cols-1 gap-3">
-                    <div>
-                      <InputFieldFormik
-                        label={t("my_profile.nationality_text")}
-                        name="nationality"
-                        type="select"
-                        options={countriesOptions}
-                        value={formValues.nationality}
-                        onChange={(valueObj) => {
-                          const { fieldName, selectedValue } = valueObj;
-                          setFieldValue(fieldName, selectedValue);
-                          setFormValues((prevformValues) => ({
-                            ...prevformValues,
-                            nationality: selectedValue,
-                          }));
-                        }}
-                        required
-                      />
-                    </div>
-                  </div>
+                      <div className="grid grid-cols-1 gap-3">
+                        <div>
+                          <InputFieldFormik
+                            label={t("my_profile.nationality_text")}
+                            name="nationality"
+                            type="select"
+                            options={countriesOptions}
+                            value={formValues.nationality}
+                            onChange={(valueObj) => {
+                              const { fieldName, selectedValue } = valueObj;
+                              setFieldValue(fieldName, selectedValue);
+                              setFormValues((prevformValues) => ({
+                                ...prevformValues,
+                                nationality: selectedValue,
+                              }));
+                            }}
+                            required
+                          />
+                        </div>
+                      </div>
 
-                  <div className="grid grid-cols-1 gap-3">
-                    <InputFieldFormik
-                      label={t("my_profile.email_text")}
-                      name="email"
-                      type="readOnly"
-                      readOnly={true}
-                      value={formValues.email}
-                    />
-                  </div>
+                      <div className="grid grid-cols-1 gap-3">
+                        <InputFieldFormik
+                          label={t("my_profile.email_text")}
+                          name="email"
+                          type="readOnly"
+                          readOnly={true}
+                          value={formValues.email}
+                        />
+                      </div>
 
-                  <div className="grid grid-cols-1 gap-3">
-                    <InputFieldFormik
-                      label={t("my_profile.phone_number_text")}
-                      name="phone"
-                      type="readOnly"
-                      readOnly={true}
-                      value={formValues.mobile_number}
-                    />
-                  </div>
+                      <div className="grid grid-cols-1 gap-3">
+                        <InputFieldFormik
+                          label={t("my_profile.phone_number_text")}
+                          name="phone"
+                          type="readOnly"
+                          readOnly={true}
+                          value={formValues.mobile_number}
+                        />
+                      </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                    <div>
-                      <InputFieldFormik
-                        label={t("my_profile.city_text")}
-                        name="city"
-                        type="text"
-                        placeholder="Enter your city"
-                        value={formValues.city}
-                        onChange={(e) => {
-                          values.city = e.target.value;
-                          setFormValues((prevformValues) => ({
-                            ...prevformValues,
-                            city: e.target.value,
-                          }));
-                        }}
-                      />
-                    </div>
-                    <div>
-                      <InputFieldFormik
-                        label={t("my_profile.state_text")}
-                        name="state"
-                        type="text"
-                        placeholder="Enter your state"
-                        value={formValues.state}
-                        onChange={(e) => {
-                          values.state = e.target.value;
-                          setFormValues((prevformValues) => ({
-                            ...prevformValues,
-                            state: e.target.value,
-                          }));
-                        }}
-                      />
-                    </div>
-                  </div>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        <div>
+                          <InputFieldFormik
+                            label={t("my_profile.city_text")}
+                            name="city"
+                            type="text"
+                            placeholder="Enter your city"
+                            value={formValues.city}
+                            onChange={(e) => {
+                              values.city = e.target.value;
+                              setFormValues((prevformValues) => ({
+                                ...prevformValues,
+                                city: e.target.value,
+                              }));
+                            }}
+                          />
+                        </div>
+                        <div>
+                          <InputFieldFormik
+                            label={t("my_profile.state_text")}
+                            name="state"
+                            type="text"
+                            placeholder="Enter your state"
+                            value={formValues.state}
+                            onChange={(e) => {
+                              values.state = e.target.value;
+                              setFormValues((prevformValues) => ({
+                                ...prevformValues,
+                                state: e.target.value,
+                              }));
+                            }}
+                          />
+                        </div>
+                      </div>
 
-                  <div className="grid grid-cols-1 gap-3">
-                    <InputFieldFormik
-                      label={t("my_profile.street_address_text")}
-                      name="street"
-                      type="text"
-                      placeholder="Enter your street address"
-                      value={formValues.street}
-                      onChange={(e) => {
-                        values.street = e.target.value;
-                        setFormValues((prevformValues) => ({
-                          ...prevformValues,
-                          street: e.target.value,
-                        }));
-                      }}
-                    />
-                  </div>
+                      <div className="grid grid-cols-1 gap-3">
+                        <InputFieldFormik
+                          label={t("my_profile.street_address_text")}
+                          name="street"
+                          type="text"
+                          placeholder="Enter your street address"
+                          value={formValues.street}
+                          onChange={(e) => {
+                            values.street = e.target.value;
+                            setFormValues((prevformValues) => ({
+                              ...prevformValues,
+                              street: e.target.value,
+                            }));
+                          }}
+                        />
+                      </div>
 
-                  {/* <div className="grid grid-cols-1 gap-3">
+                      {/* <div className="grid grid-cols-1 gap-3">
                     <InputFieldFormik
                       label={t("my_profile.password_text")}
                       name="password"
@@ -430,15 +432,21 @@ export default function MyProfile() {
                     />
                   </div> */}
 
-                  <Button
-                    type="submit"
-                    label={t("my_profile.save_changes_text")}
-                    className="bg-background_steel_blue w-full text-text_white hover:bg-gray-100 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2"
-                    disabled={isSubmitting}
-                  />
-                </Form>
-              )}
-            </Formik>
+                      <Button
+                        type="submit"
+                        label={t("my_profile.save_changes_text")}
+                        className="bg-background_steel_blue w-full text-text_white hover:bg-gray-100 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2"
+                        disabled={isSubmitting}
+                      />
+                    </Form>
+                  )}
+                </Formik>
+              </div>
+
+              <div className="bg-background_steel_blue rounded-md flex items-center justify-center">
+                  <img src="/assets/myprofile/Logo.png" alt="Camelo Logo" className="m-auto"/>
+              </div>
+            </div>
           </div>
         </main>
       )}

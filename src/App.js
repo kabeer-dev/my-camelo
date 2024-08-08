@@ -39,6 +39,11 @@ import AgentPaymentFailed from "./components/agent/paymentconfirmation/PaymentFa
 import AgentEmailSentPage from "./components/agent/paymentconfirmation/EmailSentPage";
 import AgentThankYou from "./components/agent/paymentconfirmation/ThankYou";
 
+import NotFound from "./NotFound";
+import UnderMaintenance from "./UnderMaintenance";
+import TemporarilyUnavailable from "./TemporarilyUnavailable";
+import Terms from "./Terms";
+
 
 function App() {
   const { isLoggedIn } = useSelector((state) => state.auth);
@@ -83,6 +88,11 @@ function App() {
         <Route path="/agent/payment-failed" element={<AgentPaymentFailed />} />
         <Route path="/agent/email-sent" element={<AgentEmailSentPage />} />
         <Route path="/agent/thank-you" element={<AgentThankYou />} />
+
+        <Route path="*" element={<NotFound />} />
+        <Route path="/under-maintenance" element={<UnderMaintenance />} />
+        <Route path="/temporarily-unavailable" element={<TemporarilyUnavailable />} />
+        <Route path="/terms-condition" element={<Terms />} />
       </Routes>
     </BrowserRouter>
   );

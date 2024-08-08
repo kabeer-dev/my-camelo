@@ -66,7 +66,7 @@ export default function PaymentMethod({
         arrival_time: formValues.arrivalTime,
         langauge: language,
       };
-    //  console.log('ff', payData)
+      //  console.log('ff', payData)
       try {
         const response = await axios.post(
           `${API_BASE_URL}/api/method/airport_transport.api.bookings.get_payment_methods`,
@@ -157,7 +157,7 @@ export default function PaymentMethod({
         setShowPriceBtn(false)
       }
     } catch (error) {
-      if(error.response.data.msg === 'No Trip Pricing Template found'){
+      if (error.response.data.msg === 'No Trip Pricing Template found') {
         message.error(error.response.data.msg)
       }
       console.log("Error", error);
@@ -222,7 +222,7 @@ export default function PaymentMethod({
       service_type: rideName,
       ride_proposal: proposal,
       booking_hours: formValues?.bookingByHours ? formValues.bookingByHours : '',
-      user: formValues?.agentUser ? formValues.agentUser : ''  
+      user: formValues?.agentUser ? formValues.agentUser : ''
     }
 
     console.log('ttt', bookingData)
@@ -300,7 +300,7 @@ export default function PaymentMethod({
           "language": language,
           "hours":
             rideName === "Book Vehicle In Hours" ? formValues?.bookingByHours : "",
-            "user": formValues?.agentUser ? formValues.agentUser : '',
+          "user": formValues?.agentUser ? formValues.agentUser : '',
         }
       }
 
@@ -396,6 +396,12 @@ export default function PaymentMethod({
               </div>
             </div>
           ))}
+
+          {getPaymentMethods.length <= 0 && (
+            <div>
+              <p className="text-center mt-5">{t("payment_not_available_text")}</p>
+            </div>
+          )}
 
           {showPriceBtn && (
             <div>

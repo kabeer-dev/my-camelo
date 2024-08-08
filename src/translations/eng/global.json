@@ -160,7 +160,7 @@
     "confirm_text": "Confirm",
     "payment_successful_text": "The payment was successful",
     "thank_you_big_text": "Thank you for using our application! We are pleased to inform you that your order has been successfully paid",
-    "back_home_text": "Back to Home",
+    "back_home_text": "Back To Home",
     "done_text": "Done",
     "payment_failed_text": "Payment failed",
     "payment_failed_long_text": "Payment failed, check whether you or the card issuing bank have sufficient balance",
@@ -203,6 +203,10 @@
     "get_ride_price_text": "Get Ride Price",
     "processed_text": "Processed",
     "pending_text": "Pending",
+    "payment_not_available_text": "Payment Method is not available yet",
+    "not_found_text" : "Page Not Found", 
+    "maintenance_text":"Sorry, Website is Under Maintenance. Please Try Again Later",
+    "service_unavailable_text":"Sorry, This Service is Temporarily Unavailable, Please Try Again Later",
     "errors": {
         "rider_name_error": "First Name is required",
         "last_name_error": "Last Name is required",
@@ -229,6 +233,7 @@
         "phone_digit_error": "Phone Number must be only digits",
         "postal_error": "Postal Code is required",
         "postal_must_error": "Postal Code must be only digits",
-        "hour_2_error": "You cannot select a time earlier than two hours from now."
+        "hour_2_error": "You cannot select a time earlier than Eight hours from now.",
+        "date_first_error": "Please first select arrival date"
     }
 }
