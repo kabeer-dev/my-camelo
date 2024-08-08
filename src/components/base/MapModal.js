@@ -443,7 +443,9 @@ export default function MapModal({ rideName, formValues, onSubmitDestination, zo
                       onClick={() => setSelectedPickup(null)} />}
                     {selectedDropoff && <Marker position={selectedDropoff} label={t("hero.dropoff_text")} icon={{ url: '/assets/map/dropoff.png' }}
                       onClick={() => {
-                        if (!rideName === "airportRide" && !formValues.rideType === t("hero.dropoff_value_text")) {
+                        if (rideName === "airportRide" && formValues.rideType === t("hero.dropoff_value_text")) {
+                          setSelectedDropoff(selectedDropoff)
+                        }else{
                           setSelectedDropoff(null)
                         }
                       }} />}
