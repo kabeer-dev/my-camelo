@@ -184,35 +184,52 @@ export default function MapModal({ rideName, formValues, onSubmitDestination, zo
         //   }
         //   setSelectedDropoff(point);
         // }
+        if (formValues.rideType === t("hero.dropoff_value_text")) {
+          if (!selectedPickup) {
+            const apiKey = "AIzaSyBMTLXpuXtkEfbgChZzsj7LPYlpGxHI9iU";
+            const url = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${point.lat},${point.lng}&key=${apiKey}`;
 
-        if (!selectedPickup) {
-          const apiKey = "AIzaSyBMTLXpuXtkEfbgChZzsj7LPYlpGxHI9iU";
-          const url = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${point.lat},${point.lng}&key=${apiKey}`;
+            try {
+              const response = await axios.get(url);
+              const location = response.data.results[0].formatted_address;
+              // console.log('Location:', location);
+              setLocation(`${location} Saudi Arabia`);
+              setSelectedPickup(point);
+            } catch (error) {
+              console.error('Error fetching location:', error.message);
+            }
 
-          try {
-            const response = await axios.get(url);
-            const location = response.data.results[0].formatted_address;
-            // console.log('Location:', location);
-            setLocation(`${location} Saudi Arabia`);
-            setSelectedPickup(point);
-          } catch (error) {
-            console.error('Error fetching location:', error.message);
           }
-
         } else {
-          const apiKey = "AIzaSyBMTLXpuXtkEfbgChZzsj7LPYlpGxHI9iU";
-          const url = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${point.lat},${point.lng}&key=${apiKey}`;
+          if (!selectedPickup) {
+            const apiKey = "AIzaSyBMTLXpuXtkEfbgChZzsj7LPYlpGxHI9iU";
+            const url = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${point.lat},${point.lng}&key=${apiKey}`;
 
-          try {
-            const response = await axios.get(url);
-            const location = response.data.results[0].formatted_address;
-            // console.log('Location:', location);
-            setDestination(`${location} Saudi Arabia`);
-            setSelectedDropoff(point);
-          } catch (error) {
-            console.error('Error fetching location:', error.message);
+            try {
+              const response = await axios.get(url);
+              const location = response.data.results[0].formatted_address;
+              // console.log('Location:', location);
+              setLocation(`${location} Saudi Arabia`);
+              setSelectedPickup(point);
+            } catch (error) {
+              console.error('Error fetching location:', error.message);
+            }
+
+          } else {
+            const apiKey = "AIzaSyBMTLXpuXtkEfbgChZzsj7LPYlpGxHI9iU";
+            const url = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${point.lat},${point.lng}&key=${apiKey}`;
+
+            try {
+              const response = await axios.get(url);
+              const location = response.data.results[0].formatted_address;
+              // console.log('Location:', location);
+              setDestination(`${location} Saudi Arabia`);
+              setSelectedDropoff(point);
+            } catch (error) {
+              console.error('Error fetching location:', error.message);
+            }
+
           }
-
         }
 
       } else if (rideName === "scheduledRide") {
@@ -422,8 +439,14 @@ export default function MapModal({ rideName, formValues, onSubmitDestination, zo
                       }}
                     /> */}
 
-                    {selectedPickup && <Marker position={selectedPickup} label={t("hero.pickup_text")} icon={{ url: '/assets/map/pickup.png' }} onClick={() => setSelectedPickup(null)} />}
-                    {selectedDropoff && <Marker position={selectedDropoff} label={t("hero.dropoff_text")} icon={{ url: '/assets/map/dropoff.png' }} onClick={() => setSelectedDropoff(null)} />}
+                    {selectedPickup && <Marker position={selectedPickup} label={t("hero.pickup_text")} icon={{ url: '/assets/map/pickup.png' }}
+                      onClick={() => setSelectedPickup(null)} />}
+                    {selectedDropoff && <Marker position={selectedDropoff} label={t("hero.dropoff_text")} icon={{ url: '/assets/map/dropoff.png' }}
+                      onClick={() => {
+                        if (!rideName === "airportRide" && !formValues.rideType === t("hero.dropoff_value_text")) {
+                          setSelectedDropoff(null)
+                        }
+                      }} />}
 
                     {/* Standalone Search Box */}
                     <StandaloneSearchBox
