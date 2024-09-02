@@ -8,9 +8,10 @@ import { useNavigate, useLocation } from "react-router-dom";
 import AuthFooter from "../base/AuthFooter";
 import { setLoading } from "../../../redux/actions/loaderAction";
 import { useDispatch, useSelector } from "react-redux";
-import axios from "axios";
+// import axios from "axios";
 import { message } from "antd";
 import { useTranslation } from "react-i18next";
+import axiosInstance from '../../../Api';
 
 export default function ForgetPassword() {
   const navigate = useNavigate();
@@ -34,12 +35,12 @@ export default function ForgetPassword() {
   const onSubmit = async(values, { setSubmitting }) => {
     dispatch(setLoading(true))
     try {
-      const response = await axios.get(
+      const response = await axiosInstance.get(
         `${API_BASE_URL}/api/method/airport_transport.api.user.reset_password?email=${values.email}`,
       );
       // Redirect to OTP verification screen
       if (response?.status === 200) {
-        navigate("/agent/forget-password-otp", {state: {email: values.email}});
+        navigate("/mashrouk-new-ui/agent/forget-password-otp", {state: {email: values.email}});
       }
     } catch (error) {
       message.error(`${error?.response?.data?.msg}`);
@@ -55,14 +56,14 @@ export default function ForgetPassword() {
       <div className="h-screen w-screen position relative" dir={language === 'ar' ? 'rtl' : "ltr"}>
         <div className="position absolute left-0 top-0">
           <img
-            src="/assets/signin/left_vector.png"
+            src="./assets/signin/left_vector.png"
             alt="left_vector"
             className="w-24 h-24 md:w-48 md:h-48"
           />
         </div>
         <div className="position absolute right-0 bottom-0">
           <img
-            src="/assets/signin/right_vector.png"
+            src="./assets/signin/right_vector.png"
             alt="right_vector"
             className="w-24 md:w-48 h-18 md:h-36"
           />
@@ -70,9 +71,9 @@ export default function ForgetPassword() {
 
         <div className="z-20 w-screen h-screen flex flex-row justify-center items-center">
           <div className="flex flex-col justify-center items-center">
-            <div className="mb-4 cursor-pointer" onClick={() => navigate("/agent")}>
+            <div className="mb-4 cursor-pointer" onClick={() => navigate("/mashrouk-new-ui/agent")}>
               <img
-                src="/assets/signin/logo.png"
+                src="./assets/signin/logo.png"
                 alt="Moshrouk Trips"
                 className="w-16 h-13"
               />

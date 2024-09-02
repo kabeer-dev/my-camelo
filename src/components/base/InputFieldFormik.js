@@ -129,7 +129,7 @@ const InputFieldFormik = ({
             optionFilterProp="children"
             onChange={handleSelectChange}
             options={options}
-            value={value}
+            // value={value}
             filterOption={(input, option) =>
               (option?.label ?? "").toLowerCase().includes(input.toLowerCase())
             }
@@ -141,7 +141,10 @@ const InputFieldFormik = ({
       {type === "checkbox" && (
         <div className="mb-3 flex flex-row justify-between items-center">
           <div>
-            <div className="text-sm">{`${t("hero.select_shared_ride_text")} ${percentageValue}%`}</div>
+            <div className="text-sm text-text_grey">
+              <span>{`${t("hero.select_shared_ride_text")}`} </span>
+              <span className="text-text_steel_blue font-bold">{language === 'eng' ? 'discount' : 'تخفيض'} {percentageValue}%</span>
+            </div>
           </div>
           <div>
             <Field

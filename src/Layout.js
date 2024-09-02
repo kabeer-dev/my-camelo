@@ -7,9 +7,10 @@ import Loader from "./components/loader/Loader";
 import Header from "./components/base/Header";
 import Footer from "./components/base/Footer";
 import { useDispatch, useSelector } from "react-redux";
-import axios from "axios";
+// import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { setLoading } from "./redux/actions/loaderAction";
+import axiosInstance from "./Api";
 
 export default function Layout() {
   // Define array of menu items with corresponding component IDs
@@ -32,10 +33,10 @@ export default function Layout() {
     if (email && isLoggedIn) {
       const checkUser = async () => {
         try {
-          const response = await axios.post(`${API_BASE_URL}/api/method/airport_transport.api.user.detect_email?email=${email}`);
+          const response = await axiosInstance.post(`${API_BASE_URL}/api/method/airport_transport.api.user.detect_email?email=${email}`);
           if (response && response.status === 200) {
             if(response.data.msg !== 'Transport User'){
-              navigate('/agent')
+              navigate('/mashrouk-new-ui/agent')
             }
           }
         } catch (error) {

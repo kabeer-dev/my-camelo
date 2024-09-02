@@ -8,12 +8,13 @@ import { useLocation, useNavigate } from "react-router-dom";
 import AuthFooter from "../base/AuthFooter";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import { setLoading } from "../../../redux/actions/loaderAction";
-import axios from "axios";
+// import axios from "axios";
 import { useDispatch, useSelector } from "react-redux";
 import { message } from "antd";
 import Recaptcha from "../base/Recaptcha";
 import { signInRequest } from "../../../redux/actions/authActions";
 import { useTranslation } from "react-i18next";
+import axiosInstance from '../../../Api';
 
 export default function ResetPassword() {
   const location = useLocation();
@@ -58,7 +59,7 @@ export default function ResetPassword() {
     } else {
       dispatch(setLoading(true));
       try {
-        const response = await axios.get(
+        const response = await axiosInstance.get(
           `${API_BASE_URL}/api/method/airport_transport.api.user.update_password?otp=${otp}&new_password=${values.newPassword}`
         );
         if (response?.status === 200) {
@@ -96,14 +97,14 @@ export default function ResetPassword() {
     <div className="h-screen w-screen position relative" dir={language === 'ar' ? 'rtl' : 'ltr'}>
       <div className="position absolute left-0 top-0">
         <img
-          src="/assets/signin/left_vector.png"
+          src="./assets/signin/left_vector.png"
           alt="left_vector"
           className="w-20 h-20 md:w-48 md:h-48"
         />
       </div>
       <div className="position absolute right-0 bottom-0">
         <img
-          src="/assets/signin/right_vector.png"
+          src="./assets/signin/right_vector.png"
           alt="right_vector"
           className="w-16 md:w-48 h-12 md:h-36"
         />
@@ -111,9 +112,9 @@ export default function ResetPassword() {
 
       <div className="z-20 w-screen h-screen flex flex-row justify-center items-center">
         <div className="flex flex-col justify-center items-center">
-          <div className="mb-4 cursor-pointer" onClick={() => navigate("/agent")}>
+          <div className="mb-4 cursor-pointer" onClick={() => navigate("/mashrouk-new-ui/agent")}>
             <img
-              src="/assets/signin/logo.png"
+              src="./assets/signin/logo.png"
               alt="Moshrouk Trips"
               className="w-16 h-13"
             />

@@ -4,10 +4,11 @@ import { useSelector, useDispatch } from "react-redux";
 import BookingCard from "../base/BookingCard";
 import { Input } from "antd";
 import { setLoading } from "../../redux/actions/loaderAction";
-import axios from "axios";
+// import axios from "axios";
 import Header from "../base/Header";
 import Footer from "../base/Footer";
 import { useTranslation } from "react-i18next";
+import axiosInstance from '../../Api';
 
 export default function MyBooking() {
   const token = useSelector((state) => state.auth.token);
@@ -25,7 +26,7 @@ export default function MyBooking() {
     dispatch(setLoading(true));
     const getUserDetails = async () => {
       try {
-        const response = await axios.get(`${API_BASE_URL}/api/method/airport_transport.api.bookings.my_bookings?page=1&language=${language ? language : 'eng'}`, {
+        const response = await axiosInstance.get(`${API_BASE_URL}/api/method/airport_transport.api.bookings.my_bookings?page=1&language=${language ? language : 'eng'}`, {
           headers: {
             'Content-Type': 'application/x-www-form-urlencoded',
             'Authorization': `Bearer ${token}`
@@ -145,12 +146,13 @@ export default function MyBooking() {
   }, []);
 
   const handleSearch = async (e) => {
+    dispatch(setLoading(true))
     if (e.target.value === "") {
       const value = e.target.value.toLowerCase();
       setSearchText(value);
       dispatch(setLoading(true));
       try {
-        const response = await axios.get(`${API_BASE_URL}/api/method/airport_transport.api.bookings.my_bookings?page=1&language=${language ? language : 'eng'}`, {
+        const response = await axiosInstance.get(`${API_BASE_URL}/api/method/airport_transport.api.bookings.my_bookings?page=1&language=${language ? language : 'eng'}`, {
           headers: {
             'Content-Type': 'application/x-www-form-urlencoded',
             'Authorization': `Bearer ${token}`
@@ -173,6 +175,7 @@ export default function MyBooking() {
       );
       setFilteredBookings(filtered);
     }
+    dispatch(setLoading(false))
   };
 
   useEffect(() => {
@@ -190,7 +193,7 @@ export default function MyBooking() {
       <Header />
 
       <div className="pt-20 lg:pt-20" dir={language === 'ar' ? 'rtl' : 'ltr'}>
-        <div className="px-14 py-7 border-t border-text_white bg-background_steel_blue">
+        <div className="md:px-14 py-7 border-t border-text_white bg-background_steel_blue">
           <div>
             <Input.Search
               placeholder={t("my_booking.search_bookings_text")}
@@ -200,7 +203,7 @@ export default function MyBooking() {
             />
           </div>
           {/* card content should be here */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-x-10 gap-y-0">
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-x-10 gap-y-0">
             {/* card of booking */}
             {filteredPageBookings &&
               filteredPageBookings.map((booking) => (
@@ -212,8 +215,6 @@ export default function MyBooking() {
           )}
 
           <div className="flex justify-end mt-3">
-
-
             {/* <nav aria-label="Page navigation example">
               <ul class="flex items-center -space-x-px h-8 text-sm">
                 <li>
@@ -261,7 +262,7 @@ export default function MyBooking() {
                 </li>
                 {totalPages.map((data, index) => (
                   <li onClick={() => setCurrentPage(data.id)}>
-                    <a className={`flex items-center justify-center cursor-pointer px-4 h-10 leading-tight ${currentPage === data.id ? 'text-text_white bg-background_steel_blue' : 'text-text_steel_blue bg-background_white'} border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white`}>{data.id}</a>
+                    <a className={`flex items-center justify-center cursor-pointer md:px-4 px-1 h-10 leading-tight ${currentPage === data.id ? 'text-text_white bg-background_steel_blue' : 'text-text_steel_blue bg-background_white'} border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white`}>{data.id}</a>
                   </li>
                 ))}
 

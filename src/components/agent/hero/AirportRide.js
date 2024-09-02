@@ -15,9 +15,10 @@ import HomeEmailSignUp from "./HomeEmailSignUp";
 import VehicleTypeModal from "../base/VehicleTypeModal";
 import { setLoading } from "../../../redux/actions/loaderAction";
 import PaymentMethod from "./PaymentMethod";
-import axios from "axios";
+// import axios from "axios";
 import { message } from "antd";
 import { useTranslation } from "react-i18next";
+import axiosInstance from '../../../Api';
 
 export default function AirportRide(
   {
@@ -41,7 +42,9 @@ export default function AirportRide(
     otp,
     setOtp,
     phoneOtp,
-    setPhoneOtp
+    setPhoneOtp,
+    showPaybylinkQr,
+    setShowPaybylinkQr
   }) {
   const dispatch = useDispatch();
   const { cities } = useSelector((state) => state.cities);
@@ -107,24 +110,28 @@ export default function AirportRide(
 
   const [VehicleTypeWithService, setVehicleTypeWithService] = useState(null);
   const [vehicleTypeName, setVehicleTypeName] = useState("");
-  
+
   useEffect(() => {
     dispatch(setLoading(true));
     const getVechileTypes = async () => {
-      try {
-        const response = await axios.get(`${API_BASE_URL}/api/method/airport_transport.api.bookings.get_vehicle_types?language=${language ? language : 'eng'}&service=Airport Trip`);
-        if (response && response.status === 200) {
-          // console.log('hhh', response.data)
-          setVehicleTypeWithService(response.data)
+      if (cityName) {
+        try {
+          const response = await axiosInstance.get(
+            `${API_BASE_URL}/api/method/airport_transport.api.bookings.get_vehicle_types?language=${
+              language ? language : "en"
+            }&service=Airport Trip&city=${cityName}`
+          );
+          if (response && response.status === 200) {
+            setVehicleTypeWithService(response.data);
+          }
+        } catch (error) {
+          console.log("Error", error);
         }
-      } catch (error) {
-        console.log('Error', error)
       }
-    }
+    };
     getVechileTypes();
     dispatch(setLoading(false));
-
-  }, []);
+  }, [cityName]);
 
   const [sharedRideValue, setSharedRideValue] = useState("");
   useEffect(() => {
@@ -132,7 +139,7 @@ export default function AirportRide(
       dispatch(setLoading(true))
       if (vehicleTypeName !== "") {
         try {
-          const response = await axios.get(
+          const response = await axiosInstance.get(
             `${API_BASE_URL}/api/method/airport_transport.api.bookings.get_ride_discount?vehicle_type=${vehicleTypeName}&language=${language ? language : 'eng'}`
           );
           if (response && response.status === 200) {
@@ -154,7 +161,7 @@ export default function AirportRide(
       dispatch(setLoading(true))
 
       try {
-        const response = await axios.get(
+        const response = await axiosInstance.get(
           `${API_BASE_URL}/api/method/airport_transport.api.agent.get_transport_users`,
           {
             headers: {
@@ -183,7 +190,7 @@ export default function AirportRide(
     getUsers()
   }, [formValues]);
 
-  
+
   // console.log('vehicleTypes', vehicleTypes)
   useEffect(() => {
     if (vehicleTypeName !== "") {
@@ -214,47 +221,47 @@ export default function AirportRide(
     }
   }, [dispatch, cityName]);
 
-  useEffect(() => {
-    if (cities.data?.length > 0 && !cityName) {
-      setFormValues((prevValues) => ({
-        ...prevValues,
-        "arrivalCity": cities.data[0],
-      }));
-      setOnChangeFormValues((prevValues) => ({
-        ...prevValues,
-        "arrivalCity": cities.data[0],
-      }));
+  // useEffect(() => {
+  //   if (cities.data?.length > 0 && !cityName) {
+  //     setFormValues((prevValues) => ({
+  //       ...prevValues,
+  //       "arrivalCity": cities.data[0],
+  //     }));
+  //     setOnChangeFormValues((prevValues) => ({
+  //       ...prevValues,
+  //       "arrivalCity": cities.data[0],
+  //     }));
 
-      setCityName(cities.data[0])
-    }
-  }, [cities])
+  //     setCityName(cities.data[0])
+  //   }
+  // }, [cities])
 
-  useEffect(() => {
-    if (airports.data?.length > 0) {
-      setFormValues((prevValues) => ({
-        ...prevValues,
-        "airportName": airports.data[0].airport,
-      }));
-      setOnChangeFormValues((prevValues) => ({
-        ...prevValues,
-        "airportName": airports.data[0].airport,
-      }));
+  // useEffect(() => {
+  //   if (airports.data?.length > 0) {
+  //     setFormValues((prevValues) => ({
+  //       ...prevValues,
+  //       "airportName": airports.data[0].airport,
+  //     }));
+  //     setOnChangeFormValues((prevValues) => ({
+  //       ...prevValues,
+  //       "airportName": airports.data[0].airport,
+  //     }));
 
-      setFormValues((prevValues) => ({
-        ...prevValues,
-        "terminalNumber": airports.data[0].terminals[0].terminal,
-      }));
-      setOnChangeFormValues((prevValues) => ({
-        ...prevValues,
-        "terminalNumber": airports.data[0].terminals[0].terminal,
-      }));
-      const terminals = airports.data[0].terminals.map((terminal) => terminal.terminal);
-      setTerminalOptions(terminals)
-      setSelectedPickup(airports.data[0].terminals[0].location)
-      setLocation(airports.data[0].terminals[0].location)
+  //     setFormValues((prevValues) => ({
+  //       ...prevValues,
+  //       "terminalNumber": airports.data[0].terminals[0].terminal,
+  //     }));
+  //     setOnChangeFormValues((prevValues) => ({
+  //       ...prevValues,
+  //       "terminalNumber": airports.data[0].terminals[0].terminal,
+  //     }));
+  //     const terminals = airports.data[0].terminals.map((terminal) => terminal.terminal);
+  //     setTerminalOptions(terminals)
+  //     setSelectedPickup(airports.data[0].terminals[0].location)
+  //     setLocation(airports.data[0].terminals[0].location)
 
-    }
-  }, [airports, cityName])
+  //   }
+  // }, [airports, cityName])
 
   const steps = useMemo(() => {
     const baseSteps = [
@@ -343,6 +350,8 @@ export default function AirportRide(
               setHidePhoneCreateAccountButton={setHidePhoneCreateAccountButton}
               setShowPhoneOTPScreen={setShowPhoneOTPScreen}
               setShowPaymentMethod={setShowPaymentMethod}
+              showPaybylinkQr={showPaybylinkQr}
+              setShowPaybylinkQr={setShowPaybylinkQr}
               rideName="Airport Trip"
             />
 
@@ -370,6 +379,8 @@ export default function AirportRide(
               setOtp={setOtp}
               phoneOtp={phoneOtp}
               setPhoneOtp={setPhoneOtp}
+              showPaybylinkQr={showPaybylinkQr}
+              setShowPaybylinkQr={setShowPaybylinkQr}
             />
           ) : (
             <Formik
@@ -379,18 +390,18 @@ export default function AirportRide(
               onSubmit={async (values, { setSubmitting }) => {
                 if (!location || !destination) {
                   message.error(t("hero.errors.map_required"));
-                }
-                dispatch(setLoading(true));
-
-                if (isLoggedIn) {
-                  dispatch(setLoading(false));
-                  setShowPaymentMethod(true)
                 } else {
-                  dispatch(setLoading(false));
-                  setSubTab(4)
-                  setShowSignUp(true);
-                }
+                  dispatch(setLoading(true));
 
+                  if (isLoggedIn) {
+                    dispatch(setLoading(false));
+                    setShowPaymentMethod(true)
+                  } else {
+                    dispatch(setLoading(false));
+                    setSubTab(4)
+                    setShowSignUp(true);
+                  }
+                }
                 dispatch(setLoading(false))
                 setSubmitting(false);
               }}
@@ -574,7 +585,8 @@ export default function AirportRide(
                           />
                         </div>
 
-                        <div>
+                        <div className="border border-bg_light_gray p-2 mt-3">
+                          <p className="text-lg text-text_grey font-bold">{t("hero.shared_ride_text")}!!</p>
                           <InputFieldFormik
                             label={t("hero.shared_ride_text")}
                             name="sharedRide"
@@ -599,27 +611,27 @@ export default function AirportRide(
                         </div>
 
                         {formValues.sharedRide && (
-                        <InputFieldFormik
-                          label={t("hero.seat_number_text")}
-                          name="seatNumber"
-                          type="select"
-                          value={
-                            formValues.seatNumber ||
-                            onChangeFormValues.seatNumber
-                          }
-                          options={seatNumberOptions.map((seatNumber) => ({
-                            value: seatNumber,
-                            label: seatNumber,
-                          }))}
-                          onChange={({ fieldName, selectedValue }) => {
-                            setFieldValue(fieldName, selectedValue);
-                            setOnChangeFormValues((prevValues) => ({
-                              ...prevValues,
-                              [fieldName]: selectedValue,
-                            }));
-                          }}
-                          required
-                        />
+                          <InputFieldFormik
+                            label={t("hero.seat_number_text")}
+                            name="seatNumber"
+                            type="select"
+                            value={
+                              formValues.seatNumber ||
+                              onChangeFormValues.seatNumber
+                            }
+                            options={seatNumberOptions.map((seatNumber) => ({
+                              value: seatNumber,
+                              label: seatNumber,
+                            }))}
+                            onChange={({ fieldName, selectedValue }) => {
+                              setFieldValue(fieldName, selectedValue);
+                              setOnChangeFormValues((prevValues) => ({
+                                ...prevValues,
+                                [fieldName]: selectedValue,
+                              }));
+                            }}
+                            required
+                          />
                         )}
 
                         <InputFieldFormik
@@ -660,15 +672,15 @@ export default function AirportRide(
                           }}
                           required
                         />
-                        <div className="mt-3 flex flex-col md:flex-row justify-between items-center">
+                        <div className="mt-3 flex flex-row justify-between items-center">
                           <Button
-                            className="bg-bg_btn_back w-full text-text_white hover:bg-gray-100 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2"
+                            className="bg-bg_btn_back w-1/2 text-text_white hover:bg-gray-100 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2"
                             onClick={() => handlePrevious(1, values)}
                             label={t("previous_text")}
                             type="button"
                           />
                           <Button
-                            className="bg-background_steel_blue w-full text-text_white hover:bg-gray-100 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2"
+                            className="bg-background_steel_blue w-1/2 text-text_white hover:bg-gray-100 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2"
                             onClick={() => {
                               // console.log('aaaa', values)
                               values.vehicleType = vehicleTypeName;
@@ -712,15 +724,15 @@ export default function AirportRide(
                             />
                           </div>
                         </div>
-                        <div className="mt-3 flex flex-col md:flex-row justify-between items-center">
+                        <div className="mt-3 flex flex-row justify-between items-center">
                           <Button
-                            className="bg-bg_btn_back w-full text-text_white hover:bg-gray-100 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2"
+                            className="bg-bg_btn_back w-1/2 text-text_white hover:bg-gray-100 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2"
                             onClick={() => handlePrevious(2, values)}
                             label={t("previous_text")}
                             type="button"
                           />
                           <Button
-                            className="bg-background_steel_blue w-full text-text_white hover:bg-gray-100 font-medium rounded-lg text-sm px-5 py-2.5 mb-2"
+                            className="bg-background_steel_blue w-1/2 text-text_white hover:bg-gray-100 font-medium rounded-lg text-sm px-5 py-2.5 mb-2"
                             label={t("submit_text")}
                             type="submit"
                           />

@@ -4,10 +4,11 @@ import { useSelector, useDispatch } from "react-redux";
 import BookingCard from "../base/BookingCard";
 import { Input } from "antd";
 import { setLoading } from "../../../redux/actions/loaderAction";
-import axios from "axios";
+// import axios from "axios";
 import Header from "../base/Header";
 import Footer from "../base/Footer";
 import { useTranslation } from "react-i18next";
+import axiosInstance from '../../../Api';
 
 export default function MyBooking() {
   const token = useSelector((state) => state.auth.token);
@@ -25,7 +26,7 @@ export default function MyBooking() {
     dispatch(setLoading(true));
     const getUserDetails = async () => {
       try {
-        const response = await axios.get(
+        const response = await axiosInstance.get(
           `${API_BASE_URL}/api/method/airport_transport.api.agent.get_bookings?page=1&language=${language ? language : "eng"
           }`,
           {
@@ -154,7 +155,7 @@ export default function MyBooking() {
       setSearchText(value);
       dispatch(setLoading(true));
       try {
-        const response = await axios.get(
+        const response = await axiosInstance.get(
           `${API_BASE_URL}/api/method/airport_transport.api.agent.get_bookings?page=1&language=${language ? language : "eng"
           }`,
           {

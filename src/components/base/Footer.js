@@ -28,7 +28,7 @@ export default function Footer() {
 
     const footerItemsTwo = [
         { text: t("footer.items_2.privacy_text"), href: "#" },
-        { text: t("footer.items_2.terms_text"), href: "#" },
+        { text: t("footer.items_2.terms_text"), href: "/mashrouk-new-ui/terms-condition" },
         { text: t("footer.items_2.cookies_text"), href: "#" },
     ];
 
@@ -51,7 +51,7 @@ export default function Footer() {
                 <footer className="w-full py-3 md:py-6 px-10 md:px-20 flex flex-col items-center justify-center bg-background_steel_blue text-text_white" dir={language === 'ar' ? 'rtl' : 'ltr'}>
                     <div className="mb-4">
                         <img
-                            src="/assets/footer/logo.png"
+                            src="./assets/footer/logo.png"
                             alt="Mashrook Trips"
                             className="w-16 md:w-32 h-16 md:h-32"
                         />
@@ -74,7 +74,7 @@ export default function Footer() {
                             {!isLoggedIn && (
 
                                 <li
-                                    onClick={() => navigate("/sign-in")}
+                                    onClick={() => navigate("/mashrouk-new-ui/sign-in")}
                                     className="text-text_white block cursor-pointer py-1 md:py-2 pr-2 md:pr-4 pl-2 md:pl-3 text-white rounded bg-primary-700 lg:bg-transparent lg:text-primary-700 lg:p-0 dark:text-white"
                                 >
                                     {t("footer.sign_in_text")}
@@ -84,7 +84,7 @@ export default function Footer() {
                                 <li>
                                     <Button
                                         className="hidden md:flex cursor-pointer text-text_steel_blue bg-background_white border border-gray-300 focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-100 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:border-gray-600 dark:focus:ring-gray-700"
-                                        onClick={() => navigate("/agent/create-new-account")}
+                                        onClick={() => navigate("/mashrouk-new-ui/agent/create-new-account")}
                                         label={t("footer.create_text")}
                                         type="button"
                                     />

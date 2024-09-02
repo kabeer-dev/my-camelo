@@ -1,7 +1,7 @@
 // authSaga.js
 
 import { takeEvery, put, all } from "redux-saga/effects";
-import axios from "axios";
+// import axios from "axios";
 import {
   SIGN_IN_REQUEST,
   SIGN_OUT_REQUEST,
@@ -17,6 +17,7 @@ import {
 import { message } from "antd";
 import { setLoading } from "../actions/loaderAction";
 import secureLocalStorage from "react-secure-storage";
+import axiosInstance from "../../Api";
 
 const API_BASE_URL = process.env.REACT_APP_BASE_URL_AMK_TEST;
 
@@ -28,11 +29,11 @@ function* signInSaga(action) {
     recaptchaToken: recaptchaToken,
   };
   try {
-    const response = yield axios.post(`${API_BASE_URL}/api/method/airport_transport.api.user.detect_email?email=${email}`);
+    const response = yield axiosInstance.post(`${API_BASE_URL}/api/method/airport_transport.api.user.detect_email?email=${email}`);
     if (response && response.status === 200) {
       // console.log('ggg', response.data.msg);
       if (response.data.msg === 'Transport User') {
-        const signinResponse = yield axios.post(
+        const signinResponse = yield axiosInstance.post(
           `${API_BASE_URL}/api/method/airport_transport.api.user.login`,
           { usr: email, pwd: password },
           { headers: headers }
@@ -44,14 +45,14 @@ function* signInSaga(action) {
         yield put(setLoading(false));
         // Navigate to the home page on successful sign-in
         if (navigate) {
-          navigate("/");
+          navigate("/mashrouk-new-ui/");
         }
       } else {
         const agentData = {
           usr: email,
           pwd: password
         }
-        const agentResponse = yield axios.post(
+        const agentResponse = yield axiosInstance.post(
           `${API_BASE_URL}/api/method/airport_transport.api.agent.login`, agentData);
         // console.log('aaa', agentResponse)
         const { token, username } = agentResponse.data.data;
@@ -61,7 +62,7 @@ function* signInSaga(action) {
         secureLocalStorage.setItem("agent", true);
         yield put(setLoading(false));
         if (navigate) {
-          navigate("/agent");
+          navigate("/mashrouk-new-ui/agent");
         }
       }
     }
@@ -81,7 +82,7 @@ function* signUpSaga(action) {
     recaptchaToken: recaptchaToken,
   };
   try {
-    const response = yield axios.post(
+    const response = yield axiosInstance.post(
       `${API_BASE_URL}/api/method/airport_transport.api.user.register`,
       values,
       { headers: headers }
@@ -91,7 +92,7 @@ function* signUpSaga(action) {
     yield put(setLoading(false));
     // Navigate to the home page on successful sign-in
     if (navigate) {
-      navigate("/");
+      navigate("/mashrouk-new-ui/");
     }
   } catch (error) {
     yield put(signUpFailure(error?.response?.data?.msg));

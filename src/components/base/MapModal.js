@@ -1,68 +1,80 @@
-import React, { useState, useRef, useEffect } from "react";
-import { GoogleMap, LoadScript, Marker, Polygon, StandaloneSearchBox } from "@react-google-maps/api";
-import axios from "axios";
-import { setLoading } from "../../redux/actions/loaderAction";
-import { useDispatch } from "react-redux";
-import { useTranslation } from "react-i18next";
+import React, {useState, useRef, useEffect} from 'react';
+import {
+  GoogleMap,
+  LoadScript,
+  Marker,
+  Polygon,
+  StandaloneSearchBox,
+} from '@react-google-maps/api';
+import axios from 'axios';
+import {setLoading} from '../../redux/actions/loaderAction';
+import {useDispatch} from 'react-redux';
+import {useTranslation} from 'react-i18next';
+import { Icon } from '@iconify/react';
 
-export default function MapModal({ rideName, formValues, onSubmitDestination, zoneCoords, cityName, setLocation, setDestination }) {
-  const [t, i18n] = useTranslation("global")
+export default function MapModal({
+  rideName,
+  formValues,
+  onSubmitDestination,
+  zoneCoords,
+  cityName,
+  setLocation,
+  setDestination,
+}) {
+  const [t, i18n] = useTranslation('global');
   const dispatch = useDispatch();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedPickup, setSelectedPickup] = useState(null);
   const [selectedDropoff, setSelectedDropoff] = useState(null);
-  const [error, setError] = useState("");
+  const [error, setError] = useState('');
   const [searchBox, setSearchBox] = useState(null); // State to hold the StandaloneSearchBox instance
+  const [currentLocation, setCurrentLocation] = useState(null);
 
   const mapRef = useRef(null);
 
   const containerStyle = {
-    width: "100%",
-    height: "400px",
+    width: '100%',
+    height: '400px',
   };
 
   let center;
-  if (cityName === t("hero.dammam_text")) {
+  if (cityName === t('hero.dammam_text')) {
     if (selectedPickup) {
-      center = selectedPickup
+      center = selectedPickup;
     } else if (selectedDropoff) {
-      center = selectedDropoff
+      center = selectedDropoff;
     } else {
       center = {
         lat: 26.3927,
         lng: 49.9777,
       };
     }
-
   }
-  if (cityName === t("hero.riyadh_text")) {
+  if (cityName === t('hero.riyadh_text')) {
     if (selectedPickup) {
-      center = selectedPickup
+      center = selectedPickup;
     } else if (selectedDropoff) {
-      center = selectedDropoff
+      center = selectedDropoff;
     } else {
       center = {
         lng: 46.6753,
-        lat: 24.7136
-      }
+        lat: 24.7136,
+      };
     }
-
   }
 
   const openModal = () => setIsModalOpen(true);
   const closeModal = () => {
     setIsModalOpen(false);
-    setError("");
+    setError('');
   };
 
-
-  const convertedCoords = zoneCoords.map((coord) => ((
+  const convertedCoords = zoneCoords.map((coord) =>
     coord.map.map((coo) => ({
       lat: coo[0],
       lng: coo[1],
     }))
-
-  )));
+  );
 
   // let convertedCoords2 = null;
   // if (zoneCoords2 !== null) {
@@ -73,52 +85,65 @@ export default function MapModal({ rideName, formValues, onSubmitDestination, zo
   // }
   useEffect(() => {
     const setPickOrDrop = async () => {
-      if (rideName === "airportRide") {
-        dispatch(setLoading(true))
+      if (rideName === 'airportRide') {
+        dispatch(setLoading(true));
         let point;
-        const apiKey = "AIzaSyBMTLXpuXtkEfbgChZzsj7LPYlpGxHI9iU";
-        const encodedAddress = encodeURIComponent(`${formValues.airportName} ${formValues.terminalNumber}`); // Encode the address
+        const apiKey = 'AIzaSyBMTLXpuXtkEfbgChZzsj7LPYlpGxHI9iU';
+        const encodedAddress = encodeURIComponent(
+          `${formValues.airportName} ${formValues.terminalNumber}`
+        ); // Encode the address
         const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodedAddress}&key=${apiKey}`;
         try {
           const response = await axios.get(url);
           const location = response.data.results[0].geometry.location;
           const latitude = location.lat;
           const longitude = location.lng;
-          point = { lat: latitude, lng: longitude };
-
+          point = {lat: latitude, lng: longitude};
         } catch (error) {
           console.error('Error fetching location:', error.message);
         }
-        if (cityName === t("hero.dammam_text")) {
-          const Dammampoint = { lat: 26.3927, lng: 49.9777 };
-          if (formValues.rideType === t("hero.pickup_value_text")) {
-            setLocation(`${formValues.airportName} ${formValues.terminalNumber} ${formValues.arrivalCity} Saudi Arabia`)
+        if (cityName === t('hero.dammam_text')) {
+          const Dammampoint = {lat: 26.3927, lng: 49.9777};
+          if (formValues.rideType === t('hero.pickup_value_text')) {
+            setLocation(
+              `${formValues.airportName} ${formValues.terminalNumber} ${formValues.arrivalCity} Saudi Arabia`
+            );
             setSelectedPickup(point);
-          } else if (formValues.rideType === t("hero.dropoff_value_text")) {
-            setDestination(`${formValues.airportName} ${formValues.terminalNumber} ${formValues.arrivalCity} Saudi Arabia`)
+          } else if (formValues.rideType === t('hero.dropoff_value_text')) {
+            setDestination(
+              `${formValues.airportName} ${formValues.terminalNumber} ${formValues.arrivalCity} Saudi Arabia`
+            );
             setSelectedDropoff(point);
           }
         } else {
-          const Riyadhpoint = { lng: 46.6753, lat: 24.7136 };
-          if (formValues.rideType === t("hero.pickup_value_text")) {
-            setLocation(`${formValues.airportName} ${formValues.terminalNumber} ${formValues.arrivalCity} Saudi Arabia`)
+          const Riyadhpoint = {lng: 46.6753, lat: 24.7136};
+          if (formValues.rideType === t('hero.pickup_value_text')) {
+            setLocation(
+              `${formValues.airportName} ${formValues.terminalNumber} ${formValues.arrivalCity} Saudi Arabia`
+            );
             setSelectedPickup(point);
-          } else if (formValues.rideType === t("hero.dropoff_value_text")) {
-            setDestination(`${formValues.airportName} ${formValues.terminalNumber} ${formValues.arrivalCity} Saudi Arabia`)
+          } else if (formValues.rideType === t('hero.dropoff_value_text')) {
+            setDestination(
+              `${formValues.airportName} ${formValues.terminalNumber} ${formValues.arrivalCity} Saudi Arabia`
+            );
             setSelectedDropoff(point);
           }
         }
-        dispatch(setLoading(false))
+        dispatch(setLoading(false));
       }
-    }
-    setPickOrDrop()
+    };
+    setPickOrDrop();
   }, [rideName, cityName, formValues.rideType]);
 
   const isPointInPolygon = (point, polygon, index) => {
-    const { lat, lng } = point;
+    const {lat, lng} = point;
     let inside = false;
     if (index) {
-      for (let i = 0, j = polygon[index].length - 1; i < polygon[index].length; j = i++) {
+      for (
+        let i = 0, j = polygon[index].length - 1;
+        i < polygon[index].length;
+        j = i++
+      ) {
         const xi = polygon[index][i].lat,
           yi = polygon[index][i].lng;
         const xj = polygon[index][j].lat,
@@ -131,7 +156,11 @@ export default function MapModal({ rideName, formValues, onSubmitDestination, zo
       }
       return inside;
     } else {
-      for (let i = 0, j = polygon[0].length - 1; i < polygon[0].length; j = i++) {
+      for (
+        let i = 0, j = polygon[0].length - 1;
+        i < polygon[0].length;
+        j = i++
+      ) {
         const xi = polygon[0][i].lat,
           yi = polygon[0][i].lng;
         const xj = polygon[0][j].lat,
@@ -144,18 +173,16 @@ export default function MapModal({ rideName, formValues, onSubmitDestination, zo
       }
       return inside;
     }
-
   };
 
   const onMapClick = async (event, index) => {
-
     // if (index) {
-    const point = { lat: event.latLng.lat(), lng: event.latLng.lng() };
+    const point = {lat: event.latLng.lat(), lng: event.latLng.lng()};
     if (isPointInPolygon(point, convertedCoords, index)) {
-      console.log('poly')
-      setError("");
-      dispatch(setLoading(true))
-      if (rideName === "airportRide") {
+      console.log('poly');
+      setError('');
+      dispatch(setLoading(true));
+      if (rideName === 'airportRide') {
         // if (formValues.rideType === t("hero.dropoff_value_text")) {
         //   const apiKey = "AIzaSyBMTLXpuXtkEfbgChZzsj7LPYlpGxHI9iU";
         //   const url = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${point.lat},${point.lng}&key=${apiKey}`;
@@ -184,9 +211,9 @@ export default function MapModal({ rideName, formValues, onSubmitDestination, zo
         //   }
         //   setSelectedDropoff(point);
         // }
-        if (formValues.rideType === t("hero.dropoff_value_text")) {
+        if (formValues.rideType === t('hero.dropoff_value_text')) {
           if (!selectedPickup) {
-            const apiKey = "AIzaSyBMTLXpuXtkEfbgChZzsj7LPYlpGxHI9iU";
+            const apiKey = 'AIzaSyBMTLXpuXtkEfbgChZzsj7LPYlpGxHI9iU';
             const url = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${point.lat},${point.lng}&key=${apiKey}`;
 
             try {
@@ -198,11 +225,10 @@ export default function MapModal({ rideName, formValues, onSubmitDestination, zo
             } catch (error) {
               console.error('Error fetching location:', error.message);
             }
-
           }
         } else {
           if (!selectedPickup) {
-            const apiKey = "AIzaSyBMTLXpuXtkEfbgChZzsj7LPYlpGxHI9iU";
+            const apiKey = 'AIzaSyBMTLXpuXtkEfbgChZzsj7LPYlpGxHI9iU';
             const url = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${point.lat},${point.lng}&key=${apiKey}`;
 
             try {
@@ -214,9 +240,8 @@ export default function MapModal({ rideName, formValues, onSubmitDestination, zo
             } catch (error) {
               console.error('Error fetching location:', error.message);
             }
-
           } else {
-            const apiKey = "AIzaSyBMTLXpuXtkEfbgChZzsj7LPYlpGxHI9iU";
+            const apiKey = 'AIzaSyBMTLXpuXtkEfbgChZzsj7LPYlpGxHI9iU';
             const url = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${point.lat},${point.lng}&key=${apiKey}`;
 
             try {
@@ -228,13 +253,11 @@ export default function MapModal({ rideName, formValues, onSubmitDestination, zo
             } catch (error) {
               console.error('Error fetching location:', error.message);
             }
-
           }
         }
-
-      } else if (rideName === "scheduledRide") {
+      } else if (rideName === 'scheduledRide') {
         if (!selectedPickup) {
-          const apiKey = "AIzaSyBMTLXpuXtkEfbgChZzsj7LPYlpGxHI9iU";
+          const apiKey = 'AIzaSyBMTLXpuXtkEfbgChZzsj7LPYlpGxHI9iU';
           const url = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${point.lat},${point.lng}&key=${apiKey}`;
 
           try {
@@ -246,9 +269,8 @@ export default function MapModal({ rideName, formValues, onSubmitDestination, zo
           } catch (error) {
             console.error('Error fetching location:', error.message);
           }
-
         } else {
-          const apiKey = "AIzaSyBMTLXpuXtkEfbgChZzsj7LPYlpGxHI9iU";
+          const apiKey = 'AIzaSyBMTLXpuXtkEfbgChZzsj7LPYlpGxHI9iU';
           const url = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${point.lat},${point.lng}&key=${apiKey}`;
 
           try {
@@ -260,11 +282,10 @@ export default function MapModal({ rideName, formValues, onSubmitDestination, zo
           } catch (error) {
             console.error('Error fetching location:', error.message);
           }
-
         }
       } else {
         // if (!selectedPickup) {
-        const apiKey = "AIzaSyBMTLXpuXtkEfbgChZzsj7LPYlpGxHI9iU";
+        const apiKey = 'AIzaSyBMTLXpuXtkEfbgChZzsj7LPYlpGxHI9iU';
         const url = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${point.lat},${point.lng}&key=${apiKey}`;
 
         try {
@@ -279,32 +300,31 @@ export default function MapModal({ rideName, formValues, onSubmitDestination, zo
         // }
       }
     } else {
-      setError(`You cannot select a location outside the ${cityName === t("hero.riyadh_text") ? 'Riyadh' : 'Dammam'} zone.`);
+      setError('You cannot select a point outside the service area');
     }
     // }
     // else {
     //   setError("You cannot select a location outside the Dammam zone.");
     // }
-    dispatch(setLoading(false))
+    dispatch(setLoading(false));
   };
 
   function submitDestination() {
-    if (rideName === "airportRide" || rideName === "scheduledRide") {
+    if (rideName === 'airportRide' || rideName === 'scheduledRide') {
       if (selectedPickup && selectedDropoff) {
         onSubmitDestination(selectedPickup, selectedDropoff);
         closeModal();
       } else {
-        setError("Please select both pickup and dropoff locations.");
+        setError('Please select both pickup and dropoff locations.');
       }
     } else {
       if (selectedPickup) {
         onSubmitDestination(selectedPickup, null);
         closeModal();
       } else {
-        setError("Please select pickup location.");
+        setError('Please select pickup location.');
       }
     }
-
   }
 
   const onLoad = (ref) => {
@@ -330,11 +350,35 @@ export default function MapModal({ rideName, formValues, onSubmitDestination, zo
     }
   };
 
+  const handleCurrentLocation = () => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const currentLocation = {
+            lat: position.coords.latitude,
+            lng: position.coords.longitude,
+          };
+          // Center the map to the user's current location
+          mapRef.current.panTo(currentLocation);
+
+          setCurrentLocation(currentLocation);
+        },
+        () => {
+          alert(
+            'Geolocation is not supported by this browser or permission denied.'
+          );
+        }
+      );
+    } else {
+      alert('Geolocation is not supported by this browser.');
+    }
+  };
+
   const mapOptions = {
-    streetViewControl: false, // Hides the Street View control
-    // zoomControl: false,
+    zoomControl: true,
+    streetViewControl: false,
     fullscreenControl: false,
-  }
+  };
 
   return (
     <>
@@ -343,7 +387,7 @@ export default function MapModal({ rideName, formValues, onSubmitDestination, zo
         className="block w-full bg-background_steel_blue text-text_white text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
         type="button"
       >
-        {t("hero.set_on_map_text")}
+        {t('hero.set_on_map_text')}
       </button>
 
       {isModalOpen && (
@@ -356,7 +400,7 @@ export default function MapModal({ rideName, formValues, onSubmitDestination, zo
             <div className="relative bg-background_steel_blue rounded-lg shadow dark:bg-gray-700">
               <div className="flex items-center justify-between p-4 md:p-5 rounded-t dark:border-gray-600">
                 <h3 className="text-xl text-text_white font-medium text-gray-900 dark:text-white">
-                  {t("hero.set_destination_text")}
+                  {t('hero.set_destination_text')}
                 </h3>
                 <button
                   onClick={closeModal}
@@ -385,7 +429,7 @@ export default function MapModal({ rideName, formValues, onSubmitDestination, zo
               <div className="p-4 md:p-5 space-y-4">
                 <LoadScript
                   googleMapsApiKey="AIzaSyBMTLXpuXtkEfbgChZzsj7LPYlpGxHI9iU"
-                  libraries={["places"]}
+                  libraries={['places', 'geometry']}
                 >
                   <GoogleMap
                     mapContainerStyle={containerStyle}
@@ -400,16 +444,15 @@ export default function MapModal({ rideName, formValues, onSubmitDestination, zo
                       <Polygon
                         paths={convertedCod}
                         options={{
-                          fillColor: "#4463F0",
+                          fillColor: '#4463F0',
                           fillOpacity: 0.3,
-                          strokeColor: "#355E3B",
+                          strokeColor: '#355E3B',
                           strokeOpacity: 1,
                           strokeWeight: 1,
                         }}
                         onClick={(event) => onMapClick(event, index)}
                       />
                     ))}
-
 
                     {/* <Polygon
                       paths={convertedCoords2}
@@ -439,16 +482,61 @@ export default function MapModal({ rideName, formValues, onSubmitDestination, zo
                       }}
                     /> */}
 
-                    {selectedPickup && <Marker position={selectedPickup} label={t("hero.pickup_text")} icon={{ url: '/assets/map/pickup.png' }}
-                      onClick={() => setSelectedPickup(null)} />}
-                    {selectedDropoff && <Marker position={selectedDropoff} label={t("hero.dropoff_text")} icon={{ url: '/assets/map/dropoff.png' }}
-                      onClick={() => {
-                        if (rideName === "airportRide" && formValues.rideType === t("hero.dropoff_value_text")) {
-                          setSelectedDropoff(selectedDropoff)
-                        }else{
-                          setSelectedDropoff(null)
-                        }
-                      }} />}
+                    {selectedPickup && (
+                      <Marker
+                        position={selectedPickup}
+                        label={t('hero.pickup_text')}
+                        icon={{url: './assets/map/pickup.png'}}
+                        // onClick={() => setSelectedPickup(null)}
+                        onClick={() => {
+                          if (rideName === 'airportRide') {
+                            if (
+                              formValues.rideType ===
+                              t('hero.pickup_value_text')
+                            ) {
+                              setSelectedPickup(selectedPickup);
+                            } else {
+                              setSelectedPickup(null);
+                            }
+                          } else if (rideName === 'rideByHour') {
+                            setSelectedPickup(null);
+                          } else if (rideName === 'scheduledRide') {
+                            setSelectedPickup(null);
+                          }
+                        }}
+                      />
+                    )}
+                    {selectedDropoff && (
+                      <Marker
+                        position={selectedDropoff}
+                        label={t('hero.dropoff_text')}
+                        icon={{url: './assets/map/dropoff.png'}}
+                        onClick={() => {
+                          if (rideName === 'airportRide') {
+                            if (
+                              formValues.rideType ===
+                              t('hero.dropoff_value_text')
+                            ) {
+                              setSelectedDropoff(selectedDropoff);
+                            } else {
+                              setSelectedDropoff(null);
+                            }
+                          } else if (rideName === 'rideByHour') {
+                            setSelectedDropoff(null);
+                          } else if (rideName === 'scheduledRide') {
+                            setSelectedDropoff(null);
+                          }
+                        }}
+                      />
+                    )}
+
+                    {currentLocation && (
+                      <Marker
+                        position={currentLocation}
+                        icon={{url: './assets/map/dropoff.png'}}
+                        label="Current Location"
+                      />
+                    )}
 
                     {/* Standalone Search Box */}
                     <StandaloneSearchBox
@@ -469,17 +557,28 @@ export default function MapModal({ rideName, formValues, onSubmitDestination, zo
                           fontSize: `14px`,
                           outline: `none`,
                           textOverflow: `hidden`,
-                          position: "relative",
-                          left: "50%",
-                          marginLeft: "-120px",
-                          top: "10px",
-                          zIndex: 1
+                          position: 'relative',
+                          left: '50%',
+                          marginLeft: '-120px',
+                          top: '10px',
+                          zIndex: 1,
                         }}
                       />
                     </StandaloneSearchBox>
+
+                    <button
+                      onClick={handleCurrentLocation}
+                      type="button"
+                      className="absolute top-3 right-2 z-10 bg-background_white text-text_black p-2 rounded-lg"
+                    >
+                      <Icon
+                        icon="basil:current-location-outline"
+                        width="24"
+                        height="24"
+                      />
+                    </button>
                   </GoogleMap>
                 </LoadScript>
-
               </div>
               {error && <div className="p-4 text-text_warning">{error}</div>}
               <div className="flex items-center p-4 md:p-5 space-x-3 rtl:space-x-reverse border-gray-200 rounded-b dark:border-gray-600">
@@ -488,14 +587,14 @@ export default function MapModal({ rideName, formValues, onSubmitDestination, zo
                   type="button"
                   className="text-background_steel_blue border bg-text_white border-text_white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
                 >
-                  {t("hero.confirm_destination_text")}
+                  {t('hero.confirm_destination_text')}
                 </button>
                 <button
                   onClick={closeModal}
                   type="button"
                   className="py-2.5 px-5 ms-3 text-sm font-medium rounded-lg border border-background_white text-background_white"
                 >
-                  {t("hero.decline_text")}
+                  {t('hero.decline_text')}
                 </button>
               </div>
             </div>

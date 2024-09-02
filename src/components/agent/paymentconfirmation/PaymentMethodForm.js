@@ -29,8 +29,9 @@ const PaymentMethodForm = () => {
     const [t, i18n] = useTranslation("global");
 
     const baseUrl = window.location.protocol + '//' + window.location.host
-    const successUrl = `${baseUrl}/agent/payment-success`;
-    const failureUrl = `${baseUrl}/agent/payment-failed`;
+    const successUrl = `${baseUrl}/mashrouk-new-ui/agent/payment-success`;
+    const failureUrl = `${baseUrl}/mashrouk-new-ui/agent/payment-failed`;
+    const paymentStatus = baseUrl + "/mashrouk-new-ui/agent/payment-status";
 
     useEffect(() => {
         localStorage.setItem('payment', true);
@@ -97,14 +98,14 @@ const PaymentMethodForm = () => {
                                                 localStorage.setItem('hasRefreshed', 'true');
                                                 localStorage.setItem('showPaymentMethod', 'true');
                                                 localStorage.setItem('price', price);
-                                                navigate('/agent', { state: { showPaymentMethod: true } })
+                                                navigate('/mashrouk-new-ui/agent', { state: { showPaymentMethod: true } })
                                             }
                                             }
                                         /> */}
                                         <p className="mb-3 font-bold text-background_steel_blue"> {t("hero.price_text")}: {price} {t("hero.sar_text")}S</p>
                                     </div>
                                     <form
-                                        action={successUrl}
+                                        action={paymentStatus}
                                         className="paymentWidgets"
                                         data-brands={paymentMethodName === 'mada' ? "MADA" : paymentMethodName === 'Credit Card' ? 'VISA MASTER' : ''}
                                     ></form>

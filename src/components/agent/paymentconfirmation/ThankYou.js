@@ -2,13 +2,14 @@ import React, { useEffect } from "react";
 import { Events, scrollSpy } from "react-scroll";
 import { useSelector, useDispatch } from "react-redux";
 import { setLoading } from "../../../redux/actions/loaderAction";
-import axios from "axios";
+// import axios from "axios";
 import Header from "../base/Header";
 import Footer from "../base/Footer";
 import Button from "../base/Button";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { message } from "antd";
+import axiosInstance from '../../../Api';
 
 export default function ThankYou() {
   const dispatch = useDispatch();
@@ -74,7 +75,7 @@ export default function ThankYou() {
   //           newBookingData.hyperpay_id = id;
   //           console.log('ppp', newBookingData)
   //           try {
-  //             const response = await axios.post(
+  //             const response = await axiosInstance.post(
   //               `${API_BASE_URL}/api/method/airport_transport.api.bookings.user_booking`,
   //               newBookingData,
   //               {
@@ -103,7 +104,7 @@ export default function ThankYou() {
       if (savePaymentStatus === "false") {
         const getPayByLinkBookingStatus = async () => {
           try {
-            const response = await axios.get(
+            const response = await axiosInstance.get(
               `${API_BASE_URL}/api/method/airport_transport.api.integrations.paybylink.get_payment_status?id=${id}&checkoutId=${checkoutId}`);
             if (response && response.status === 200) {
               console.log(response);
@@ -143,7 +144,7 @@ export default function ThankYou() {
             <div className="grid grid-cols-1 gap-3">
               <div className="mx-auto">
                 <img
-                  src="/assets/paymentconditions/paymentsuccess.png"
+                  src="./assets/paymentconditions/paymentsuccess.png"
                   alt="payment success"
                 />
               </div>
@@ -154,7 +155,7 @@ export default function ThankYou() {
                 className="bg-background_steel_blue text-text_white hover:bg-gray-100 font-medium rounded text-sm px-5 py-2.5 mb-2 "
                 label="OK"
                 type="button"
-                onClick={() => navigate('/agent')}
+                onClick={() => navigate('/mashrouk-new-ui/agent')}
               />
             </div>
           </div>

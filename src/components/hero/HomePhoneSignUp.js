@@ -2,13 +2,14 @@ import React, { useState, useEffect, useCallback } from "react";
 import { Formik, Form } from "formik";
 import * as Yup from "yup";
 import Button from "../base/Button";
-import axios from "axios";
+// import axios from "axios";
 import { setLoading } from "../../redux/actions/loaderAction";
 import { message } from "antd";
 import OtpInput from "react-otp-input";
 import PaymentMethod from "./PaymentMethod";
 import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
+import axiosInstance from '../../Api';
 
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
@@ -37,7 +38,7 @@ export default function HomePhoneSignUp({
   const dispatch = useDispatch();
   const [error, setError] = useState("");
 
-  const [timer, setTimer] = useState(30); // Timer state
+  const [timer, setTimer] = useState(60); // Timer state
   const [showResend, setShowResend] = useState(false); // State to show resend button
   const [phoneNumber, setPhoneNumber] = useState("");
   const [recaptchaToken, setRecaptchaToken] = useState(null);
@@ -60,7 +61,7 @@ export default function HomePhoneSignUp({
   const onPhoneSubmit = async (values, { setSubmitting }) => {
     dispatch(setLoading(true));
     try {
-      const response = await axios.get(
+      const response = await axiosInstance.get(
         `${API_BASE_URL}/api/method/airport_transport.api.user.send_mobile_otp?phone=${values.phone}`
       );
       if (response?.status === 200) {
@@ -80,7 +81,7 @@ export default function HomePhoneSignUp({
               email: email,
               phone: phoneNumber,
             };
-            const response = await axios.post(
+            const response = await axiosInstance.post(
               `${API_BASE_URL}/api/method/airport_transport.api.user.register`,
               data,
               {
@@ -122,7 +123,7 @@ export default function HomePhoneSignUp({
     dispatch(setLoading(true));
     if (!phoneVerified) {
       try {
-        const response = await axios.get(
+        const response = await axiosInstance.get(
           `${API_BASE_URL}/api/method/airport_transport.api.user.confirm_phone?phone=${phoneNumber}&otp=${phoneOtp}`
         );
         if (response?.status === 200) {
@@ -142,7 +143,7 @@ export default function HomePhoneSignUp({
           phone: phoneNumber,
         };
         try {
-          const response = await axios.post(
+          const response = await axiosInstance.post(
             `${API_BASE_URL}/api/method/airport_transport.api.user.register`,
             data,
             {
@@ -202,12 +203,12 @@ export default function HomePhoneSignUp({
     // Handle resend OTP logic
     dispatch(setLoading(true))
     try {
-      const otpResponse = await axios.get(
+      const otpResponse = await axiosInstance.get(
         `${API_BASE_URL}/api/method/airport_transport.api.user.send_confirmation_email?email=${email}`,
       );
       // Redirect to OTP verification screen
       if (otpResponse?.status === 200) {
-        setTimer(30); // Reset timer
+        setTimer(60); // Reset timer
         setShowResend(false); // Hide resend button
         message.success(`${otpResponse?.data?.msg}`);
       }
@@ -271,7 +272,7 @@ export default function HomePhoneSignUp({
               )}
 
               {!hidePhoneCreateAccountButton && (
-                <div className="text-center mt-6 flex flex-col md:flex-row justify-between items-center">
+                <div className="text-center mt-6 flex md:flex-col md:flex-row justify-between items-center">
                   <Button
                     className="bg-bg_btn_back w-full text-text_white hover:bg-gray-100 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2"
                     onClick={() => {
@@ -349,7 +350,7 @@ export default function HomePhoneSignUp({
                     </div>
                   )}
 
-                  <div className="my-3 flex flex-col md:flex-row justify-between items-center">
+                  <div className="my-3 flex md:flex-col md:flex-row justify-between items-center">
                     <Button
                       className="bg-bg_btn_back w-full text-text_white hover:bg-gray-100 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2"
                       onClick={() => {

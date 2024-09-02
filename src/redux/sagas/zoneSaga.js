@@ -1,11 +1,12 @@
 import { call, put, takeEvery } from "redux-saga/effects";
-import axios from "axios";
+// import axios from "axios";
 import {
     GET_ZONE_REQUEST,
     getZoneSuccess,
     getZoneFailure,
 } from "../actions/zoneActions";
 import secureLocalStorage from "react-secure-storage";
+import axiosInstance from "../../Api";
 
 const API_BASE_URL = process.env.REACT_APP_BASE_URL_AMK_TEST;
 
@@ -15,7 +16,7 @@ function* fetchZoneSaga(action) {
     const language = secureLocalStorage.getItem("language");
     try {
         const response = yield call(
-            axios.get,
+            axiosInstance.get,
             `${API_BASE_URL}/api/method/airport_transport.api.bookings.get_zones?service=${services}&city=${cityName}&language=${language ? language : 'eng'}`
         );
         const zones = response?.data?.data;

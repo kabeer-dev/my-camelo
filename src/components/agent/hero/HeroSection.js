@@ -33,6 +33,7 @@ export default function HeroSection() {
   const recaptchaRef = React.createRef();
   const [otp, setOtp] = useState("");
   const [phoneOtp, setPhoneOtp] = useState("");
+  const [showPaybylinkQr, setShowPaybylinkQr] = useState(false);
 
   useEffect(() => {
     dispatch(fetchServicesListRequest());
@@ -133,11 +134,11 @@ export default function HeroSection() {
           } transition-all duration-300 mx-auto h-auto bg-cover bg-fixed bg-start bg-no-repeat`}
         dir={language === 'ar' ? 'rtl' : 'ltr'}
       >
-        <div className="py-5 md:py-10 px-10 md:px-20 flex flex-col md:flex-col lg:flex-row justify-between items-center">
+        <div className="py-5 md:py-10 px-10 flex flex-col md:flex-col lg:flex-row justify-between items-center">
           <div className="md:w-[592px]">
             <div className="my-4">
               {servicesList.data && servicesList.data.map((service) => (
-                <>
+                <div key={service.id}>
                   {activeTab === service.id && (
                     <>
                       <div>
@@ -155,7 +156,7 @@ export default function HeroSection() {
                     </>
 
                   )}
-                </>
+                </div>
               ))}
             </div>
           </div>
@@ -164,7 +165,7 @@ export default function HeroSection() {
             {/* tabs code is here */}
             <div className="bg-background_white py-2 px-4 flex flex-row justify-between items-center rounded transition-all duration-300">
               {servicesList.data && servicesList.data.map((service) => (
-                <>
+                <div key={service.id}>
                   <div
                     className={`py-1 px-5 md:py-2 md:px-10 flex flex-col items-center cursor-pointer rounded transition-all duration-300 ${activeTab === service.id
                       ? "bg-background_steel_blue text-text_white"
@@ -180,7 +181,7 @@ export default function HeroSection() {
                       {service.service_name}
                     </div>
                   </div>
-                </>
+                </div>
               ))}
 
             </div>
@@ -214,6 +215,8 @@ export default function HeroSection() {
                     setOtp={setOtp}
                     phoneOtp={phoneOtp}
                     setPhoneOtp={setPhoneOtp}
+                    showPaybylinkQr={showPaybylinkQr}
+                    setShowPaybylinkQr={setShowPaybylinkQr}
                   />
                 </div>
               )}
@@ -243,6 +246,8 @@ export default function HeroSection() {
                     setOtp={setOtp}
                     phoneOtp={phoneOtp}
                     setPhoneOtp={setPhoneOtp}
+                    showPaybylinkQr={showPaybylinkQr}
+                    setShowPaybylinkQr={setShowPaybylinkQr}
                   />
                 </div>
               )}
@@ -272,6 +277,8 @@ export default function HeroSection() {
                     setOtp={setOtp}
                     phoneOtp={phoneOtp}
                     setPhoneOtp={setPhoneOtp}
+                    showPaybylinkQr={showPaybylinkQr}
+                    setShowPaybylinkQr={setShowPaybylinkQr}
                   />
                 </div>
               )}

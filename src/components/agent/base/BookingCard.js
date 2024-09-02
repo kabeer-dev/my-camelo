@@ -10,7 +10,7 @@ export default function BookingCard({ booking }) {
       <div className="bg-text_white rounded-md px-5 py-7 flex flex-col justify-center items-center mb-4">
         <div className="my-1">
           <img
-            src={`/assets/mybooking/${booking.status === 'Non-Payment Cancellation' ? 'Cancelled': (booking.status === 'Booked' ? 'Completed' : 'Booked')}.png`}
+            src={`./assets/mybooking/${booking.status === 'Non-Payment Cancellation' ? 'Cancelled': (booking.status === 'Booked' ? 'Completed' : 'Booked')}.png`}
             alt="ride-completed"
             className="w-20 h-20"
           />

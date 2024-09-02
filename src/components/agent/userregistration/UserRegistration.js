@@ -10,11 +10,12 @@ import AuthFooter from "../base/AuthFooter";
 import { useDispatch, useSelector } from "react-redux";
 import { signUpRequest } from "../../../redux/actions/authActions";
 import { setLoading } from "../../../redux/actions/loaderAction";
-import axios from "axios";
+// import axios from "axios";
 import { message } from "antd";
 import Recaptcha from "../base/Recaptcha";
 import moment from "moment";
 import { useTranslation } from "react-i18next";
+import axiosInstance from '../../../Api';
 
 export default function UserRegistration() {
   const navigate = useNavigate();
@@ -104,7 +105,7 @@ export default function UserRegistration() {
   // Fetch genderOptions and countriesOptions from APIs
   useEffect(() => {
     // Fetch gender options
-    axios
+    axiosInstance
       .get(`${API_BASE_URL}/api/method/airport_transport.api.user.get_gender?language=${language ? language : 'eng'}`)
       .then((response) => {
         const genderData = response.data.data; // Extract the gender data
@@ -122,7 +123,7 @@ export default function UserRegistration() {
       });
 
     // Fetch country options
-    axios
+    axiosInstance
       .get(
         `${API_BASE_URL}/api/method/airport_transport.api.user.get_nationality?language=${language ? language : 'eng'}`
       )
@@ -173,14 +174,14 @@ export default function UserRegistration() {
       };
       // console.log('gg', token, values)
       try {
-        const response = await axios.post(
+        const response = await axiosInstance.post(
           `${API_BASE_URL}/api/method/airport_transport.api.user.register?language=${language}`,
           values,
           { headers: headers }
         );
         if (response && response.status === 200) {
           message.success(`${response?.data?.msg}`)
-          navigate('/agent')
+          navigate('/mashrouk-new-ui/agent')
         }
       } catch (error) {
         message.error(`${error?.response?.data?.msg}`);
@@ -199,23 +200,23 @@ export default function UserRegistration() {
       <div className="h-screen w-screen position relative" dir={language === 'ar' ? 'rtl' : 'ltr'}>
         <div className="position absolute left-0 top-0">
           <img
-            src="/assets/signin/left_vector.png"
+            src="./assets/signin/left_vector.png"
             alt="left_vector"
             className="w-20 h-20 md:w-48 md:h-48"
           />
         </div>
         <div className="position absolute right-0 bottom-0">
           <img
-            src="/assets/signin/right_vector.png"
+            src="./assets/signin/right_vector.png"
             alt="right_vector"
             className="w-16 md:w-48 h-12 md:h-36"
           />
         </div>
         <div className="z-20 w-screen h-screen flex flex-row justify-center items-center">
           <div className="flex flex-col justify-center items-center">
-            <div className="mb-2 cursor-pointer" onClick={() => navigate("/agent")}>
+            <div className="mb-2 cursor-pointer" onClick={() => navigate("/mashrouk-new-ui/agent")}>
               <img
-                src="/assets/signin/logo.png"
+                src="./assets/signin/logo.png"
                 alt="Moshrouk Trips"
                 className="w-16 h-13"
               />

@@ -3,7 +3,6 @@ import { Events, scrollSpy } from "react-scroll";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { message } from "antd";
-import axios from "axios";
 import { setLoading } from "../../redux/actions/loaderAction";
 import { useTranslation } from "react-i18next";
 import Header from "../base/Header";
@@ -35,7 +34,7 @@ export default function RequestSubmit() {
             <div className="grid grid-cols-1 gap-3">
               <div className="mx-auto">
                 <img
-                  src="/assets/paymentconditions/paymentsuccess.png"
+                  src="./assets/paymentconditions/paymentsuccess.png"
                   alt="payment success"
                 />
               </div>
@@ -52,7 +51,7 @@ export default function RequestSubmit() {
               <div className="m-auto">
                 <button
                   type="button"
-                  onClick={() => navigate("/")}
+                  onClick={() => navigate("/mashrouk-new-ui/")}
                   className="bg-background_steel_blue text-text_white hover:bg-gray-100 font-medium text-sm px-5 py-2.5 me-2 mb-2"
                 >
                   {t("back_home_text")}

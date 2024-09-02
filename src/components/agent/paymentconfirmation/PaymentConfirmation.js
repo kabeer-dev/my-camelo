@@ -26,7 +26,7 @@ export default function PaymentConfirmation() {
 
   useEffect(() =>{
     if(!isLoggedIn){
-      window.location.href = '/';
+      window.location.href = '/mashrouk-new-ui/';
     }
   }, [isLoggedIn])
 
@@ -101,15 +101,15 @@ export default function PaymentConfirmation() {
   const onClick = ({ key }) => {
     switch (key) {
       case "1":
-        navigate("/agent/my-profile");
+        navigate("/mashrouk-new-ui/agent/my-profile");
         break;
       case "2":
-        navigate("/agent/my-bookings");
+        navigate("/mashrouk-new-ui/agent/my-bookings");
         break;
       case "3":
         message.success(`Logged out`);
         dispatch(signOutRequest());
-        navigate("/agent");
+        navigate("/mashrouk-new-ui/agent");
         break;
       default:
         break;
@@ -150,9 +150,9 @@ export default function PaymentConfirmation() {
       values.cardNumber !== 123456789 ||
       values.cvc !== 123
     ) {
-      navigate("/payment-failed");
+      navigate("/mashrouk-new-ui/payment-failed");
     } else {
-      navigate("/payment-success");
+      navigate("/mashrouk-new-ui/payment-success");
     }
     setSubmitting(false);
   };
@@ -170,9 +170,9 @@ export default function PaymentConfirmation() {
             {/* Make header fixed */}
             <nav className="bg-background_steel_blue md:h-20 lg:h-20 px-4 lg:px-20 py-2.5 dark:bg-gray-800">
               <div className="flex flex-wrap justify-between items-center mx-auto max-w-screen-xl md:h-full lg:h-full">
-                <button onClick={() => navigate("/agent")} className="flex items-center">
+                <button onClick={() => navigate("/mashrouk-new-ui/agent")} className="flex items-center">
                   <img
-                    src="/assets/header/logo.png"
+                    src="./assets/header/logo.png"
                     className="w-14 h-14 sm:h-14 my-2"
                     alt="Camelo Logo"
                   />
@@ -181,9 +181,9 @@ export default function PaymentConfirmation() {
                   <div>
                     <Button
                       className="text-text_white font-medium text-md mr-2 hidden md:flex"
-                      onClick={() =>
-                        (window.location.href = "http://localhost:3000/#")
-                      }
+                      // onClick={() =>
+                      //   (window.location.href = "http://localhost:3000/#")
+                      // }
                       label={
                         <>
                           <div className="flex flex-row justify-center items-baseline">
@@ -202,7 +202,7 @@ export default function PaymentConfirmation() {
                       <div>
                         <Button
                           className="hidden md:flex bg-transparent text-text_white font-medium text-md px-2.5 cursor-pointer"
-                          onClick={() => navigate("/agent/sign-in")} // Use navigate here
+                          onClick={() => navigate("/mashrouk-new-ui/agent/sign-in")} // Use navigate here
                           label="Sign in"
                           type="button"
                         />
@@ -210,7 +210,7 @@ export default function PaymentConfirmation() {
                       <div>
                         <Button
                           className="cursor-pointer hidden md:flex text-text_steel_blue bg-background_white border border-gray-300 focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-100 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:border-gray-600 dark:focus:ring-gray-700"
-                          onClick={() => navigate("/agent/create-new-account")}
+                          onClick={() => navigate("/mashrouk-new-ui/agent/create-new-account")}
                           label="Create new account"
                           type="button"
                         />
@@ -406,7 +406,7 @@ export default function PaymentConfirmation() {
           <footer className="mt-10 w-full py-3 md:py-6 px-10 md:px-20 flex flex-col items-center justify-center bg-background_steel_blue text-text_white">
             <div className="mb-4">
               <img
-                src="/assets/footer/logo.png"
+                src="./assets/footer/logo.png"
                 alt="Mashrook Trips"
                 className="w-16 md:w-32 h-16 md:h-32"
               />
@@ -427,7 +427,7 @@ export default function PaymentConfirmation() {
                   </li>
                 ))}
                 <li
-                  onClick={() => navigate("/agent/sign-in")}
+                  onClick={() => navigate("/mashrouk-new-ui/agent/sign-in")}
                   className="text-text_white block cursor-pointer py-1 md:py-2 pr-2 md:pr-4 pl-2 md:pl-3 text-white rounded bg-primary-700 lg:bg-transparent lg:text-primary-700 lg:p-0 dark:text-white"
                 >
                   Sign in
@@ -435,7 +435,7 @@ export default function PaymentConfirmation() {
                 <li>
                   <Button
                     className="hidden md:flex cursor-pointer text-text_steel_blue bg-background_white border border-gray-300 focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-100 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:border-gray-600 dark:focus:ring-gray-700"
-                    onClick={() => navigate("/agent/create-new-account")}
+                    onClick={() => navigate("/mashrouk-new-ui/agent/create-new-account")}
                     label="Create new account"
                     type="button"
                   />

@@ -14,13 +14,16 @@ import HomeEmailSignUp from "./HomeEmailSignUp";
 import { setLoading } from "../../redux/actions/loaderAction";
 import VehicleTypeModal from "../base/VehicleTypeModal";
 import PaymentMethod from "./PaymentMethod";
-import axios from "axios";
+// import axios from "axios";
 import { message } from "antd";
 import { useTranslation } from "react-i18next";
+import axiosInstance from "../../Api";
 
 export default function RideByHour({
-  subTab, setSubTab,
-  showSignUp, setShowSignUp,
+  subTab,
+  setSubTab,
+  showSignUp,
+  setShowSignUp,
   showAlreadyRegistered,
   setShowAlreadyRegistered,
   showOTPScreen,
@@ -39,7 +42,9 @@ export default function RideByHour({
   otp,
   setOtp,
   phoneOtp,
-  setPhoneOtp
+  setPhoneOtp,
+  showPaybylinkQr,
+  setShowPaybylinkQr,
 }) {
   const dispatch = useDispatch();
   const { cities } = useSelector((state) => state.cities);
@@ -50,8 +55,8 @@ export default function RideByHour({
   const language = useSelector((state) => state.auth.language);
 
   useEffect(() => {
-    setMap(zoneMap && zoneMap.length > 0 ? zoneMap : null)
-  }, [zoneMap])
+    setMap(zoneMap && zoneMap.length > 0 ? zoneMap : null);
+  }, [zoneMap]);
   const services = "Book Vehicle In Hours";
   const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
 
@@ -78,29 +83,56 @@ export default function RideByHour({
 
   const [vehicleTypeName, setVehicleTypeName] = useState("");
 
-  const [location, setLocation] = useState("")
-  const [destination, setDestination] = useState("")
+  const [location, setLocation] = useState("");
+  const [destination, setDestination] = useState("");
 
   const API_BASE_URL = process.env.REACT_APP_BASE_URL_AMK_TEST;
 
   const [VehicleTypeWithService, setVehicleTypeWithService] = useState(null);
+  // useEffect(() => {
+  //   dispatch(setLoading(true));
+  //   const getVechileTypes = async () => {
+  //     if (cityName) {
+  //       try {
+  //         const response = await axiosInstance.get(
+  //           `${API_BASE_URL}/api/method/airport_transport.api.bookings.get_vehicle_types?language=${
+  //             language ? language : "eng"
+  //           }&service=Book Vehicle In Hours&city=${cityName}`
+  //         );
+  //         if (response && response.status === 200) {
+  //           // console.log('hhh', response.data)
+  //           setVehicleTypeWithService(response.data);
+  //         }
+  //       } catch (error) {
+  //         console.log("Error", error);
+  //       }
+  //     }
+  //     getVechileTypes();
+  //   };
+  //   dispatch(setLoading(false));
+  // }, [cityName]);
+
   useEffect(() => {
     dispatch(setLoading(true));
     const getVechileTypes = async () => {
-      try {
-        const response = await axios.get(`${API_BASE_URL}/api/method/airport_transport.api.bookings.get_vehicle_types?language=${language ? language : 'eng'}&service=Book Vehicle In Hours`);
-        if (response && response.status === 200) {
-          // console.log('hhh', response.data)
-          setVehicleTypeWithService(response.data)
+      if (cityName) {
+        try {
+          const response = await axiosInstance.get(
+            `${API_BASE_URL}/api/method/airport_transport.api.bookings.get_vehicle_types?language=${
+              language ? language : "en"
+            }&service=Book Vehicle In Hours&city=${cityName}`
+          );
+          if (response && response.status === 200) {
+            setVehicleTypeWithService(response.data);
+          }
+        } catch (error) {
+          console.log("Error", error);
         }
-      } catch (error) {
-        console.log('Error', error)
       }
-    }
+    };
     getVechileTypes();
     dispatch(setLoading(false));
-
-  }, []);
+  }, [cityName]);
 
   useEffect(() => {
     if (vehicleTypeName !== "") {
@@ -120,32 +152,32 @@ export default function RideByHour({
   }, [vehicleTypeName]);
 
   const handlePrevious = (step, values) => {
-    dispatch(setLoading(true))
+    dispatch(setLoading(true));
     setFormValues(values);
     setSubTab(step);
-    dispatch(setLoading(false))
+    dispatch(setLoading(false));
   };
 
   useEffect(() => {
     dispatch(fetchCitiesRequest());
     dispatch(fetchVehicleTypesRequest());
-    const expectedCityName = cityName ? cityName : 'Dammam';
+    const expectedCityName = cityName ? cityName : "Dammam";
     dispatch(getZoneRequest(services, expectedCityName));
   }, [dispatch, cityName]);
 
-  useEffect(() => {
-    if (cities.data?.length > 0 && !cityName) {
-      setFormValues((prevValues) => ({
-        ...prevValues,
-        "arrivalCity": cities.data[0],
-      }));
-      setOnChangeFormValues((prevValues) => ({
-        ...prevValues,
-        "arrivalCity": cities.data[0],
-      }));
-      setCityName(cities.data[0])
-    }
-  }, [cities])
+  // useEffect(() => {
+  //   if (cities.data?.length > 0 && !cityName) {
+  //     setFormValues((prevValues) => ({
+  //       ...prevValues,
+  //       arrivalCity: cities.data[0],
+  //     }));
+  //     setOnChangeFormValues((prevValues) => ({
+  //       ...prevValues,
+  //       arrivalCity: cities.data[0],
+  //     }));
+  //     setCityName(cities.data[0]);
+  //   }
+  // }, [cities]);
 
   // const steps = [
   //   { id: 1, text: t("hero.stepper_steps.ride_detail_text") },
@@ -156,11 +188,14 @@ export default function RideByHour({
   const steps = useMemo(() => {
     const baseSteps = [
       { id: 1, text: t("hero.stepper_steps.ride_detail_text") },
-      { id: 2, text: t("hero.stepper_steps.additional_info_text") },
+      { id: 2, text: t("hero.stepper_steps.vehicle_detail_text") },
     ];
 
     if (!isLoggedIn) {
-      baseSteps.push({ id: 4, text: t("hero.stepper_steps.account_info_text") });
+      baseSteps.push({
+        id: 4,
+        text: t("hero.stepper_steps.account_info_text"),
+      });
     }
 
     return baseSteps;
@@ -179,23 +214,24 @@ export default function RideByHour({
   const onSubmit = async (values, { setSubmitting }) => {
     if (!location) {
       message.error(t("hero.errors.map_required"));
-    }
-    if (vehicleTypeName !== '') {
-      values.vehicleType = vehicleTypeName;
-      dispatch(setLoading(true))
+    } else {
+      if (vehicleTypeName !== "") {
+        values.vehicleType = vehicleTypeName;
+        dispatch(setLoading(true));
 
-      if (isLoggedIn) {
-        dispatch(setLoading(false));
-        setShowPaymentMethod(true)
-      } else {
-        dispatch(setLoading(false));
-        setSubTab(4)
-        setShowSignUp(true);
+        if (isLoggedIn) {
+          dispatch(setLoading(false));
+          setShowPaymentMethod(true);
+        } else {
+          dispatch(setLoading(false));
+          setSubTab(4);
+          setShowSignUp(true);
+        }
       }
-
-      setSubmitting(false);
-      dispatch(setLoading(false))
     }
+
+    setSubmitting(false);
+    dispatch(setLoading(false));
   };
 
   const byHoursOptions = [
@@ -217,7 +253,6 @@ export default function RideByHour({
     setSelectedPickup(pickup);
     setSelectedDropoff(dropoff);
   };
-
 
   return (
     <>
@@ -248,185 +283,185 @@ export default function RideByHour({
                 setShowOTPScreen={setShowOTPScreen}
                 setHideCreateAccountButton={setHideCreateAccountButton}
                 setShowPhone={setShowPhone}
-                setHidePhoneCreateAccountButton={setHidePhoneCreateAccountButton}
+                setHidePhoneCreateAccountButton={
+                  setHidePhoneCreateAccountButton
+                }
                 setShowPhoneOTPScreen={setShowPhoneOTPScreen}
                 setShowPaymentMethod={setShowPaymentMethod}
+                showPaybylinkQr={showPaybylinkQr}
+                setShowPaybylinkQr={setShowPaybylinkQr}
                 rideName="Book Vehicle In Hours"
               />
+            ) : showSignUp ? (
+              <>
+                <HomeEmailSignUp
+                  formValues={formValues}
+                  setSubTab={setSubTab}
+                  setShowSignUp={setShowSignUp}
+                  showAlreadyRegistered={showAlreadyRegistered}
+                  setShowAlreadyRegistered={setShowAlreadyRegistered}
+                  showOTPScreen={showOTPScreen}
+                  setShowOTPScreen={setShowOTPScreen}
+                  setHideCreateAccountButton={setHideCreateAccountButton}
+                  hideCreateAccountButton={hideCreateAccountButton}
+                  showPhone={showPhone}
+                  setShowPhone={setShowPhone}
+                  hidePhoneCreateAccountButton={hidePhoneCreateAccountButton}
+                  setHidePhoneCreateAccountButton={
+                    setHidePhoneCreateAccountButton
+                  }
+                  showPhoneOTPScreen={showPhoneOTPScreen}
+                  setShowPhoneOTPScreen={setShowPhoneOTPScreen}
+                  showPaymentMethod={showPaymentMethod}
+                  setShowPaymentMethod={setShowPaymentMethod}
+                  recaptchaRef={recaptchaRef}
+                  otp={otp}
+                  setOtp={setOtp}
+                  phoneOtp={phoneOtp}
+                  setPhoneOtp={setPhoneOtp}
+                  showPaybylinkQr={showPaybylinkQr}
+                  setShowPaybylinkQr={setShowPaybylinkQr}
+                />
+              </>
+            ) : (
+              <>
+                {" "}
+                <Formik
+                  initialValues={formValues}
+                  validationSchema={validationSchema}
+                  onSubmit={onSubmit}
+                >
+                  {({ values, errors, setFieldValue, validateForm }) => {
+                    const isStep1Valid =
+                      values.bookingByHours &&
+                      values.arrivalCity &&
+                      values.arrivalDate &&
+                      values.arrivalTime;
+                    // const isStep2Valid = values.vehicleType;
 
-            ) :
+                    return (
+                      <Form className="mx-auto w-full">
+                        {subTab === 1 && (
+                          <>
+                            <div>
+                              <InputFieldFormik
+                                label={t("hero.booking_by_hours")}
+                                name="bookingByHours"
+                                type="select"
+                                options={byHoursOptions}
+                                value={
+                                  formValues.bookingByHours ||
+                                  onChangeFormValues.bookingByHours
+                                }
+                                onChange={(valueObj) => {
+                                  const { fieldName, selectedValue } = valueObj;
+                                  setFieldValue(fieldName, selectedValue);
+                                  setOnChangeFormValues((prevValues) => ({
+                                    ...prevValues,
+                                    [fieldName]: selectedValue,
+                                  }));
+                                }}
+                                required
+                              />
+                            </div>
 
-              showSignUp ? (
-                <>
-                  <HomeEmailSignUp
-                    formValues={formValues}
-                    setSubTab={setSubTab}
-                    setShowSignUp={setShowSignUp}
-                    showAlreadyRegistered={showAlreadyRegistered}
-                    setShowAlreadyRegistered={setShowAlreadyRegistered}
-                    showOTPScreen={showOTPScreen}
-                    setShowOTPScreen={setShowOTPScreen}
-                    setHideCreateAccountButton={setHideCreateAccountButton}
-                    hideCreateAccountButton={hideCreateAccountButton}
-                    showPhone={showPhone}
-                    setShowPhone={setShowPhone}
-                    hidePhoneCreateAccountButton={hidePhoneCreateAccountButton}
-                    setHidePhoneCreateAccountButton={setHidePhoneCreateAccountButton}
-                    showPhoneOTPScreen={showPhoneOTPScreen}
-                    setShowPhoneOTPScreen={setShowPhoneOTPScreen}
-                    showPaymentMethod={showPaymentMethod}
-                    setShowPaymentMethod={setShowPaymentMethod}
-                    recaptchaRef={recaptchaRef}
-                    otp={otp}
-                    setOtp={setOtp}
-                    phoneOtp={phoneOtp}
-                    setPhoneOtp={setPhoneOtp}
-                  />
-                </>
-              ) : (
+                            <div>
+                              <InputFieldFormik
+                                label={t("hero.arrival_city_text")}
+                                name="arrivalCity"
+                                type="select"
+                                options={
+                                  cities &&
+                                  cities.data &&
+                                  cities.data.map((city) => ({
+                                    value: city,
+                                    label: city,
+                                  }))
+                                }
+                                value={
+                                  formValues.arrivalCity ||
+                                  onChangeFormValues.arrivalCity
+                                }
+                                onChange={(valueObj) => {
+                                  const { fieldName, selectedValue } = valueObj;
+                                  setFieldValue(fieldName, selectedValue);
+                                  setCityName(selectedValue);
+                                  setFormValues((prevValues) => ({
+                                    ...prevValues,
+                                    [fieldName]: selectedValue,
+                                  }));
+                                  setOnChangeFormValues((prevValues) => ({
+                                    ...prevValues,
+                                    [fieldName]: selectedValue,
+                                  }));
+                                }}
+                                required
+                              />
+                            </div>
 
-                <>
-                  {" "}
-                  <Formik
-                    initialValues={formValues}
-                    validationSchema={validationSchema}
-                    onSubmit={onSubmit}
-                  >
-                    {({ values, errors, setFieldValue, validateForm }) => {
-                      const isStep1Valid =
-                        values.bookingByHours &&
-                        // values.arrivalCity &&
-                        values.arrivalDate &&
-                        values.arrivalTime;
-                      // const isStep2Valid = values.vehicleType;
+                            <div>
+                              <InputFieldFormik
+                                label={t("hero.arrival_date_text")}
+                                name="arrivalDate"
+                                type="arrivalDate"
+                                value={values.arrivalDate}
+                                arrivalDates={arrivalDates}
+                                setArrivalDates={setArrivalDates}
+                                onChange={({ date, dateString }) => {
+                                  setOnChangeFormValues((prevValues) => ({
+                                    ...prevValues,
+                                    ["arrivalDate"]: dateString,
+                                  }));
+                                  setFieldValue("arrivalDate", dateString);
+                                }}
+                                required
+                              />
+                            </div>
 
-                      return (
-                        <Form className="mx-auto w-full">
-                          {subTab === 1 && (
-                            <>
-                              <div>
-                                <InputFieldFormik
-                                  label={t("hero.booking_by_hours")}
-                                  name="bookingByHours"
-                                  type="select"
-                                  options={byHoursOptions}
-                                  value={
-                                    formValues.bookingByHours ||
-                                    onChangeFormValues.bookingByHours
-                                  }
-                                  onChange={(valueObj) => {
-                                    const { fieldName, selectedValue } = valueObj;
-                                    setFieldValue(fieldName, selectedValue);
-                                    setOnChangeFormValues((prevValues) => ({
-                                      ...prevValues,
-                                      [fieldName]: selectedValue,
-                                    }));
-                                  }}
-                                  required
-                                />
-                              </div>
+                            <div>
+                              <InputFieldFormik
+                                label={t("hero.arrival_time_text")}
+                                name="arrivalTime"
+                                type="arrivalTime"
+                                value={values.arrivalTime || ""}
+                                arrivalDates={arrivalDates}
+                                onChange={({ fieldName, selectedValue }) => {
+                                  setOnChangeFormValues((prevValues) => ({
+                                    ...prevValues,
+                                    [fieldName]: selectedValue,
+                                  }));
+                                  setFieldValue(fieldName, selectedValue);
+                                }}
+                                required
+                              />
+                            </div>
 
-                              <div>
-                                <InputFieldFormik
-                                  label={t("hero.arrival_city_text")}
-                                  name="arrivalCity"
-                                  type="select"
-                                  options={
-                                    cities &&
-                                    cities.data &&
-                                    cities.data.map((city) => ({
-                                      value: city,
-                                      label: city,
-                                    }))
-                                  }
-                                  value={
-                                    formValues.arrivalCity ||
-                                    onChangeFormValues.arrivalCity
-                                  }
-                                  onChange={(valueObj) => {
-                                    const { fieldName, selectedValue } = valueObj;
-                                    setFieldValue(fieldName, selectedValue);
-                                    setCityName(selectedValue);
-                                    setFormValues((prevValues) => ({
-                                      ...prevValues,
-                                      [fieldName]: selectedValue,
-                                    }));
-                                    setOnChangeFormValues((prevValues) => ({
-                                      ...prevValues,
-                                      [fieldName]: selectedValue,
-                                    }));
-                                  }}
-                                  required
-                                />
-                              </div>
+                            <div className="w-full mt-3">
+                              <Button
+                                className="bg-background_steel_blue w-full text-text_white hover:bg-gray-100 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2"
+                                onClick={() => {
+                                  values.arrivalCity = formValues.arrivalCity;
+                                  validateForm().then(() => {
+                                    if (isStep1Valid) {
+                                      setSubTab(2);
+                                      setFormValues(values);
+                                    }
+                                  });
+                                }}
+                                label={t("next_text")}
+                                type="button"
+                                disabled={!isStep1Valid}
+                              />
+                            </div>
+                          </>
+                        )}
 
-                              <div >
-                                <InputFieldFormik
-                                  label={t("hero.arrival_date_text")}
-                                  name="arrivalDate"
-                                  type="arrivalDate"
-                                  value={values.arrivalDate}
-                                  arrivalDates={arrivalDates}
-                                  setArrivalDates={setArrivalDates}
-                                  onChange={({ date, dateString }) => {
-                                    setOnChangeFormValues((prevValues) => ({
-                                      ...prevValues,
-                                      ['arrivalDate']: dateString,
-                                    }));
-                                    setFieldValue('arrivalDate', dateString);
-                                  }}
-
-                                  required
-                                />
-
-                              </div>
-
-                              <div>
-                                <InputFieldFormik
-                                  label={t("hero.arrival_time_text")}
-                                  name="arrivalTime"
-                                  type="arrivalTime"
-                                  value={values.arrivalTime || ''}
-
-                                  arrivalDates={arrivalDates}
-                                  onChange={({ fieldName, selectedValue }) => {
-                                    setOnChangeFormValues((prevValues) => ({
-                                      ...prevValues,
-                                      [fieldName]: selectedValue,
-                                    }));
-                                    setFieldValue(fieldName, selectedValue);
-                                  }}
-                                  required
-                                />
-                              </div>
-
-                              <div className="w-full mt-3">
-                                <Button
-                                  className="bg-background_steel_blue w-full text-text_white hover:bg-gray-100 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2"
-                                  onClick={() => {
-                                    values.arrivalCity = formValues.arrivalCity
-                                    validateForm().then(() => {
-                                      if (isStep1Valid) {
-                                        setSubTab(2);
-                                        setFormValues(values);
-                                      }
-                                    });
-
-                                  }}
-                                  label={t("next_text")}
-                                  type="button"
-                                  disabled={!isStep1Valid}
-                                />
-                              </div>
-                            </>
-                          )}
-
-                          {subTab === 2 && (
-                            <>
-                              {/* <div>
+                        {subTab === 2 && (
+                          <>
+                            {/* <div>
                              <VehicleTypeModal />
                            </div> */}
-                              {/* <div className="pb-4 border-b border-gray-300">
+                            {/* <div className="pb-4 border-b border-gray-300">
                              <InputFieldFormik
                                label="Vehicle type"
                                name="vehicleType"
@@ -454,60 +489,59 @@ export default function RideByHour({
                                required
                              />
                            </div> */}
-                              <div>
-                                <VehicleTypeModal
-                                  VehicleTypeWithService={VehicleTypeWithService}
-                                  vehicleTypeName={vehicleTypeName}
-                                  setVehicleTypeName={setVehicleTypeName}
+                            <div>
+                              <VehicleTypeModal
+                                VehicleTypeWithService={VehicleTypeWithService}
+                                vehicleTypeName={vehicleTypeName}
+                                setVehicleTypeName={setVehicleTypeName}
+                              />
+                            </div>
+
+                            <div className="my-4 flex flex-col md:flex-row justify-between items-start">
+                              <div className="w-full md:w-1/2 mx-0 md:mx-1">
+                                <Heading
+                                  title={t("hero.set_destination_text")}
+                                  className={"text-xl text-text_black"}
                                 />
                               </div>
-
-                              <div className="my-4 flex flex-col md:flex-row justify-between items-start">
-                                <div className="w-full md:w-1/2 mx-0 md:mx-1">
-                                  <Heading
-                                    title={t("hero.set_destination_text")}
-                                    className={"text-xl text-text_black"}
-                                  />
-                                </div>
-                                <div className="w-full md:w-1/2 mx-0 md:mx-1">
-                                  <MapModal
-                                    rideName="rideByHour"
-                                    formValues={formValues}
-                                    onSubmitDestination={handleMapSubmit}
-                                    zoneCoords={map}
-                                    cityName={values.arrivalCity}
-                                    setLocation={setLocation}
-                                    setDestination={setDestination}
-                                  />
-
-                                </div>
+                              <div className="w-full md:w-1/2 mx-0 md:mx-1">
+                                <MapModal
+                                  rideName="rideByHour"
+                                  formValues={formValues}
+                                  onSubmitDestination={handleMapSubmit}
+                                  zoneCoords={map}
+                                  cityName={values.arrivalCity}
+                                  setLocation={setLocation}
+                                  setDestination={setDestination}
+                                />
                               </div>
+                            </div>
 
-                              <div className="mt-3 flex flex-col md:flex-row justify-between items-center">
-                                <div className="w-full md:w-1/2 mx-0 md:mx-1">
-                                  <Button
-                                    className="bg-bg_btn_back w-full text-text_white hover:bg-gray-100 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2"
-                                    onClick={() => handlePrevious(1, values)}
-                                    label={t("previous_text")}
-                                    type="button"
-                                  />
-                                </div>
-                                <div className="w-full md:w-1/2 mx-0 md:mx-1">
-                                  <Button
-                                    className="bg-background_steel_blue w-full text-text_white hover:bg-gray-100 font-medium rounded-lg text-sm px-5 py-2.5 mb-2"
-                                    label={t("submit_text")}
-                                    type="submit"
-                                  />
-                                </div>
+                            <div className="mt-3 flex md:flex-row justify-between items-center">
+                              <div className="w-1/2 mx-0 md:mx-1">
+                                <Button
+                                  className="bg-bg_btn_back w-full text-text_white hover:bg-gray-100 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2"
+                                  onClick={() => handlePrevious(1, values)}
+                                  label={t("previous_text")}
+                                  type="button"
+                                />
                               </div>
-                            </>
-                          )}
-                        </Form>
-                      );
-                    }}
-                  </Formik>
-                </>
-              )}
+                              <div className="w-1/2 mx-0 md:mx-1">
+                                <Button
+                                  className="bg-background_steel_blue w-full text-text_white hover:bg-gray-100 font-medium rounded-lg text-sm px-5 py-2.5 mb-2"
+                                  label={t("submit_text")}
+                                  type="submit"
+                                />
+                              </div>
+                            </div>
+                          </>
+                        )}
+                      </Form>
+                    );
+                  }}
+                </Formik>
+              </>
+            )}
           </div>
         </div>
       </div>

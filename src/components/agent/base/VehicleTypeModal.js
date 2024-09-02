@@ -90,11 +90,19 @@ export default function VehicleTypeModal({VehicleTypeWithService, vehicleTypeNam
                 </button>
               </div>
               <div className="p-4 md:p-5 space-y-4">
-                <Input.Search
+                {/* <Input.Search
                   placeholder={t("search_vehicle_text")}
                   onChange={handleSearch}
                   value={searchText}
                   allowClear
+                /> */}
+                 <Input
+                  placeholder={t("search_vehicle_text")}
+                  onChange={handleSearch}
+                  value={searchText}
+                  allowClear
+                  prefix={<Icon icon="mingcute:search-line" width="24" height="24"  style={{color: "#C3A58B"}} />}
+                  className="p-3 bg-background_grey"
                 />
                 <div>
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -139,7 +147,7 @@ export default function VehicleTypeModal({VehicleTypeWithService, vehicleTypeNam
                             </div>
                             <hr />
 
-                            <div className="mt-3 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
+                            <div className="mt-3 grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-2">
                               <div
                                 className={`p-2 flex flex-col justify-center items-center rounded-md text-gray-200 text-center text-sm ${isHovered
                                   ? "bg-text_white text-background_steel_blue"

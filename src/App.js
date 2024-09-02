@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import "./App.css";
 import Layout from "./Layout";
@@ -15,6 +15,7 @@ import MyProfile from "./components/myprofile/MyProfile";
 import { useSelector } from "react-redux";
 import PaymentSuccess from "./components/paymentconfirmation/PaymentSuccess";
 import PaymentFailed from "./components/paymentconfirmation/PaymentFailed";
+import CheckPaymentStatus from "./components/paymentconfirmation/CheckPaymentStatus";
 // import PaymentConfirmation from "./components/paymentconfirmation/PaymentConfirmation";
 import PhoneSignUp from "./components/signup/PhoneSignUp";
 import PaymentMethodForm from "./components/paymentconfirmation/PaymentMethodForm";
@@ -38,61 +39,75 @@ import AgentPaymentSuccess from "./components/agent/paymentconfirmation/PaymentS
 import AgentPaymentFailed from "./components/agent/paymentconfirmation/PaymentFailed";
 import AgentEmailSentPage from "./components/agent/paymentconfirmation/EmailSentPage";
 import AgentThankYou from "./components/agent/paymentconfirmation/ThankYou";
+import AgentCheckPaymentStatus from "./components/agent/paymentconfirmation/CheckPaymentStatus";
 
 import NotFound from "./NotFound";
 import UnderMaintenance from "./UnderMaintenance";
 import TemporarilyUnavailable from "./TemporarilyUnavailable";
 import Terms from "./Terms";
 
+import TagManager from 'react-gtm-module';
+
 
 function App() {
   const { isLoggedIn } = useSelector((state) => state.auth);
+
+  useEffect(() => {
+    // Initialize Google Tag Manager
+    const tagManagerArgs = {
+      gtmId: 'GTM-KZ2N2DTR'
+    };
+    TagManager.initialize(tagManagerArgs);
+  }, []);
 
   return (
     <BrowserRouter>
       <Loader />
       <Routes>
-        <Route path="/" element={<Layout />} />
-        <Route path="/sign-in" element={<SignIn />} />
-        <Route path="/create-new-account" element={<SignUp />} />
-        <Route path="/otp" element={<OTPScreen />} />
-        <Route path="/phone-signup" element={<PhoneSignUp />} />
-        <Route path="/user-registration" element={<UserRegistration />} />
-        <Route path="/forget-password" element={<ForgetPassword />} />
-        <Route path="/forget-password-otp" element={<ForgetOtpScreen />} />
-        <Route path="/reset-password" element={<ResetPassword />} />
-        {isLoggedIn && <Route path="/my-bookings" element={<MyBooking />} />}
-        {isLoggedIn && <Route path="/my-profile" element={<MyProfile />} />}
-        {/* <Route path="/payment-confirmation" element={<PaymentConfirmation />} /> */}
-        <Route path="/payment-confirmation" element={<PaymentMethodForm />} />
-        <Route path="/payment-success" element={<PaymentSuccess />} />
-        <Route path="/payment-failed" element={<PaymentFailed />} />
-        <Route path="/email-sent" element={<EmailSentPage />} />
-        <Route path="/thank-you" element={<ThankYou />} />
+        <Route path="/mashrouk-new-ui/" element={<Layout />} />
+        <Route path="/mashrouk-new-ui/sign-in" element={<SignIn />} />
+        <Route path="/mashrouk-new-ui/create-new-account" element={<SignUp />} />
+        <Route path="/mashrouk-new-ui/otp" element={<OTPScreen />} />
+        <Route path="/mashrouk-new-ui/phone-signup" element={<PhoneSignUp />} />
+        <Route path="/mashrouk-new-ui/user-registration" element={<UserRegistration />} />
+        <Route path="/mashrouk-new-ui/forget-password" element={<ForgetPassword />} />
+        <Route path="/mashrouk-new-ui/forget-password-otp" element={<ForgetOtpScreen />} />
+        <Route path="/mashrouk-new-ui/reset-password" element={<ResetPassword />} />
+        {isLoggedIn && <Route path="/mashrouk-new-ui/my-bookings" element={<MyBooking />} />}
+        {isLoggedIn && <Route path="/mashrouk-new-ui/my-profile" element={<MyProfile />} />}
+        {/* <Route path="/mashrouk-new-ui/payment-confirmation" element={<PaymentConfirmation />} /> */}
+        <Route path="/mashrouk-new-ui/payment-confirmation" element={<PaymentMethodForm />} />
+        <Route path="/mashrouk-new-ui/payment-success" element={<PaymentSuccess />} />
+        <Route path="/mashrouk-new-ui/payment-failed" element={<PaymentFailed />} />
+        <Route path="/mashrouk-new-ui/payment-status" element={<CheckPaymentStatus />} />
+        <Route path="/mashrouk-new-ui/email-sent" element={<EmailSentPage />} />
+        <Route path="/mashrouk-new-ui/thank-you" element={<ThankYou />} />
 
-        <Route path="/join-agent" element={<JoinAgent />} />
-        <Route path="/request-submit" element={<RequestSubmit />} />
-        <Route path="/request-failed" element={<RequestFailed />} />
+        <Route path="/mashrouk-new-ui/join-agent" element={<JoinAgent />} />
+        <Route path="/mashrouk-new-ui/request-submit" element={<RequestSubmit />} />
+        <Route path="/mashrouk-new-ui/request-failed" element={<RequestFailed />} />
 
         {/* Agent routes */}
-        <Route path="/agent" element={<AgentLayout />} />
-        <Route path="/agent/create-new-account" element={<AgentSignUp />} />
-        <Route path="/agent/otp" element={<AgentOTPScreen />} />
-        <Route path="/agent/phone-signup" element={<AgentPhoneSignUp />} />
-        <Route path="/agent/user-registration" element={<AgentUserRegistration />} />
-        {isLoggedIn && <Route path="/agent/my-bookings" element={<AgentMyBooking />} />}
-        {/* {isLoggedIn && <Route path="/my-profile" element={<MyProfile />} />} */}
-        {/* <Route path="/payment-confirmation" element={<PaymentConfirmation />} /> */}
-        <Route path="/agent/payment-confirmation" element={<AgentPaymentMethodForm />} />
-        <Route path="/agent/payment-success" element={<AgentPaymentSuccess />} />
-        <Route path="/agent/payment-failed" element={<AgentPaymentFailed />} />
-        <Route path="/agent/email-sent" element={<AgentEmailSentPage />} />
-        <Route path="/agent/thank-you" element={<AgentThankYou />} />
+        <Route path="/mashrouk-new-ui/agent" element={<AgentLayout />} />
+        <Route path="/mashrouk-new-ui/agent/create-new-account" element={<AgentSignUp />} />
+        <Route path="/mashrouk-new-ui/agent/otp" element={<AgentOTPScreen />} />
+        <Route path="/mashrouk-new-ui/agent/phone-signup" element={<AgentPhoneSignUp />} />
+        <Route path="/mashrouk-new-ui/agent/user-registration" element={<AgentUserRegistration />} />
+        {isLoggedIn && <Route path="/mashrouk-new-ui/agent/my-bookings" element={<AgentMyBooking />} />}
+        {/* {isLoggedIn && <Route path="/mashrouk-new-ui/my-profile" element={<MyProfile />} />} */}
+        {/* <Route path="/mashrouk-new-ui/payment-confirmation" element={<PaymentConfirmation />} /> */}
+        <Route path="/mashrouk-new-ui/agent/payment-confirmation" element={<AgentPaymentMethodForm />} />
+        <Route path="/mashrouk-new-ui/agent/payment-success" element={<AgentPaymentSuccess />} />
+        <Route path="/mashrouk-new-ui/agent/payment-failed" element={<AgentPaymentFailed />} />
+        <Route path="/mashrouk-new-ui/agent/payment-status" element={<AgentCheckPaymentStatus />} />
+        <Route path="/mashrouk-new-ui/agent/email-sent" element={<AgentEmailSentPage />} />
+        <Route path="/mashrouk-new-ui/agent/thank-you" element={<AgentThankYou />} />
+        <Route path="/mashrouk-new-ui/agent/terms-condition" element={<Terms />} />
 
-        <Route path="*" element={<NotFound />} />
-        <Route path="/under-maintenance" element={<UnderMaintenance />} />
-        <Route path="/temporarily-unavailable" element={<TemporarilyUnavailable />} />
-        <Route path="/terms-condition" element={<Terms />} />
+        <Route path="/mashrouk-new-ui/*" element={<NotFound />} />
+        <Route path="/mashrouk-new-ui/under-maintenance" element={<UnderMaintenance />} />
+        <Route path="/mashrouk-new-ui/temporarily-unavailable" element={<TemporarilyUnavailable />} />
+        <Route path="/mashrouk-new-ui/terms-condition" element={<Terms />} />
       </Routes>
     </BrowserRouter>
   );

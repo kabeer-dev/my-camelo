@@ -22,7 +22,7 @@ export default function AuthFooter() {
               </li>
               <li>
                 <a
-                  href="/terms-of-service"
+                  href="/terms-condition"
                   className="text-background_steel_blue hover:underline me-4 md:me-6"
                 >
                   {t("footer.items_2.terms_text")}

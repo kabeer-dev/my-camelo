@@ -1,11 +1,12 @@
 import React from "react";
 import Button from "./Button";
 import { useTranslation } from "react-i18next";
-import axios from "axios";
+// import axios from "axios";
 import { useDispatch, useSelector } from "react-redux";
 import { setLoading } from "../../redux/actions/loaderAction";
 import jsPDF from 'jspdf';
 import { message } from "antd";
+import axiosInstance from "../../Api";
 
 export default function BookingCard({ booking }) {
   const [t, i18n] = useTranslation("global");
@@ -16,7 +17,7 @@ export default function BookingCard({ booking }) {
   const PdfDownload = async(bookingId) => {
     dispatch(setLoading(true));
     try{
-      const response = await axios.get(`${API_BASE_URL}/api/method/airport_transport.api.bookings.get_pdf_receipt?name=${bookingId}`,{
+      const response = await axiosInstance.get(`${API_BASE_URL}/api/method/airport_transport.api.bookings.get_pdf_receipt?name=${bookingId}`,{
         headers: {
           'Authorization': `Bearer ${token}`
         },
@@ -47,7 +48,7 @@ export default function BookingCard({ booking }) {
       <div className="bg-text_white rounded-md px-5 py-7 flex flex-col justify-center items-center mb-4">
         <div className="my-1">
           <img
-           src={`/assets/mybooking/${booking.status === 'Non-Payment Cancellation' ? 'Cancelled': (booking.status === 'Booked' ? 'Completed' : 'Booked')}.png`}
+           src={`./assets/mybooking/${booking.status === 'Non-Payment Cancellation' ? 'Cancelled': (booking.status === 'Booked' ? 'Completed' : 'Booked')}.png`}
             alt="ride-completed"
             className="w-20 h-20"
           />

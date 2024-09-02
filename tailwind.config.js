@@ -17,6 +17,7 @@ module.exports = {
       text_white: "#ffffff",
       text_black: "#000000",
       text_lightdark_grey: "#5D5D5D",
+      text_grey: "#B0B0B0",
       text_steel_blue: "#C3A58B",
       hover_steel_blue: "#C3A58B",
       bg_btn_back : "#5d5d5d",

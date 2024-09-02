@@ -7,8 +7,9 @@ import "./ForgetOtpScreen.css";
 import { message } from "antd";
 import { useDispatch, useSelector } from "react-redux";
 import { setLoading } from "../../redux/actions/loaderAction";
-import axios from "axios";
+// import axios from "axios";
 import { useTranslation } from "react-i18next";
+import axiosInstance from "../../Api"
 
 export default function ForgetOtpScreen() {
   const navigate = useNavigate();
@@ -16,7 +17,7 @@ export default function ForgetOtpScreen() {
   const dispatch = useDispatch();
   const [otp, setOtp] = useState("");
   const [error, setError] = useState("");
-  const [timer, setTimer] = useState(30); // Timer state
+  const [timer, setTimer] = useState(60); // Timer state
   const [showResend, setShowResend] = useState(false);
   const email = location.state?.email;
   const API_BASE_URL = process.env.REACT_APP_BASE_URL_AMK_TEST;
@@ -27,12 +28,12 @@ export default function ForgetOtpScreen() {
   const handleVerify = async () => {
     dispatch(setLoading(true));
     try {
-      const response = await axios.get(
+      const response = await axiosInstance.get(
         `${API_BASE_URL}/api/method/airport_transport.api.user.confirm_email?email=${email}&otp=${otp}`
       );
       if (response?.status === 200) {
         // message.success(`${response?.data?.msg}`);
-        navigate("/reset-password", { state: { otp: otp, email: email } });
+        navigate("/mashrouk-new-ui/reset-password", { state: { otp: otp, email: email } });
       }
     } catch (error) {
       message.error(`${error?.response?.data?.msg}`);
@@ -69,12 +70,12 @@ export default function ForgetOtpScreen() {
     // Handle resend OTP logic
     dispatch(setLoading(true))
     try {
-      const otpResponse = await axios.get(
+      const otpResponse = await axiosInstance.get(
         `${API_BASE_URL}/api/method/airport_transport.api.user.reset_password?email=${email}`,
       );
       // Redirect to OTP verification screen
       if (otpResponse?.status === 200) {
-        setTimer(30); // Reset timer
+        setTimer(60); // Reset timer
         setShowResend(false); // Hide resend button
         message.success(`${otpResponse?.data?.msg}`);
       }
@@ -90,23 +91,23 @@ export default function ForgetOtpScreen() {
       <div className="h-screen w-screen position relative">
         <div className="position absolute left-0 top-0" dir={language === 'ar' ? 'rtl' : 'ltr'}>
           <img
-            src="/assets/signin/left_vector.png"
+            src="./assets/signin/left_vector.png"
             alt="left_vector"
             className="w-24 h-24 md:w-48 md:h-48"
           />
         </div>
         <div className="position absolute right-0 bottom-0" dir={language === 'ar' ? 'rtl' : 'ltr'}>
           <img
-            src="/assets/signin/right_vector.png"
+            src="./assets/signin/right_vector.png"
             alt="right_vector"
             className="w-24 md:w-48 h-18 md:h-36"
           />
         </div>
         <div className="z-20 w-screen h-screen flex flex-row justify-center items-center">
           <div className="flex flex-col justify-center items-center">
-            <div className="mb-4 cursor-pointer" onClick={() => navigate("/")} dir={language === 'ar' ? 'rtl' : 'ltr'}>
+            <div className="mb-4 cursor-pointer" onClick={() => navigate("/mashrouk-new-ui/")} dir={language === 'ar' ? 'rtl' : 'ltr'}>
               <img
-                src="/assets/signin/logo.png"
+                src="./assets/signin/logo.png"
                 alt="Moshrouk Trips"
                 className="w-16 h-13"
               />
@@ -130,7 +131,7 @@ export default function ForgetOtpScreen() {
                     </span>{" "}
                     <span
                       className=" text-text_steel_blue underline font-bold cursor-pointer ml-1"
-                      onClick={() => navigate("/forget-password")}
+                      onClick={() => navigate("/mashrouk-new-ui/forget-password")}
                     >
                       ({t("change_text")})
                     </span>

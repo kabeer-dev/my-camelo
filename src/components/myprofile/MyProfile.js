@@ -6,13 +6,16 @@ import { message } from "antd";
 import { Formik, Form } from "formik";
 import * as Yup from "yup";
 import InputFieldFormik from "../base/InputFieldFormik";
-import axios from "axios";
+// import axios from "axios";
 import { setLoading } from "../../redux/actions/loaderAction";
 import Header from "../base/Header";
 import Footer from "../base/Footer";
 import { useTranslation } from "react-i18next";
+import axiosInstance from "../../Api";
+import { useNavigate } from "react-router-dom";
 
 export default function MyProfile() {
+  const navigate = useNavigate();
   const API_BASE_URL = process.env.REACT_APP_BASE_URL_AMK_TEST;
   const token = useSelector((state) => state.auth.token);
   const language = useSelector((state) => state.auth.language);
@@ -40,7 +43,7 @@ export default function MyProfile() {
     dispatch(setLoading(true));
     const getUserDetails = async () => {
       try {
-        const response = await axios.get(
+        const response = await axiosInstance.get(
           `${API_BASE_URL}/api/method/airport_transport.api.user.get_user_info`,
           {
             headers: {
@@ -79,6 +82,9 @@ export default function MyProfile() {
           dispatch(setLoading(false));
         }
       } catch (error) {
+        if (error.response.status === 401) {
+          navigate("/mashrouk-new-ui/sign-in");
+        }
         console.error("Error:", error);
         dispatch(setLoading(false));
       }
@@ -91,8 +97,8 @@ export default function MyProfile() {
   };
 
   useEffect(() => {
-    Events.scrollEvent.register("begin", function (to, element) { });
-    Events.scrollEvent.register("end", function (to, element) { });
+    Events.scrollEvent.register("begin", function (to, element) {});
+    Events.scrollEvent.register("end", function (to, element) {});
 
     scrollSpy.update();
 
@@ -132,7 +138,7 @@ export default function MyProfile() {
   // Fetch genderOptions and countriesOptions from APIs
   useEffect(() => {
     // Fetch country options
-    axios
+    axiosInstance
       .get(
         `${API_BASE_URL}/api/method/airport_transport.api.user.get_nationality`
       )
@@ -168,7 +174,7 @@ export default function MyProfile() {
     console.log("Transformed values for my profile:", transformedValues); // For testing purpose
     dispatch(setLoading(true));
     try {
-      const response = await axios.post(
+      const response = await axiosInstance.post(
         `${API_BASE_URL}/api/method/airport_transport.api.user.update_user_info`,
         transformedValues,
         {
@@ -193,7 +199,7 @@ export default function MyProfile() {
       <Header />
 
       {userDetails && (
-        <main className="mt-20" dir={language === 'ar' ? 'rtl' : 'ltr'}>
+        <main className="mt-20" dir={language === "ar" ? "rtl" : "ltr"}>
           {/* Form Section */}
           <div className="container mx-auto p-4">
             <div className="grid md:grid-cols-2 sm:grid-cols-1 gap-4">
@@ -444,7 +450,11 @@ export default function MyProfile() {
               </div>
 
               <div className="bg-background_steel_blue rounded-md flex items-center justify-center">
-                  <img src="/assets/myprofile/Logo.png" alt="Camelo Logo" className="m-auto"/>
+                <img
+                  src="./assets/myprofile/Logo.png"
+                  alt="Camelo Logo"
+                  className="m-auto"
+                />
               </div>
             </div>
           </div>

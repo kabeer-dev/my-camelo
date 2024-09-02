@@ -3,7 +3,7 @@ import { Formik, Form } from "formik";
 import * as Yup from "yup";
 import InputFieldFormik from "../base/InputFieldFormik";
 import Button from "../base/Button";
-import axios from "axios";
+// import axios from "axios";
 import { setLoading } from "../../redux/actions/loaderAction";
 import { message } from "antd";
 import OtpInput from "react-otp-input";
@@ -11,6 +11,7 @@ import HomePhoneSignUp from "./HomePhoneSignUp";
 import Recaptcha from "../base/Recaptcha";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
+import axiosInstance from '../../Api'
 
 import PaymentMethod from "./PaymentMethod";
 import { signInSuccess } from "../../redux/actions/authActions";
@@ -39,10 +40,12 @@ export default function HomeEmailSignUp({
   setOtp,
   phoneOtp,
   setPhoneOtp,
+  showPaybylinkQr, 
+  setShowPaybylinkQr
 }) {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const [timer, setTimer] = useState(30); // Timer state
+  const [timer, setTimer] = useState(60); // Timer state
   const [showResend, setShowResend] = useState(false); // State to show resend button
   const [email, setEmail] = useState("");
   const [error, setError] = useState("");
@@ -76,7 +79,7 @@ export default function HomeEmailSignUp({
         recaptchaToken: recaptchaToken,
       };
       try {
-        const response = await axios.post(
+        const response = await axiosInstance.post(
           `${API_BASE_URL}/api/method/airport_transport.api.user.login`,
           { usr: values.email, pwd: values.password },
           { headers: headers }
@@ -97,13 +100,13 @@ export default function HomeEmailSignUp({
           "Content-Type": "application/json",
           recaptchaToken: recaptchaToken,
         };
-        const response = await axios.get(
+        const response = await axiosInstance.get(
           `${API_BASE_URL}/api/method/airport_transport.api.user.check_email?email=${values.email}`,
           { headers: headers }
         );
         if (response?.status === 200) {
           try {
-            const otpResponse = await axios.get(
+            const otpResponse = await axiosInstance.get(
               `${API_BASE_URL}/api/method/airport_transport.api.user.send_confirmation_email?email=${values.email}`
             );
             if (otpResponse?.status === 200) {
@@ -135,7 +138,7 @@ export default function HomeEmailSignUp({
   const handleVerify = useCallback(async () => {
     dispatch(setLoading(true));
     try {
-      const response = await axios.get(
+      const response = await axiosInstance.get(
         `${API_BASE_URL}/api/method/airport_transport.api.user.confirm_email?email=${email}&otp=${otp}`
       );
       if (response?.status === 200) {
@@ -179,12 +182,12 @@ export default function HomeEmailSignUp({
     // Handle resend OTP logic
     dispatch(setLoading(true))
     try {
-      const otpResponse = await axios.get(
+      const otpResponse = await axiosInstance.get(
         `${API_BASE_URL}/api/method/airport_transport.api.user.send_confirmation_email?email=${email}`,
       );
       // Redirect to OTP verification screen
       if (otpResponse?.status === 200) {
-        setTimer(30); // Reset timer
+        setTimer(60); // Reset timer
         setShowResend(false); // Hide resend button
         message.success(`${otpResponse?.data?.msg}`);
       }
@@ -198,7 +201,7 @@ export default function HomeEmailSignUp({
   return (
     <>
       {showPaymentMethod ? (
-        <PaymentMethod formValues={formValues} />
+        <PaymentMethod formValues={formValues} showPaybylinkQr={showPaybylinkQr} setShowPaybylinkQr={setShowPaybylinkQr}/>
       ) : showPhone ? (
         <HomePhoneSignUp
           formValues={formValues}
@@ -270,7 +273,7 @@ export default function HomeEmailSignUp({
                   <div
                     className="mt-0 md:mt-2 lg:mt-0 w-full text-sm flex justify-end text-text_steel_blue cursor-pointer"
                     onClick={() =>
-                      navigate("/forget-password", {
+                      navigate("/mashrouk-new-ui/forget-password", {
                         state: { email: values.email },
                       })
                     }
@@ -278,7 +281,7 @@ export default function HomeEmailSignUp({
                     {t("hero.forget_password_text")}
                   </div>
 
-                  <div className="text-center mt-6 flex flex-col md:flex-row justify-between items-center">
+                  <div className="text-center mt-6 flex md:flex-col md:flex-row justify-between items-center">
                     <Button
                       className="bg-bg_btn_back w-full text-text_white hover:bg-gray-100 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2"
                       onClick={() => {
@@ -297,7 +300,7 @@ export default function HomeEmailSignUp({
               )}
 
               {!hideCreateAccountButton && !showAlreadyRegistered && (
-                <div className="text-center mt-6 flex flex-col md:flex-row justify-between items-center">
+                <div className="text-center mt-6 flex md:flex-col md:flex-row justify-between items-center">
                   <Button
                     className="bg-bg_btn_back w-full text-text_white hover:bg-gray-100 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2"
                     onClick={() => {
@@ -359,7 +362,7 @@ export default function HomeEmailSignUp({
                     </div>
                   </div>
 
-                  <div className="my-3 flex flex-col md:flex-row justify-between items-center">
+                  <div className="my-3 flex md:flex-col md:flex-row justify-between items-center">
                     <Button
                       className="bg-bg_btn_back w-full text-text_white hover:bg-gray-100 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2"
                       onClick={() => {

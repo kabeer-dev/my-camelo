@@ -3,12 +3,13 @@ import { Formik, Form } from "formik";
 import Heading from "../base/Heading";
 import * as Yup from "yup";
 import Button from "../base/Button";
-import axios from "axios";
+// import axios from "axios";
 import { setLoading } from "../../redux/actions/loaderAction";
 import { message } from "antd";
 import OtpInput from "react-otp-input";
 import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
+import axiosInstance from '../../Api';
 
 import { useDispatch, useSelector } from "react-redux";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -22,7 +23,7 @@ export default function PhoneSignUp() {
   const email = location.state?.email;
   const [error, setError] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
-  const [timer, setTimer] = useState(30); // Timer state
+  const [timer, setTimer] = useState(60); // Timer state
   const [showResend, setShowResend] = useState(false); // State to show resend button
 
   const [t, i18n] = useTranslation("global");
@@ -48,7 +49,7 @@ export default function PhoneSignUp() {
   const onPhoneSubmit = async (values, { setSubmitting }) => {
     dispatch(setLoading(true));
     try {
-      const response = await axios.get(
+      const response = await axiosInstance.get(
         `${API_BASE_URL}/api/method/airport_transport.api.user.send_mobile_otp?phone=${values.phone}`
       );
       if (response?.status === 200) {
@@ -59,7 +60,7 @@ export default function PhoneSignUp() {
       }
     } catch (error) {
       if (error?.response?.data?.msg === "SMS OTP not allowed for country") {
-        navigate("/user-registration", {
+        navigate("/mashrouk-new-ui/user-registration", {
           state: { email: email, phone: values.phone },
         });
       } else {
@@ -73,11 +74,11 @@ export default function PhoneSignUp() {
   const handleVerify = useCallback(async () => {
     dispatch(setLoading(true));
     try {
-      const response = await axios.get(
+      const response = await axiosInstance.get(
         `${API_BASE_URL}/api/method/airport_transport.api.user.confirm_phone?phone=${phoneNumber}&otp=${phoneOtp}`
       );
       if (response?.status === 200) {
-        navigate("/user-registration", {
+        navigate("/mashrouk-new-ui/user-registration", {
           state: { email: email, phone: phoneNumber },
         });
       }
@@ -117,7 +118,7 @@ export default function PhoneSignUp() {
     // Handle resend OTP logic
     dispatch(setLoading(true))
     try {
-      const otpResponse = await axios.get(
+      const otpResponse = await axiosInstance.get(
         `${API_BASE_URL}/api/method/airport_transport.api.user.send_confirmation_email?email=${email}`,
       );
       // Redirect to OTP verification screen
@@ -125,7 +126,7 @@ export default function PhoneSignUp() {
         message.success(`${otpResponse?.data?.msg}`);
         setShowPhoneOTPScreen(true);
         setHidePhoneCreateAccountButton(true);
-        setTimer(30); // Reset timer
+        setTimer(60); // Reset timer
         setShowResend(false);
       }
     } catch (error) {
@@ -141,14 +142,14 @@ export default function PhoneSignUp() {
       <div className="h-screen w-screen position relative">
         <div className="position absolute left-0 top-0" dir={language === 'ar' ? 'rtl' : 'ltr'}>
           <img
-            src="/assets/signin/left_vector.png"
+            src="./assets/signin/left_vector.png"
             alt="left_vector"
             className="w-24 h-24 md:w-48 md:h-48"
           />
         </div>
         <div className="position absolute right-0 bottom-0" dir={language === 'ar' ? 'rtl' : 'ltr'}>
           <img
-            src="/assets/signin/right_vector.png"
+            src="./assets/signin/right_vector.png"
             alt="right_vector"
             className="w-24 md:w-48 h-18 md:h-36"
           />
@@ -156,9 +157,9 @@ export default function PhoneSignUp() {
 
         <div className="z-20 w-screen h-screen flex flex-row justify-center items-center">
           <div className="flex flex-col justify-center items-center">
-            <div className="mb-4 cursor-pointer" onClick={() => navigate("/")} dir={language === 'ar' ? 'rtl' : 'ltr'}>
+            <div className="mb-4 cursor-pointer" onClick={() => navigate("/mashrouk-new-ui/")} dir={language === 'ar' ? 'rtl' : 'ltr'}>
               <img
-                src="/assets/signin/logo.png"
+                src="./assets/signin/logo.png"
                 alt="Moshrouk Trips"
                 className="w-16 h-13"
               />

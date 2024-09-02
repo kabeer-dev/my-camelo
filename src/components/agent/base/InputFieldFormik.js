@@ -12,6 +12,7 @@ import { Icon } from "@iconify/react";
 import creditCardType from "credit-card-type";
 import { useTranslation } from "react-i18next";
 import { useSelector } from "react-redux";
+import { useMedia } from "use-media";
 
 dayjs.extend(customParseFormat);
 
@@ -21,11 +22,13 @@ const InputFieldFormik = ({
   label,
   options = [],
   value,
-  onChange = () => { },
+  onChange = () => {},
   arrivalDates = null,
-  setArrivalDates = () => { },
+  setArrivalDates = () => {},
   percentageValue,
 }) => {
+  const isSmall = useMedia("(max-width: 768px)");
+
   const [timeError, setTimeError] = useState("");
   const [, , helpers] = useField(name);
 
@@ -61,9 +64,7 @@ const InputFieldFormik = ({
         const selectedTime = dayjs(timeString, "HH:mm");
 
         if (selectedTime.isBefore(currentTime.add(8, "hour"))) {
-          setTimeError(
-            t("errors.hour_2_error")
-          );
+          setTimeError(t("errors.hour_2_error"));
           helpers.setValue("");
           return;
         }
@@ -75,7 +76,6 @@ const InputFieldFormik = ({
     } else {
       setTimeError(t("errors.date_first_error"));
     }
-
   };
 
   const renderErrorMessage = (msg) => (
@@ -120,27 +120,54 @@ const InputFieldFormik = ({
 
       {type === "select" && (
         <>
-          <Select
-            direction={language === 'ar' ? 'rtl' : 'ltr'}
-            size="large"
-            showSearch
-            placeholder={`Select ${label}`}
-            optionFilterProp="children"
-            onChange={handleSelectChange}
-            options={options}
-            value={value}
-            filterOption={(input, option) =>
-              (option?.label ?? "").toLowerCase().includes(input.toLowerCase())
-            }
-            {...commonProps}
-          />
+          {name === "agentUser" ? (
+            <Select
+              direction={language === "ar" ? "rtl" : "ltr"}
+              size="large"
+              showSearch
+              placeholder={`Select ${label}`}
+              optionFilterProp="children"
+              onChange={handleSelectChange}
+              options={options}
+              // value={value}
+              filterOption={(input, option) =>
+                (option?.label ?? "")
+                  .toLowerCase()
+                  .includes(input.toLowerCase())
+              }
+              {...commonProps}
+              style={{ width: isSmall ? "285px" : "100%" }}
+            />
+          ) : (
+            <Select
+              direction={language === "ar" ? "rtl" : "ltr"}
+              size="large"
+              showSearch
+              placeholder={`Select ${label}`}
+              optionFilterProp="children"
+              onChange={handleSelectChange}
+              options={options}
+              // value={value}
+              filterOption={(input, option) =>
+                (option?.label ?? "")
+                  .toLowerCase()
+                  .includes(input.toLowerCase())
+              }
+              {...commonProps}
+            />
+          )}
         </>
       )}
 
       {type === "checkbox" && (
         <div className="mb-3 flex flex-row justify-between items-center">
           <div>
-            <div className="text-sm">{`${t("hero.select_shared_ride_text")} ${percentageValue}%`}</div>
+            <div className="text-sm text-text_grey">
+              <span>{`${t("hero.select_shared_ride_text")}`} </span>
+              <span className="text-text_steel_blue font-bold">
+                {language === "eng" ? "discount" : "تخفيض"} {percentageValue}%
+              </span>
+            </div>
           </div>
           <div>
             <Field
@@ -213,7 +240,7 @@ const InputFieldFormik = ({
       )}
 
       {["text", "email", "number", "tel"].includes(type) && (
-        <Field direction={language === 'ar' ? 'rtl' : 'ltr'} name={name} >
+        <Field direction={language === "ar" ? "rtl" : "ltr"} name={name}>
           {({ field }) => (
             <Input
               size="large"
@@ -254,7 +281,7 @@ const InputFieldFormik = ({
       )}
 
       {["readOnly"].includes(type) && (
-        <Field name={name} >
+        <Field name={name}>
           {({ field }) => (
             <Input
               {...field}

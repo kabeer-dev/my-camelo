@@ -44,14 +44,14 @@ export default function SignIn() {
       <div className="h-screen w-screen position relative">
         <div className="position absolute left-0 top-0" dir={language === 'ar' ? 'rtl' : 'ltr'}>
           <img
-            src="/assets/signin/left_vector.png"
+            src="./assets/signin/left_vector.png"
             alt="left_vector"
             className="w-24 h-24 md:w-48 md:h-48"
           />
         </div>
         <div className="position absolute right-0 bottom-0" dir={language === 'ar' ? 'rtl' : 'ltr'}>
           <img
-            src="/assets/signin/right_vector.png"
+            src="./assets/signin/right_vector.png"
             alt="right_vector"
             className="w-16 md:w-48 h-12 md:h-36"
           />
@@ -59,9 +59,9 @@ export default function SignIn() {
 
         <div className="z-20 w-screen h-screen flex flex-row justify-center items-center">
           <div className="flex flex-col justify-center items-center">
-            <div className="mb-4 cursor-pointer" onClick={() => navigate("/")} dir={language === 'ar' ? 'rtl' : 'ltr'}>
+            <div className="mb-4 cursor-pointer" onClick={() => navigate("/mashrouk-new-ui/")} dir={language === 'ar' ? 'rtl' : 'ltr'}>
               <img
-                src="/assets/signin/logo.png"
+                src="./assets/signin/logo.png"
                 alt="Moshrouk Trips"
                 className="w-16 h-13"
               />
@@ -115,7 +115,7 @@ export default function SignIn() {
                         <div
                           className="mt-0 md:mt-2 lg:mt-0 w-full text-sm flex justify-end rtl:justify-start text-text_steel_blue cursor-pointer"
                           onClick={() =>
-                            navigate("/forget-password", {
+                            navigate("/mashrouk-new-ui/forget-password", {
                               state: { email: values.email },
                             })
                           }
@@ -136,7 +136,7 @@ export default function SignIn() {
                           <span>{t("no_account_text")}</span>
                           <span
                             className="text-sm font-semibold mr-2 text-text_steel_blue hover:underline ml-2"
-                            onClick={() => navigate("/create-new-account")}
+                            onClick={() => navigate("/mashrouk-new-ui/create-new-account")}
                           >
                              {t("header.create_text")}
                           </span>

@@ -1,18 +1,19 @@
 import { call, put, takeEvery } from "redux-saga/effects";
-import axios from "axios";
+// import axios from "axios";
 import {
   FETCH_AIRPORT_REQUEST,
   fetchAirportSuccess,
   fetchAirportFailure,
 } from "../actions/airportActions";
 import secureLocalStorage from "react-secure-storage";
+import axiosInstance from "../../Api";
 
 const API_BASE_URL = process.env.REACT_APP_BASE_URL_AMK_TEST;
 
 function fetchAirport(action) {
   const cityName = action.payload;
   const language = secureLocalStorage.getItem("language");
-  return axios.get(
+  return axiosInstance.get(
     `${API_BASE_URL}/api/method/airport_transport.api.bookings.get_airport?city=${cityName}&language=${language ? language : 'eng'}`
   );
 }

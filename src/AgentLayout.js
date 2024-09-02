@@ -10,8 +10,9 @@ import { useDispatch, useSelector } from "react-redux";
 import { useLocation, useNavigate } from "react-router-dom";
 import secureLocalStorage from "react-secure-storage";
 import { agentChange } from "./redux/actions/authActions";
-import axios from "axios";
+// import axios from "axios";
 import { setLoading } from "./redux/actions/loaderAction";
+import axiosInstance from "./Api";
 
 export default function AgentLayout() {
   // Define array of menu items with corresponding component IDs
@@ -33,12 +34,11 @@ export default function AgentLayout() {
     if (email && isLoggedIn) {
       const checkAgent = async () => {
         try {
-          const response = await axios.post(`${API_BASE_URL}/api/method/airport_transport.api.user.detect_email?email=${email}`);
+          const response = await axiosInstance.post(`${API_BASE_URL}/api/method/airport_transport.api.user.detect_email?email=${email}`);
           if (response && response.status === 200) {
             console.log('ss', response.data.msg)
             if(response.data.msg !== 'Agent User'){
-              console.log('yes')
-              navigate('/')
+              navigate('/mashrouk-new-ui')
             }
           }
         } catch (error) {
@@ -47,7 +47,7 @@ export default function AgentLayout() {
       }
       checkAgent()
     }else if(!agent || !isLoggedIn){
-      navigate('/')
+      navigate('/mashrouk-new-ui')
     }
 
     dispatch(setLoading(false))

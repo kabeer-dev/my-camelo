@@ -14,7 +14,7 @@ export default function AuthFooter() {
             <ul className="flex flex-wrap items-center mb-6 text-sm font-medium text-gray-500 sm:mb-0 dark:text-gray-400">
               <li>
                 <a
-                  href="/privacy-policy"
+                  href="/agent/privacy-policy"
                   className="text-background_steel_blue hover:underline me-4 md:me-6"
                 >
                   {t("footer.items_2.privacy_text")}
@@ -22,7 +22,7 @@ export default function AuthFooter() {
               </li>
               <li>
                 <a
-                  href="/terms-of-service"
+                  href="/agent/terms-condition"
                   className="text-background_steel_blue hover:underline me-4 md:me-6"
                 >
                   {t("footer.items_2.terms_text")}
