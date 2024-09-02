@@ -284,7 +284,7 @@ export default function HomePhoneSignUp({
                     type="button"
                   />
                   <Button
-                    className="bg-background_steel_blue w-full text-text_white hover:bg-gray-100 font-medium rounded text-sm px-5 py-2.5 me-2 mb-2"
+                    className="bg-background_steel_blue w-1/2 text-text_white hover:bg-gray-100 font-medium rounded text-sm px-5 py-2.5 me-2 mb-2"
                     label={t("next_text")}
                     type="submit"
                   />

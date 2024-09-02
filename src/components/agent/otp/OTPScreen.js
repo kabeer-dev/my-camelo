@@ -34,8 +34,8 @@ export default function OTPScreen() {
       );
       if (response?.status === 200) {
         message.success(`${response?.data?.msg}`);
-        navigate("/mashrouk-new-ui/agent/phone-signup", { state: { email: email } });
-        // navigate("/mashrouk-new-ui/user-registration", { state: { email: email } });
+        navigate("/agent/phone-signup", { state: { email: email } });
+        // navigate("/user-registration", { state: { email: email } });
         dispatch(setLoading(false));
       }
     } catch (error) {
@@ -94,23 +94,23 @@ export default function OTPScreen() {
       <div className="h-screen w-screen position relative">
         <div className="position absolute left-0 top-0" dir={language === 'ar' ? 'rtl' : 'ltr'}>
           <img
-            src="./assets/signin/left_vector.png"
+            src="/assets/signin/left_vector.png"
             alt="left_vector"
             className="w-24 h-24 md:w-48 md:h-48"
           />
         </div>
         <div className="position absolute right-0 bottom-0" dir={language === 'ar' ? 'rtl' : 'ltr'}>
           <img
-            src="./assets/signin/right_vector.png"
+            src="/assets/signin/right_vector.png"
             alt="right_vector"
             className="w-24 md:w-48 h-18 md:h-36"
           />
         </div>
         <div className="z-20 w-screen h-screen flex flex-row justify-center items-center">
           <div className="flex flex-col justify-center items-center">
-            <div className="mb-4 cursor-pointer" onClick={() => navigate("/mashrouk-new-ui/agent")} dir={language === 'ar' ? 'rtl' : 'ltr'}>
+            <div className="mb-4 cursor-pointer" onClick={() => navigate("/agent")} dir={language === 'ar' ? 'rtl' : 'ltr'}>
               <img
-                src="./assets/signin/logo.png"
+                src="/assets/signin/logo.png"
                 alt="Moshrouk Trips"
                 className="w-16 h-13"
               />
@@ -129,7 +129,7 @@ export default function OTPScreen() {
                     </span>{" "}
                     <span
                       className=" text-text_steel_blue underline font-bold cursor-pointer ml-1"
-                      onClick={() => navigate("/mashrouk-new-ui/agent/create-new-account")}
+                      onClick={() => navigate("/agent/create-new-account")}
                     >
                       ({t("change_text")})
                     </span>

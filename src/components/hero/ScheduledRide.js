@@ -112,7 +112,6 @@ export default function ScheduledRide({
     dispatch(setLoading(false));
   }, [cityName]);
 
-
   useEffect(() => {
     if (vehicleTypeName !== "") {
       const selectedVehicle = VehicleTypeWithService.data.find(
@@ -551,7 +550,7 @@ export default function ScheduledRide({
                             </div>
                           </div>
 
-                          <div className="mt-3 flex md:flex-row justify-between items-center">
+                          <div className="mt-3 flex flex-row justify-between items-center">
                             <div className="w-1/2 mx-0 md:mx-1">
                               <Button
                                 className="bg-bg_btn_back w-full text-text_white hover:bg-gray-100 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2"

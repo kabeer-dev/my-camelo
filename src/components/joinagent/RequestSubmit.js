@@ -34,7 +34,7 @@ export default function RequestSubmit() {
             <div className="grid grid-cols-1 gap-3">
               <div className="mx-auto">
                 <img
-                  src="./assets/paymentconditions/paymentsuccess.png"
+                  src="/assets/paymentconditions/paymentsuccess.png"
                   alt="payment success"
                 />
               </div>
@@ -51,7 +51,7 @@ export default function RequestSubmit() {
               <div className="m-auto">
                 <button
                   type="button"
-                  onClick={() => navigate("/mashrouk-new-ui/")}
+                  onClick={() => navigate("/")}
                   className="bg-background_steel_blue text-text_white hover:bg-gray-100 font-medium text-sm px-5 py-2.5 me-2 mb-2"
                 >
                   {t("back_home_text")}

@@ -1,15 +1,18 @@
 import React, { useState, useEffect } from "react";
-// import { Icon } from "@iconify/react";
+import { Icon } from "@iconify/react";
 import { Events, scrollSpy } from "react-scroll";
-import { useLocation } from "react-router-dom";
-import { useSelector } from "react-redux";
+import { useLocation, useNavigate } from "react-router-dom";
+import { useSelector, useDispatch } from "react-redux";
 import Header from "../base/Header";
 import Footer from "../base/Footer";
 import { useTranslation } from "react-i18next";
 
 const PaymentMethodForm = () => {
   const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
+  const username = useSelector((state) => state.auth.username);
+  const dispatch = useDispatch();
   const location = useLocation();
+  const navigate = useNavigate();
   const language = useSelector((state) => state.auth.language);
 
   useEffect(() => {
@@ -26,18 +29,18 @@ const PaymentMethodForm = () => {
   const [t, i18n] = useTranslation("global");
 
   const baseUrl = window.location.protocol + "//" + window.location.host;
-  const successUrl = `${baseUrl}/mashrouk-new-ui/payment-success`;
-  const failureUrl = baseUrl + "/mashrouk-new-ui/payment-failed";
-  const paymentStatus = baseUrl + "/mashrouk-new-ui/payment-status";
+  const successUrl = `${baseUrl}/payment-success`;
+  const failureUrl = `${baseUrl}/payment-failed`;
+  const paymentStatus = `${baseUrl}/payment-status`;
+  // const failureUrl = baseUrl + '/payment-failed';
 
   useEffect(() => {
-    localStorage.setItem("checkId", checkoutId);
     localStorage.setItem("payment", true);
     localStorage.setItem("paymentMethodName", paymentMethodName);
     if (checkoutId) {
       // Inject the paymentWidgets.js script
       const paymentWidgetScript = document.createElement("script");
-      paymentWidgetScript.src = `https://eu-test.oppwa.com/v1/paymentWidgets.js?checkoutId=${checkoutId}`;
+      paymentWidgetScript.src = `https://eu-prod.oppwa.com/v1/paymentWidgets.js?checkoutId=${checkoutId}`;
       paymentWidgetScript.async = true;
       document.body.appendChild(paymentWidgetScript);
 
@@ -109,7 +112,6 @@ const PaymentMethodForm = () => {
                   </div>
                   <form
                     action={paymentStatus}
-                    // action={paymentStatus()}
                     className="paymentWidgets"
                     data-brands={
                       paymentMethodName === "Mada"

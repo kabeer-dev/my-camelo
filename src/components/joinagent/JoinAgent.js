@@ -168,7 +168,7 @@ export default function JoinAgent() {
                 if (response && response.status === 200) {
                     // console.log(response)
                     message.success(response.data.msg);
-                    navigate('/mashrouk-new-ui/request-submit')
+                    navigate('/request-submit')
                 }
             }
             catch (error) {
@@ -339,7 +339,7 @@ export default function JoinAgent() {
                                             onDragLeave={handleDragLeave}
                                         >
                                             <div className="bg-background_grey p-6 ">
-                                                <img src="./assets/joinagent/upload_Icon.png" alt="Upload Icon" className="m-auto" />
+                                                <img src="/assets/joinagent/upload_Icon.png" alt="Upload Icon" className="m-auto" />
                                                 <p
                                                     onClick={handleClick}
                                                     className="flex justify-center items-center bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-300 m-auto"
@@ -394,12 +394,12 @@ export default function JoinAgent() {
                         <p className="text-text_white text-center text-lg">
                             {t("advantagies_text")}
                         </p>
-                        <img src="./assets/joinagent/logo.png" alt="logo" className="mt-3 m-auto" />
+                        <img src="/assets/joinagent/logo.png" alt="logo" className="mt-3 m-auto" />
                         <div>
                             {featurePairs.map((feature) => (
                                 <div key={feature.id} className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-10">
                                     <div className="flex">
-                                        <img src="./assets/joinagent/featureLogo.png" />
+                                        <img src="/assets/joinagent/featureLogo.png" />
                                         <div className="ml-3">
                                             <p className="text-text_white">{feature[0].name}</p>
                                             <p className="text-text_white">{feature[0].description}</p>
@@ -407,7 +407,7 @@ export default function JoinAgent() {
                                     </div>
                                     <div>
                                         <div className="flex">
-                                            <img src="./assets/joinagent/featureLogo.png" />
+                                            <img src="/assets/joinagent/featureLogo.png" />
                                             <div className="ml-3">
                                                 <p className="text-text_white">{feature[1].name}</p>
                                                 <p className="text-text_white">{feature[1].description}</p>

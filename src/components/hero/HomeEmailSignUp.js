@@ -40,8 +40,6 @@ export default function HomeEmailSignUp({
   setOtp,
   phoneOtp,
   setPhoneOtp,
-  showPaybylinkQr, 
-  setShowPaybylinkQr
 }) {
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -201,7 +199,7 @@ export default function HomeEmailSignUp({
   return (
     <>
       {showPaymentMethod ? (
-        <PaymentMethod formValues={formValues} showPaybylinkQr={showPaybylinkQr} setShowPaybylinkQr={setShowPaybylinkQr}/>
+        <PaymentMethod formValues={formValues} />
       ) : showPhone ? (
         <HomePhoneSignUp
           formValues={formValues}
@@ -273,7 +271,7 @@ export default function HomeEmailSignUp({
                   <div
                     className="mt-0 md:mt-2 lg:mt-0 w-full text-sm flex justify-end text-text_steel_blue cursor-pointer"
                     onClick={() =>
-                      navigate("/mashrouk-new-ui/forget-password", {
+                      navigate("/forget-password", {
                         state: { email: values.email },
                       })
                     }

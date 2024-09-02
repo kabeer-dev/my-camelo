@@ -76,7 +76,7 @@ export default function SignUp() {
           // Redirect to OTP verification screen
           if (otpResponse?.status === 200) {
             message.success(`${otpResponse?.data?.msg}`);
-            navigate("/mashrouk-new-ui/agent/otp", { state: { email: values.email } });
+            navigate("/agent/otp", { state: { email: values.email } });
             dispatch(setLoading(false))
           }
         } catch (error) {
@@ -98,14 +98,14 @@ export default function SignUp() {
       <div className="h-screen w-screen position relative">
         <div className="position absolute left-0 top-0" dir={language === 'ar' ? 'rtl' : 'ltr'}>
           <img
-            src="./assets/signin/left_vector.png"
+            src="/assets/signin/left_vector.png"
             alt="left_vector"
             className="w-24 h-24 md:w-48 md:h-48"
           />
         </div>
         <div className="position absolute right-0 bottom-0" dir={language === 'ar' ? 'rtl' : 'ltr'}>
           <img
-            src="./assets/signin/right_vector.png"
+            src="/assets/signin/right_vector.png"
             alt="right_vector"
             className="w-24 md:w-48 h-18 md:h-36"
           />
@@ -113,9 +113,9 @@ export default function SignUp() {
 
         <div className="z-20 w-screen h-screen flex flex-row justify-center items-center">
           <div className="flex flex-col justify-center items-center">
-            <div className="mb-4 cursor-pointer" onClick={() => navigate("/mashrouk-new-ui/agent")} dir={language === 'ar' ? 'rtl' : 'ltr'}>
+            <div className="mb-4 cursor-pointer" onClick={() => navigate("/agent")} dir={language === 'ar' ? 'rtl' : 'ltr'}>
               <img
-                src="./assets/signin/logo.png"
+                src="/assets/signin/logo.png"
                 alt="Moshrouk Trips"
                 className="w-16 h-13"
               />
@@ -160,7 +160,7 @@ export default function SignUp() {
                           className="bg-background_steel_blue w-full text-text_white hover:bg-gray-100 font-medium rounded text-sm px-5 py-2.5 me-2 mb-2"
                           label={t("create_a_text")}
                           type="submit"
-                          onClick={() => navigate("/mashrouk-new-ui/agent/create-new-account")}
+                          onClick={() => navigate("/agent/create-new-account")}
                         />
                       </div>
 
@@ -168,7 +168,7 @@ export default function SignUp() {
                         {t("already_account_text")}{" "}
                         <span
                           className="text-sm font-semibold ml-2 text-text_steel_blue hover:underline"
-                          onClick={() => navigate("/mashrouk-new-ui/agent/sign-in")}
+                          onClick={() => navigate("/agent/sign-in")}
                         >
                           {t("header.sign_in_text")}
                         </span>

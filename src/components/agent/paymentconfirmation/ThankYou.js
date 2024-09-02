@@ -144,7 +144,7 @@ export default function ThankYou() {
             <div className="grid grid-cols-1 gap-3">
               <div className="mx-auto">
                 <img
-                  src="./assets/paymentconditions/paymentsuccess.png"
+                  src="/assets/paymentconditions/paymentsuccess.png"
                   alt="payment success"
                 />
               </div>
@@ -155,7 +155,7 @@ export default function ThankYou() {
                 className="bg-background_steel_blue text-text_white hover:bg-gray-100 font-medium rounded text-sm px-5 py-2.5 mb-2 "
                 label="OK"
                 type="button"
-                onClick={() => navigate('/mashrouk-new-ui/agent')}
+                onClick={() => navigate('/agent')}
               />
             </div>
           </div>

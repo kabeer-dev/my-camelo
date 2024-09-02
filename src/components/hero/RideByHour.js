@@ -89,28 +89,6 @@ export default function RideByHour({
   const API_BASE_URL = process.env.REACT_APP_BASE_URL_AMK_TEST;
 
   const [VehicleTypeWithService, setVehicleTypeWithService] = useState(null);
-  // useEffect(() => {
-  //   dispatch(setLoading(true));
-  //   const getVechileTypes = async () => {
-  //     if (cityName) {
-  //       try {
-  //         const response = await axiosInstance.get(
-  //           `${API_BASE_URL}/api/method/airport_transport.api.bookings.get_vehicle_types?language=${
-  //             language ? language : "eng"
-  //           }&service=Book Vehicle In Hours&city=${cityName}`
-  //         );
-  //         if (response && response.status === 200) {
-  //           // console.log('hhh', response.data)
-  //           setVehicleTypeWithService(response.data);
-  //         }
-  //       } catch (error) {
-  //         console.log("Error", error);
-  //       }
-  //     }
-  //     getVechileTypes();
-  //   };
-  //   dispatch(setLoading(false));
-  // }, [cityName]);
 
   useEffect(() => {
     dispatch(setLoading(true));
@@ -517,7 +495,7 @@ export default function RideByHour({
                               </div>
                             </div>
 
-                            <div className="mt-3 flex md:flex-row justify-between items-center">
+                            <div className="mt-3 flex flex-row justify-between items-center">
                               <div className="w-1/2 mx-0 md:mx-1">
                                 <Button
                                   className="bg-bg_btn_back w-full text-text_white hover:bg-gray-100 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2"

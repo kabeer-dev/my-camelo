@@ -181,7 +181,7 @@ export default function UserRegistration() {
         );
         if (response && response.status === 200) {
           message.success(`${response?.data?.msg}`)
-          navigate('/mashrouk-new-ui/agent')
+          navigate('/agent')
         }
       } catch (error) {
         message.error(`${error?.response?.data?.msg}`);
@@ -200,23 +200,23 @@ export default function UserRegistration() {
       <div className="h-screen w-screen position relative" dir={language === 'ar' ? 'rtl' : 'ltr'}>
         <div className="position absolute left-0 top-0">
           <img
-            src="./assets/signin/left_vector.png"
+            src="/assets/signin/left_vector.png"
             alt="left_vector"
             className="w-20 h-20 md:w-48 md:h-48"
           />
         </div>
         <div className="position absolute right-0 bottom-0">
           <img
-            src="./assets/signin/right_vector.png"
+            src="/assets/signin/right_vector.png"
             alt="right_vector"
             className="w-16 md:w-48 h-12 md:h-36"
           />
         </div>
         <div className="z-20 w-screen h-screen flex flex-row justify-center items-center">
           <div className="flex flex-col justify-center items-center">
-            <div className="mb-2 cursor-pointer" onClick={() => navigate("/mashrouk-new-ui/agent")}>
+            <div className="mb-2 cursor-pointer" onClick={() => navigate("/agent")}>
               <img
-                src="./assets/signin/logo.png"
+                src="/assets/signin/logo.png"
                 alt="Moshrouk Trips"
                 className="w-16 h-13"
               />

@@ -2,7 +2,6 @@
   "name": "camelo",
   "version": "0.1.0",
   "private": true,
-  "homepage": "/mashrouk-new-ui/",
   "dependencies": {
     "@headlessui/react": "^2.1.2",
     "@iconify/react": "^5.0.0-beta.2",

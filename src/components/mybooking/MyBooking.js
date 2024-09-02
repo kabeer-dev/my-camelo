@@ -46,15 +46,14 @@ export default function MyBooking() {
           setTotalPages(listArray)
           setFilteredBookings(data)
           // }
-          dispatch(setLoading(false));
         }
       }
       catch (error) {
         console.error('Error:', error);
-        dispatch(setLoading(false));
       };
     }
     getUserDetails();
+    dispatch(setLoading(false));
   }, [token])
 
   // const testBookings = [

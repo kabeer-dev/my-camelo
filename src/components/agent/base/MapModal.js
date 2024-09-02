@@ -1,16 +1,16 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, {useState, useRef, useEffect} from 'react';
 import {
   GoogleMap,
   LoadScript,
   Marker,
   Polygon,
   StandaloneSearchBox,
-} from "@react-google-maps/api";
-import axios from "axios";
-import { setLoading } from "../../../redux/actions/loaderAction";
-import { useDispatch } from "react-redux";
-import { useTranslation } from "react-i18next";
-import { Icon } from "@iconify/react";
+} from '@react-google-maps/api';
+import axios from 'axios';
+import {setLoading} from '../../../redux/actions/loaderAction';
+import {useDispatch} from 'react-redux';
+import {useTranslation} from 'react-i18next';
+import {Icon} from '@iconify/react';
 
 export default function MapModal({
   rideName,
@@ -21,23 +21,24 @@ export default function MapModal({
   setLocation,
   setDestination,
 }) {
-  const [t, i18n] = useTranslation("global");
+  const [t, i18n] = useTranslation('global');
   const dispatch = useDispatch();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedPickup, setSelectedPickup] = useState(null);
   const [selectedDropoff, setSelectedDropoff] = useState(null);
-  const [error, setError] = useState("");
+  const [error, setError] = useState('');
   const [searchBox, setSearchBox] = useState(null); // State to hold the StandaloneSearchBox instance
+  const [currentLocation, setCurrentLocation] = useState(null);
 
   const mapRef = useRef(null);
 
   const containerStyle = {
-    width: "100%",
-    height: "400px",
+    width: '100%',
+    height: '400px',
   };
 
   let center;
-  if (cityName === t("hero.dammam_text")) {
+  if (cityName === t('hero.dammam_text')) {
     if (selectedPickup) {
       center = selectedPickup;
     } else if (selectedDropoff) {
@@ -49,7 +50,7 @@ export default function MapModal({
       };
     }
   }
-  if (cityName === t("hero.riyadh_text")) {
+  if (cityName === t('hero.riyadh_text')) {
     if (selectedPickup) {
       center = selectedPickup;
     } else if (selectedDropoff) {
@@ -65,7 +66,7 @@ export default function MapModal({
   const openModal = () => setIsModalOpen(true);
   const closeModal = () => {
     setIsModalOpen(false);
-    setError("");
+    setError('');
   };
 
   const convertedCoords = zoneCoords.map((coord) =>
@@ -84,10 +85,10 @@ export default function MapModal({
   // }
   useEffect(() => {
     const setPickOrDrop = async () => {
-      if (rideName === "airportRide") {
+      if (rideName === 'airportRide') {
         dispatch(setLoading(true));
         let point;
-        const apiKey = "AIzaSyBMTLXpuXtkEfbgChZzsj7LPYlpGxHI9iU";
+        const apiKey = 'AIzaSyBMTLXpuXtkEfbgChZzsj7LPYlpGxHI9iU';
         const encodedAddress = encodeURIComponent(
           `${formValues.airportName} ${formValues.terminalNumber}`
         ); // Encode the address
@@ -97,31 +98,31 @@ export default function MapModal({
           const location = response.data.results[0].geometry.location;
           const latitude = location.lat;
           const longitude = location.lng;
-          point = { lat: latitude, lng: longitude };
+          point = {lat: latitude, lng: longitude};
         } catch (error) {
-          console.error("Error fetching location:", error.message);
+          console.error('Error fetching location:', error.message);
         }
-        if (cityName === t("hero.dammam_text")) {
-          const Dammampoint = { lat: 26.3927, lng: 49.9777 };
-          if (formValues.rideType === t("hero.pickup_value_text")) {
+        if (cityName === t('hero.dammam_text')) {
+          const Dammampoint = {lat: 26.3927, lng: 49.9777};
+          if (formValues.rideType === t('hero.pickup_value_text')) {
             setLocation(
               `${formValues.airportName} ${formValues.terminalNumber} ${formValues.arrivalCity} Saudi Arabia`
             );
             setSelectedPickup(point);
-          } else if (formValues.rideType === t("hero.dropoff_value_text")) {
+          } else if (formValues.rideType === t('hero.dropoff_value_text')) {
             setDestination(
               `${formValues.airportName} ${formValues.terminalNumber} ${formValues.arrivalCity} Saudi Arabia`
             );
             setSelectedDropoff(point);
           }
         } else {
-          const Riyadhpoint = { lng: 46.6753, lat: 24.7136 };
-          if (formValues.rideType === t("hero.pickup_value_text")) {
+          const Riyadhpoint = {lng: 46.6753, lat: 24.7136};
+          if (formValues.rideType === t('hero.pickup_value_text')) {
             setLocation(
               `${formValues.airportName} ${formValues.terminalNumber} ${formValues.arrivalCity} Saudi Arabia`
             );
             setSelectedPickup(point);
-          } else if (formValues.rideType === t("hero.dropoff_value_text")) {
+          } else if (formValues.rideType === t('hero.dropoff_value_text')) {
             setDestination(
               `${formValues.airportName} ${formValues.terminalNumber} ${formValues.arrivalCity} Saudi Arabia`
             );
@@ -135,7 +136,7 @@ export default function MapModal({
   }, [rideName, cityName, formValues.rideType]);
 
   const isPointInPolygon = (point, polygon, index) => {
-    const { lat, lng } = point;
+    const {lat, lng} = point;
     let inside = false;
     if (index) {
       for (
@@ -176,12 +177,12 @@ export default function MapModal({
 
   const onMapClick = async (event, index) => {
     // if (index) {
-    const point = { lat: event.latLng.lat(), lng: event.latLng.lng() };
+    const point = {lat: event.latLng.lat(), lng: event.latLng.lng()};
     if (isPointInPolygon(point, convertedCoords, index)) {
-      console.log("poly");
-      setError("");
+      console.log('poly');
+      setError('');
       dispatch(setLoading(true));
-      if (rideName === "airportRide") {
+      if (rideName === 'airportRide') {
         // if (formValues.rideType === t("hero.dropoff_value_text")) {
         //   const apiKey = "AIzaSyBMTLXpuXtkEfbgChZzsj7LPYlpGxHI9iU";
         //   const url = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${point.lat},${point.lng}&key=${apiKey}`;
@@ -210,9 +211,9 @@ export default function MapModal({
         //   }
         //   setSelectedDropoff(point);
         // }
-        if (formValues.rideType === t("hero.dropoff_value_text")) {
+        if (formValues.rideType === t('hero.dropoff_value_text')) {
           if (!selectedPickup) {
-            const apiKey = "AIzaSyBMTLXpuXtkEfbgChZzsj7LPYlpGxHI9iU";
+            const apiKey = 'AIzaSyBMTLXpuXtkEfbgChZzsj7LPYlpGxHI9iU';
             const url = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${point.lat},${point.lng}&key=${apiKey}`;
 
             try {
@@ -222,12 +223,12 @@ export default function MapModal({
               setLocation(`${location} Saudi Arabia`);
               setSelectedPickup(point);
             } catch (error) {
-              console.error("Error fetching location:", error.message);
+              console.error('Error fetching location:', error.message);
             }
           }
         } else {
           if (!selectedPickup) {
-            const apiKey = "AIzaSyBMTLXpuXtkEfbgChZzsj7LPYlpGxHI9iU";
+            const apiKey = 'AIzaSyBMTLXpuXtkEfbgChZzsj7LPYlpGxHI9iU';
             const url = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${point.lat},${point.lng}&key=${apiKey}`;
 
             try {
@@ -237,10 +238,10 @@ export default function MapModal({
               setLocation(`${location} Saudi Arabia`);
               setSelectedPickup(point);
             } catch (error) {
-              console.error("Error fetching location:", error.message);
+              console.error('Error fetching location:', error.message);
             }
           } else {
-            const apiKey = "AIzaSyBMTLXpuXtkEfbgChZzsj7LPYlpGxHI9iU";
+            const apiKey = 'AIzaSyBMTLXpuXtkEfbgChZzsj7LPYlpGxHI9iU';
             const url = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${point.lat},${point.lng}&key=${apiKey}`;
 
             try {
@@ -250,13 +251,13 @@ export default function MapModal({
               setDestination(`${location} Saudi Arabia`);
               setSelectedDropoff(point);
             } catch (error) {
-              console.error("Error fetching location:", error.message);
+              console.error('Error fetching location:', error.message);
             }
           }
         }
-      } else if (rideName === "scheduledRide") {
+      } else if (rideName === 'scheduledRide') {
         if (!selectedPickup) {
-          const apiKey = "AIzaSyBMTLXpuXtkEfbgChZzsj7LPYlpGxHI9iU";
+          const apiKey = 'AIzaSyBMTLXpuXtkEfbgChZzsj7LPYlpGxHI9iU';
           const url = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${point.lat},${point.lng}&key=${apiKey}`;
 
           try {
@@ -266,10 +267,10 @@ export default function MapModal({
             setLocation(`${location} Saudi Arabia`);
             setSelectedPickup(point);
           } catch (error) {
-            console.error("Error fetching location:", error.message);
+            console.error('Error fetching location:', error.message);
           }
         } else {
-          const apiKey = "AIzaSyBMTLXpuXtkEfbgChZzsj7LPYlpGxHI9iU";
+          const apiKey = 'AIzaSyBMTLXpuXtkEfbgChZzsj7LPYlpGxHI9iU';
           const url = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${point.lat},${point.lng}&key=${apiKey}`;
 
           try {
@@ -279,12 +280,12 @@ export default function MapModal({
             setDestination(`${location} Saudi Arabia`);
             setSelectedDropoff(point);
           } catch (error) {
-            console.error("Error fetching location:", error.message);
+            console.error('Error fetching location:', error.message);
           }
         }
       } else {
         // if (!selectedPickup) {
-        const apiKey = "AIzaSyBMTLXpuXtkEfbgChZzsj7LPYlpGxHI9iU";
+        const apiKey = 'AIzaSyBMTLXpuXtkEfbgChZzsj7LPYlpGxHI9iU';
         const url = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${point.lat},${point.lng}&key=${apiKey}`;
 
         try {
@@ -293,7 +294,7 @@ export default function MapModal({
           // console.log('Location:', location);
           setLocation(`${location} Saudi Arabia`);
         } catch (error) {
-          console.error("Error fetching location:", error.message);
+          console.error('Error fetching location:', error.message);
         }
         setSelectedPickup(point);
         // }
@@ -301,7 +302,7 @@ export default function MapModal({
     } else {
       setError(
         `You cannot select a location outside the ${
-          cityName === t("hero.riyadh_text") ? "Riyadh" : "Dammam"
+          cityName === t('hero.riyadh_text') ? 'Riyadh' : 'Dammam'
         } zone.`
       );
     }
@@ -313,19 +314,19 @@ export default function MapModal({
   };
 
   function submitDestination() {
-    if (rideName === "airportRide" || rideName === "scheduledRide") {
+    if (rideName === 'airportRide' || rideName === 'scheduledRide') {
       if (selectedPickup && selectedDropoff) {
         onSubmitDestination(selectedPickup, selectedDropoff);
         closeModal();
       } else {
-        setError("Please select both pickup and dropoff locations.");
+        setError('Please select both pickup and dropoff locations.');
       }
     } else {
       if (selectedPickup) {
         onSubmitDestination(selectedPickup, null);
         closeModal();
       } else {
-        setError("Please select pickup location.");
+        setError('Please select pickup location.');
       }
     }
   }
@@ -363,21 +364,23 @@ export default function MapModal({
           };
           // Center the map to the user's current location
           mapRef.current.panTo(currentLocation);
+
+          setCurrentLocation(currentLocation);
         },
         () => {
           alert(
-            "Geolocation is not supported by this browser or permission denied."
+            'Geolocation is not supported by this browser or permission denied.'
           );
         }
       );
     } else {
-      alert("Geolocation is not supported by this browser.");
+      alert('Geolocation is not supported by this browser.');
     }
   };
 
   const mapOptions = {
-    streetViewControl: false, // Hides the Street View control
-    // zoomControl: false,
+    zoomControl: true,
+    streetViewControl: false,
     fullscreenControl: false,
   };
 
@@ -487,7 +490,7 @@ export default function MapModal({
                       <Marker
                         position={selectedPickup}
                         label={t('hero.pickup_text')}
-                        icon={{url: './assets/map/pickup.png'}}
+                        icon={{url: '/assets/map/pickup.png'}}
                         onClick={() => {
                           if (rideName === 'airportRide') {
                             if (
@@ -510,7 +513,7 @@ export default function MapModal({
                       <Marker
                         position={selectedDropoff}
                         label={t('hero.dropoff_text')}
-                        icon={{url: './assets/map/dropoff.png'}}
+                        icon={{url: '/assets/map/dropoff.png'}}
                         onClick={() => {
                           if (rideName === 'airportRide') {
                             if (
@@ -527,6 +530,14 @@ export default function MapModal({
                             setSelectedDropoff(null);
                           }
                         }}
+                      />
+                    )}
+
+                    {currentLocation && (
+                      <Marker
+                        position={currentLocation}
+                        icon={{url: './assets/map/dropoff.png'}}
+                        label="Current Location"
                       />
                     )}
 

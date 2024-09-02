@@ -3,7 +3,7 @@ import { Events, scrollSpy } from "react-scroll";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { message } from "antd";
-// import axios from "axios";
+import axios from "axios";
 import { setLoading } from "../../redux/actions/loaderAction";
 import { useTranslation } from "react-i18next";
 import Header from "../base/Header";
@@ -16,11 +16,13 @@ export default function PaymentSuccess() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const location = useLocation();
+
   const [paymentSuccess, setPaymentSuccess] = useState(false);
+  dispatch(setLoading(true));
 
   useEffect(() => {
     if (!isLoggedIn) {
-      window.location.href = "/mashrouk-new-ui/";
+      window.location.href = "/";
     }
   }, [isLoggedIn]);
 
@@ -84,40 +86,35 @@ export default function PaymentSuccess() {
   }, []);
 
   useEffect(() => {
-    const getPaymentStatus = async () => {
-      if (saveData === "false" && newBookingData) {
-        if (
-          paymentMethodName === "Mada" ||
-          paymentMethodName === "Credit Card"
-        ) {
-          const createMadaBooking = async () => {
-            // if (saveData === "false") {
-            try {
-              const response = await axiosInstance.post(
-                `${API_BASE_URL}/api/method/airport_transport.api.bookings.user_booking`,
-                newBookingData,
-                {
-                  headers: {
-                    Authorization: `Bearer ${token}`,
-                  },
-                }
-              );
-              if (response && response.status === 200) {
-                // console.log('jjj', response.data);
-                message.success(response.data.msg);
-                localStorage.setItem("saveData", true);
-                setPaymentSuccess(true);
+    if (saveData === "false" && newBookingData) {
+      if (paymentMethodName === "Mada" || paymentMethodName === "Credit Card") {
+        const createMadaBooking = async () => {
+          // if (saveData === "false") {
+          try {
+            const response = await axiosInstance.post(
+              `${API_BASE_URL}/api/method/airport_transport.api.bookings.user_booking`,
+              newBookingData,
+              {
+                headers: {
+                  Authorization: `Bearer ${token}`,
+                },
               }
-            } catch (error) {
-              console.error("Error:", error);
+            );
+            if (response && response.status === 200) {
+              // console.log('jjj', response.data);
+              message.success(response.data.msg);
+              localStorage.setItem("saveData", true);
+              setPaymentSuccess(true);
             }
-            // }
-          };
-          createMadaBooking();
-        }
+          } catch (error) {
+            console.error("Error:", error);
+          }
+          // }
+        };
+        createMadaBooking();
       }
-    };
-    getPaymentStatus();
+    }
+
     dispatch(setLoading(false));
   }, []);
 
@@ -132,7 +129,7 @@ export default function PaymentSuccess() {
               <div className="grid grid-cols-1 gap-3">
                 <div className="mx-auto">
                   <img
-                    src="./assets/paymentconditions/paymentsuccess.png"
+                    src="/assets/paymentconditions/paymentsuccess.png"
                     alt="payment success"
                   />
                 </div>
@@ -155,7 +152,7 @@ export default function PaymentSuccess() {
                 <div className="md:col-start-2">
                   <button
                     type="button"
-                    onClick={() => navigate("/mashrouk-new-ui/")}
+                    onClick={() => navigate("/")}
                     className="bg-white w-full text-black border border-black hover:bg-gray-100 font-medium text-sm px-5 py-2.5 me-2 mb-2"
                   >
                     {t("back_home_text")}
@@ -164,7 +161,7 @@ export default function PaymentSuccess() {
                 <div>
                   <button
                     type="button"
-                    onClick={() => navigate("/mashrouk-new-ui/")}
+                    onClick={() => navigate("/")}
                     className="bg-background_steel_blue w-full text-text_white hover:bg-gray-100 font-medium text-sm px-5 py-2.5 me-2 mb-2"
                   >
                     {t("done_text")}

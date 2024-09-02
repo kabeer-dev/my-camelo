@@ -10,6 +10,7 @@ import InputFieldFormik from "../base/InputFieldFormik";
 import { setLoading } from "../../redux/actions/loaderAction";
 import Header from "../base/Header";
 import Footer from "../base/Footer";
+import { SIGN_OUT_SUCCESS } from "../../redux/actions/authActions";
 import { useTranslation } from "react-i18next";
 import axiosInstance from "../../Api";
 import { useNavigate } from "react-router-dom";
@@ -83,7 +84,7 @@ export default function MyProfile() {
         }
       } catch (error) {
         if (error.response.status === 401) {
-          navigate("/mashrouk-new-ui/sign-in");
+          navigate("/sign-in");
         }
         console.error("Error:", error);
         dispatch(setLoading(false));
@@ -451,7 +452,7 @@ export default function MyProfile() {
 
               <div className="bg-background_steel_blue rounded-md flex items-center justify-center">
                 <img
-                  src="./assets/myprofile/Logo.png"
+                  src="/assets/myprofile/Logo.png"
                   alt="Camelo Logo"
                   className="m-auto"
                 />

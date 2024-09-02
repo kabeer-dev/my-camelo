@@ -6,6 +6,7 @@ import { setLoading } from "../../redux/actions/loaderAction";
 import { useTranslation } from "react-i18next";
 import { Icon } from "@iconify/react";
 import Button from "../base/Button";
+import { SIGN_OUT_SUCCESS } from "../../redux/actions/authActions";
 import axiosInstance from "../../Api";
 import { message } from "antd";
 import PayByLinkQr from "./PayByLinkQr";
@@ -47,17 +48,6 @@ export default function PaymentMethod({
   const [qrCode, setQrCode] = useState("");
   const zoneData = useSelector((state) => state?.zone?.zone);
   const [payByLinkPaymentLink, setPayByLinkPaymentLink] = useState("");
-  // console.log("sss", formValues);
-  // console.log("ddd", getPaymentMethods);
-  // let price;
-  // const getPrice = localStorage.getItem('price');
-  // if (correctPrice) {
-  //   price = correctPrice
-  // }
-  // else {
-  //   price = parseInt(getPrice, 10);
-  // }
-  // console.log('ssss', price)
 
   const arrivalDate = new Date(formValues.arrivalDate);
   const year = arrivalDate.getFullYear();
@@ -88,6 +78,9 @@ export default function PaymentMethod({
           setGetPaymentMethods(response.data.data);
         }
       } catch (error) {
+        if (error.response.status === 401) {
+          navigate("/sign-in");
+        }
         console.log("Error", error);
       }
     };
@@ -112,24 +105,16 @@ export default function PaymentMethod({
         if (response && response.status === 200) {
           setUserEmail(response.data.data.email);
           dispatch(setLoading(false));
+        } else if (response && response.status === 401) {
+          navigate("/sign-in");
         }
       } catch (error) {
-        if (error.response.status === 401) {
-          navigate("/mashrouk-new-ui/sign-in");
-        }
         console.error("Error:", error);
         dispatch(setLoading(false));
       }
     };
     getUser();
   }, []);
-  // useEffect(() => {
-  //   const hasRefreshed = localStorage.getItem('hasRefreshed');
-  //   if (hasRefreshed) {
-  //     localStorage.removeItem('hasRefreshed');
-  //     window.location.reload();
-  //   }
-  // }, []);
 
   const getRidePrice = async (pMethod) => {
     dispatch(setLoading(true));
@@ -175,7 +160,7 @@ export default function PaymentMethod({
   const getRandomDigit = () => Math.floor(Math.random() * 10);
   useEffect(() => {
     if (!isLoggedIn) {
-      window.location.href = "/mashrouk-new-ui/";
+      window.location.href = "/";
     }
   }, [isLoggedIn]);
   const paymentMethods = [
@@ -245,24 +230,24 @@ export default function PaymentMethod({
     if (paymentMethodName === "Mada" || paymentMethodName === "Credit Card") {
       let entryId;
       if (paymentMethodName === "Mada") {
-        entryId = "8ac7a4ca8c31c0ef018c3463d225039d";
+        entryId = "8ac9a4cb8d3ac5a1018d5028e4d96fec";
       } else if (paymentMethodName === "Credit Card") {
-        entryId = "8ac7a4ca8c31c0ef018c34634bf30399";
+        entryId = "8ac9a4cb8d3ac5a1018d50287bfa6fe7";
       }
-      const url = "https://eu-test.oppwa.com/v1/checkouts";
+      const url = "https://eu-prod.oppwa.com/v1/checkouts";
       const data = new URLSearchParams({
         entityId: entryId,
         amount: calculatedPrice,
         currency: "SAR",
         paymentType: "DB",
         // 'PaymentMethods': 'VISA, MASTER',
-        testMode: "EXTERNAL",
+        // testMode: "EXTERNAL",
       });
       const options = {
         headers: {
           "Content-Type": "application/x-www-form-urlencoded",
           Authorization:
-            "Bearer OGFjN2E0Y2E4YzMxYzBlZjAxOGMzNDYyY2E3NTAzOTV8cVliNUd0eUgyellGajI1bg==",
+            "Bearer OGFjOWE0Y2I4ZDNhYzVhMTAxOGQ1MDI3Zjg1ZjZmZTJ8TmJKeEZqODdiekZEQXNlZQ==",
         },
       };
 
@@ -274,7 +259,7 @@ export default function PaymentMethod({
         localStorage.setItem("saveData", false);
         localStorage.setItem("paymentMethodName", paymentMethodName);
         const checkoutId = response.data.id;
-        navigate("/mashrouk-new-ui/payment-confirmation", {
+        navigate("/payment-confirmation", {
           state: {
             checkoutId: checkoutId,
             paymentMethodName: paymentMethodName,
@@ -289,10 +274,10 @@ export default function PaymentMethod({
       }
     } else {
       const baseUrl = window.location.protocol + "//" + window.location.host;
-      const successUrl = `${baseUrl}/mashrouk-new-ui/thank-you`;
+      const successUrl = `${baseUrl}/thank-you`;
       const payByLinkData = {
         "customer.email": userEmail,
-        amount: calculatedPrice.toFixed(2),
+        amount: calculatedPrice,
         currency: "SAR",
         paymentType: "DB",
         shopperResultUrl: successUrl,
@@ -349,7 +334,6 @@ export default function PaymentMethod({
         if (response?.status === 200) {
           // console.log(response.data);
           const link = response.data.message.link;
-          // window.location.href = payByLinkPaymentLink;
           setPayByLinkPaymentLink(link);
           var bookingValues = JSON.stringify(bookingData);
           localStorage.setItem("bookingValues", bookingValues);
@@ -358,7 +342,6 @@ export default function PaymentMethod({
           localStorage.setItem("paymentMethodName", paymentMethodName);
           // console.log('fff', response.data)
           setQrCode(response.data.message.qrCode);
-          // navigate('/mashrouk-new-ui/email-sent', { state: { paymentLink: payByLinkPaymentLink } })
         }
       } catch (error) {
         console.log("Error", error);
@@ -424,7 +407,7 @@ export default function PaymentMethod({
                     dispatch(setLoading(true));
                     setSelectedPaymentName(method.payment_method);
                     setShowPriceBtn(true);
-                    dispatch(setLoading(false));
+                    // dispatch(setLoading(false));
                     getRidePrice(method.payment_method);
                   }}
                 >

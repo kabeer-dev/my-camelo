@@ -40,8 +40,6 @@ export default function HomeEmailSignUp({
   setOtp,
   phoneOtp,
   setPhoneOtp,
-  showPaybylinkQr,
-  setShowPaybylinkQr
 }) {
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -201,7 +199,7 @@ export default function HomeEmailSignUp({
   return (
     <>
       {showPaymentMethod ? (
-        <PaymentMethod formValues={formValues} showPaybylinkQr={showPaybylinkQr} setShowPaybylinkQr={setShowPaybylinkQr} />
+        <PaymentMethod formValues={formValues} />
       ) : showPhone ? (
         <HomePhoneSignUp
           formValues={formValues}
@@ -273,7 +271,7 @@ export default function HomeEmailSignUp({
                   <div
                     className="mt-0 md:mt-2 lg:mt-0 w-full text-sm flex justify-end text-text_steel_blue cursor-pointer"
                     onClick={() =>
-                      navigate("/mashrouk-new-ui/agent/forget-password", {
+                      navigate("/agent/forget-password", {
                         state: { email: values.email },
                       })
                     }
@@ -281,9 +279,9 @@ export default function HomeEmailSignUp({
                     {t("hero.forget_password_text")}
                   </div>
 
-                  <div className="text-center mt-6 flex flex-row justify-between items-center">
+                  <div className="text-center mt-6 flex md:flex-col md:flex-row justify-between items-center">
                     <Button
-                      className="bg-bg_btn_back w-1/2 text-text_white hover:bg-gray-100 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2"
+                      className="bg-bg_btn_back w-full text-text_white hover:bg-gray-100 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2"
                       onClick={() => {
                         setShowAlreadyRegistered(false);
                       }}
@@ -291,7 +289,7 @@ export default function HomeEmailSignUp({
                       type="button"
                     />
                     <Button
-                      className="bg-background_steel_blue w-1/2 text-text_white hover:bg-gray-100 font-medium rounded text-sm px-5 py-2.5 me-2 mb-2"
+                      className="bg-background_steel_blue w-full text-text_white hover:bg-gray-100 font-medium rounded text-sm px-5 py-2.5 me-2 mb-2"
                       label={(t("login_text"))}
                       type="submit"
                     />
@@ -300,9 +298,9 @@ export default function HomeEmailSignUp({
               )}
 
               {!hideCreateAccountButton && !showAlreadyRegistered && (
-                <div className="text-center mt-6 flex flex-row justify-between items-center">
+                <div className="text-center mt-6 flex md:flex-col md:flex-row justify-between items-center">
                   <Button
-                    className="bg-bg_btn_back w-1/2 text-text_white hover:bg-gray-100 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2"
+                    className="bg-bg_btn_back w-full text-text_white hover:bg-gray-100 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2"
                     onClick={() => {
                       setSubTab(1);
                       setShowSignUp(false);
@@ -311,7 +309,7 @@ export default function HomeEmailSignUp({
                     type="button"
                   />
                   <Button
-                    className="bg-background_steel_blue w-1/2 text-text_white hover:bg-gray-100 font-medium rounded text-sm px-5 py-2.5 me-2 mb-2"
+                    className="bg-background_steel_blue w-full text-text_white hover:bg-gray-100 font-medium rounded text-sm px-5 py-2.5 me-2 mb-2"
                     label={t("continue_text")}
                     type="submit"
                   />
@@ -362,9 +360,9 @@ export default function HomeEmailSignUp({
                     </div>
                   </div>
 
-                  <div className="my-3 flex flex-row justify-between items-center">
+                  <div className="my-3 flex md:flex-col md:flex-row justify-between items-center">
                     <Button
-                      className="bg-bg_btn_back w-1/2 text-text_white hover:bg-gray-100 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2"
+                      className="bg-bg_btn_back w-full text-text_white hover:bg-gray-100 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2"
                       onClick={() => {
                         setShowOTPScreen(false);
                         setHideCreateAccountButton(false);
@@ -374,7 +372,7 @@ export default function HomeEmailSignUp({
                       type="button"
                     />
                     <Button
-                      className="bg-background_steel_blue w-1/2 text-text_white hover:bg-gray-100 font-medium rounded text-sm px-5 py-2.5 me-2 mb-2"
+                      className="bg-background_steel_blue w-full text-text_white hover:bg-gray-100 font-medium rounded text-sm px-5 py-2.5 me-2 mb-2"
                       label={t("verify_text")}
                       type="button"
                       onClick={handleVerify}
@@ -389,5 +387,3 @@ export default function HomeEmailSignUp({
     </>
   );
 }
-
-

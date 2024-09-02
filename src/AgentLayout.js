@@ -38,7 +38,8 @@ export default function AgentLayout() {
           if (response && response.status === 200) {
             console.log('ss', response.data.msg)
             if(response.data.msg !== 'Agent User'){
-              navigate('/mashrouk-new-ui')
+              console.log('yes')
+              navigate('/')
             }
           }
         } catch (error) {
@@ -47,7 +48,7 @@ export default function AgentLayout() {
       }
       checkAgent()
     }else if(!agent || !isLoggedIn){
-      navigate('/mashrouk-new-ui')
+      navigate('/')
     }
 
     dispatch(setLoading(false))

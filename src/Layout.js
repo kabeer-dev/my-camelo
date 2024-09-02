@@ -15,7 +15,7 @@ import axiosInstance from "./Api";
 export default function Layout() {
   // Define array of menu items with corresponding component IDs
   const dispatch = useDispatch();
-  const navigate= useNavigate();
+  const navigate = useNavigate();
   const API_BASE_URL = process.env.REACT_APP_BASE_URL_AMK_TEST;
   const email = useSelector((state) => state.auth.email);
   const agent = useSelector((state) => state.auth.agent);
@@ -29,28 +29,30 @@ export default function Layout() {
   ];
 
   useEffect(() => {
-    dispatch(setLoading(true))
+    dispatch(setLoading(true));
     if (email && isLoggedIn) {
       const checkUser = async () => {
         try {
-          const response = await axiosInstance.post(`${API_BASE_URL}/api/method/airport_transport.api.user.detect_email?email=${email}`);
+          const response = await axiosInstance.post(
+            `${API_BASE_URL}/api/method/airport_transport.api.user.detect_email?email=${email}`
+          );
           if (response && response.status === 200) {
-            if(response.data.msg !== 'Transport User'){
-              navigate('/mashrouk-new-ui/agent')
+            if (response.data.msg !== "Transport User") {
+              navigate("/agent");
             }
           }
         } catch (error) {
-          console.log('Error', error)
+          console.log("Error", error);
         }
-      }
-      checkUser()
+      };
+      checkUser();
     }
-    dispatch(setLoading(false))
-  }, [])
+    dispatch(setLoading(false));
+  }, []);
 
   useEffect(() => {
-    Events.scrollEvent.register("begin", function (to, element) { });
-    Events.scrollEvent.register("end", function (to, element) { });
+    Events.scrollEvent.register("begin", function (to, element) {});
+    Events.scrollEvent.register("end", function (to, element) {});
 
     scrollSpy.update();
 

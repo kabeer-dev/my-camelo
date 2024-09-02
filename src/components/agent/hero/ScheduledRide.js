@@ -92,6 +92,7 @@ export default function ScheduledRide({
   const [destination, setDestination] = useState("");
 
   const [VehicleTypeWithService, setVehicleTypeWithService] = useState(null);
+
   useEffect(() => {
     dispatch(setLoading(true));
     const getVechileTypes = async () => {

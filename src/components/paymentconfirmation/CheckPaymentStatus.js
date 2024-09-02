@@ -8,7 +8,6 @@ import { setLoading } from "../../redux/actions/loaderAction";
 import { useTranslation } from "react-i18next";
 import Header from "../base/Header";
 import Footer from "../base/Footer";
-import axiosInstance from "../../Api";
 
 export default function CheckPaymentStatus() {
   const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
@@ -21,7 +20,7 @@ export default function CheckPaymentStatus() {
 
   useEffect(() => {
     if (!isLoggedIn) {
-      window.location.href = "/mashrouk-new-ui/";
+      window.location.href = "/";
     }
   }, [isLoggedIn]);
 
@@ -51,16 +50,16 @@ export default function CheckPaymentStatus() {
       try {
         const response = await axios.get(url, options);
         if (response.data.result.code === "000.100.112") {
-          navigate("/mashrouk-new-ui/payment-success");
+          navigate("/payment-success");
         } else if (response.data.result.code === "800.100.152") {
-          navigate("/mashrouk-new-ui/payment-failed");
+          navigate("/payment-failed");
         } else {
           console.log("err", response);
         }
       } catch (err) {
         console.log("Status Error", err);
         if (err.response.data.result.code === "200.300.404") {
-          navigate("/mashrouk-new-ui/payment-failed");
+          navigate("/payment-failed");
         }
       }
     };

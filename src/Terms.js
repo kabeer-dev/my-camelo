@@ -1,11 +1,11 @@
 import React from "react";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import Header from "./components/base/Header";
 import Footer from "./components/base/Footer";
 import { useTranslation } from "react-i18next";
 
 export default function Terms() {
-    // const dispatch = useDispatch();
+    const dispatch = useDispatch();
     const language = useSelector((state) => state.auth.language);
     const [t, i18n] = useTranslation("global");
 

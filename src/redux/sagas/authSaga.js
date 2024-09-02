@@ -45,7 +45,7 @@ function* signInSaga(action) {
         yield put(setLoading(false));
         // Navigate to the home page on successful sign-in
         if (navigate) {
-          navigate("/mashrouk-new-ui/");
+          navigate("/");
         }
       } else {
         const agentData = {
@@ -62,7 +62,7 @@ function* signInSaga(action) {
         secureLocalStorage.setItem("agent", true);
         yield put(setLoading(false));
         if (navigate) {
-          navigate("/mashrouk-new-ui/agent");
+          navigate("/agent");
         }
       }
     }
@@ -92,7 +92,7 @@ function* signUpSaga(action) {
     yield put(setLoading(false));
     // Navigate to the home page on successful sign-in
     if (navigate) {
-      navigate("/mashrouk-new-ui/");
+      navigate("/");
     }
   } catch (error) {
     yield put(signUpFailure(error?.response?.data?.msg));

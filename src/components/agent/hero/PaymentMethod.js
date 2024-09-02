@@ -6,6 +6,7 @@ import { setLoading } from "../../../redux/actions/loaderAction";
 import { useTranslation } from "react-i18next";
 import { Icon } from "@iconify/react";
 import Button from "../base/Button";
+import { SIGN_OUT_SUCCESS } from "../../../redux/actions/authActions";
 import { message } from "antd";
 import axiosInstance from "../../../Api";
 import PayByLinkQr from "./PayByLinkQr";
@@ -88,7 +89,7 @@ export default function PaymentMethod({
         }
       } catch (error) {
         if (error.response.status === 401) {
-          navigate("/mashrouk-new-ui/sign-in");
+          navigate("/sign-in");
         }
         console.log("Error", error);
       }
@@ -178,7 +179,7 @@ export default function PaymentMethod({
   const getRandomDigit = () => Math.floor(Math.random() * 10);
   useEffect(() => {
     if (!isLoggedIn) {
-      window.location.href = "/mashrouk-new-ui/";
+      window.location.href = "/";
     }
   }, [isLoggedIn]);
   const paymentMethods = [
@@ -251,24 +252,24 @@ export default function PaymentMethod({
     if (paymentMethodName === "Mada" || paymentMethodName === "Credit Card") {
       let entryId;
       if (paymentMethodName === "Mada") {
-        entryId = "8ac7a4ca8c31c0ef018c3463d225039d";
+        entryId = "8ac9a4cb8d3ac5a1018d5028e4d96fec";
       } else if (paymentMethodName === "Credit Card") {
-        entryId = "8ac7a4ca8c31c0ef018c34634bf30399";
+        entryId = "8ac9a4cb8d3ac5a1018d50287bfa6fe7";
       }
-      const url = "https://eu-test.oppwa.com/v1/checkouts";
+      const url = "https://eu-prod.oppwa.com/v1/checkouts";
       const data = new URLSearchParams({
         entityId: entryId,
         amount: calculatedPrice,
         currency: "SAR",
         paymentType: "DB",
         // 'PaymentMethods': 'VISA, MASTER',
-        testMode: "EXTERNAL",
+        // 'testMode': 'EXTERNAL',
       });
       const options = {
         headers: {
           "Content-Type": "application/x-www-form-urlencoded",
           Authorization:
-            "Bearer OGFjN2E0Y2E4YzMxYzBlZjAxOGMzNDYyY2E3NTAzOTV8cVliNUd0eUgyellGajI1bg==",
+            "Bearer OGFjOWE0Y2I4ZDNhYzVhMTAxOGQ1MDI3Zjg1ZjZmZTJ8TmJKeEZqODdiekZEQXNlZQ==",
         },
       };
 
@@ -281,7 +282,7 @@ export default function PaymentMethod({
         localStorage.setItem("paymentMethodName", paymentMethodName);
         localStorage.setItem("paymentMethodName", paymentMethodName);
         const checkoutId = response.data.id;
-        navigate("/mashrouk-new-ui/agent/payment-confirmation", {
+        navigate("/agent/payment-confirmation", {
           state: {
             checkoutId: checkoutId,
             paymentMethodName: paymentMethodName,
@@ -296,13 +297,14 @@ export default function PaymentMethod({
       }
     } else {
       const baseUrl = window.location.protocol + "//" + window.location.host;
-      const successUrl = `${baseUrl}/mashrouk-new-ui/agent/thank-you`;
+      const successUrl = `${baseUrl}/agent/thank-you`;
       const payByLinkData = {
         "customer.email": formValues?.agentUser ? formValues.agentUser : "",
-        amount: calculatedPrice.toFixed(2),
+        amount: calculatedPrice,
         currency: "SAR",
         paymentType: "DB",
         shopperResultUrl: successUrl,
+        createQRCode: true,
         doc: {
           ticket: randomDigits,
           airport: formValues?.airportName ? formValues.airportName : "",
@@ -362,13 +364,11 @@ export default function PaymentMethod({
           // console.log(response.data);
           const link = response.data.message.link;
           setPayByLinkPaymentLink(link);
-          // window.location.href = payByLinkPaymentLink;
           var bookingValues = JSON.stringify(bookingData);
           localStorage.setItem("bookingValues", bookingValues);
           localStorage.setItem("saveData", false);
           localStorage.setItem("paymentMethodName", paymentMethodName);
           setQrCode(response.data.message.qrCode);
-          // navigate('/mashrouk-new-ui/agent/email-sent', { state: { paymentLink: payByLinkPaymentLink } })
         }
       } catch (error) {
         console.log("Error", error);

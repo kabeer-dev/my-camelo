@@ -80,7 +80,7 @@ export default function Header() {
       //   navigate("/agent/my-profile");
       //   break;
       case "1":
-        navigate("/mashrouk-new-ui/agent/my-bookings");
+        navigate("/agent/my-bookings");
         break;
       case "2":
         message.success(`Logged out`);
@@ -88,7 +88,7 @@ export default function Header() {
         secureLocalStorage.removeItem("email");
         dispatch(emailChange(null));
         dispatch(signOutRequest());
-        navigate("/mashrouk-new-ui/");
+        navigate("/");
         break;
       default:
         break;
@@ -132,25 +132,23 @@ export default function Header() {
 
               <div className="flex items-center ml-5">
                 <button
-                  onClick={() => navigate("/mashrouk-new-ui/")}
+                  onClick={() => navigate("/")}
                   className="flex items-center"
                 >
                   <img
-                    src="./assets/header/cameloLogo.png"
+                    src="/assets/header/cameloLogo.png"
                     className="w-18 h-14 sm:h-14 my-2"
                     alt="Camelo Logo"
                   />
                   <img
-                    src="./assets/header/xLogo.png"
+                    src="/assets/header/xLogo.png"
                     className="w-18 h-3 my-2 ml-2"
                     alt="X Logo"
                   />
                   <img
                     // src="/assets/header/agentLogo.png"
                     src={
-                      agentPhoto
-                        ? agentPhoto
-                        : "./assets/header/NoAgentLogo.png"
+                      agentPhoto ? agentPhoto : "/assets/header/NoAgentLogo.png"
                     }
                     className="w-10 h-12 sm:h-14 my-2 ml-3"
                     alt="Agent Logo"
@@ -163,7 +161,7 @@ export default function Header() {
                   <>
                     <div>
                       <button
-                      // onClick={() => navigate("/mashrouk-new-ui/")}
+                      // onClick={() => navigate("/")}
                       >
                         <Icon
                           icon="ph:user-thin"
@@ -175,7 +173,7 @@ export default function Header() {
                     </div>
                     <div className="ml-3">
                       <button
-                        onClick={() => navigate("/mashrouk-new-ui/sign-in")}
+                        onClick={() => navigate("/sign-in")}
                         className="text-text_white"
                       >
                         {t("header.sign_in_text")}
@@ -250,7 +248,7 @@ export default function Header() {
                         <>
                           <div>
                             <img
-                              src="./assets/header/navigator_icon.png"
+                              src="/assets/header/navigator_icon.png"
                               alt="navigator_icon"
                               className="absolute top-[60px] w-[40px] h-[20px] hidden md:block lg:block"
                             />
@@ -293,7 +291,7 @@ export default function Header() {
                         <div className="flex justify-center mt-[50vh]">
                           <Button
                             className="mt-2 bg-transparent text-text_black font-medium text-md px-2.5 cursor-pointer"
-                            onClick={() => navigate("/mashrouk-new-ui/sign-in")} // Use navigate here
+                            onClick={() => navigate("/sign-in")} // Use navigate here
                             label={t("header.sign_in_text")}
                             type="button"
                           />
@@ -301,9 +299,7 @@ export default function Header() {
                         <div>
                           <Button
                             className="mt-2 cursor-pointer text-text_white bg-background_steel_blue border border-gray-300 focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-100 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:border-gray-600 dark:focus:ring-gray-700"
-                            onClick={() =>
-                              navigate("/mashrouk-new-ui/create-new-account")
-                            }
+                            onClick={() => navigate("/create-new-account")}
                             label={t("header.create_text")}
                             type="button"
                           />
@@ -354,25 +350,23 @@ export default function Header() {
             <nav className="bg-background_steel_blue md:h-20 lg:h-20 py-2.5 dark:bg-gray-800">
               <div className="px-10 flex flex-col md:flex-col lg:flex-row justify-between items-center">
                 <button
-                  onClick={() => navigate("/mashrouk-new-ui/agent")}
+                  onClick={() => navigate("/agent")}
                   className="flex items-center ml-1"
                 >
                   <img
-                    src="./assets/header/cameloLogo.png"
+                    src="/assets/header/cameloLogo.png"
                     className="w-18 h-14 sm:h-14 my-2"
                     alt="Camelo Logo"
                   />
                   <img
-                    src="./assets/header/xLogo.png"
+                    src="/assets/header/xLogo.png"
                     className="w-18 h-10 sm:h-4 my-2 ml-2"
                     alt="X Logo"
                   />
                   <img
                     // src="/assets/header/agentLogo.png"
                     src={
-                      agentPhoto
-                        ? agentPhoto
-                        : "./assets/header/NoAgentLogo.png"
+                      agentPhoto ? agentPhoto : "/assets/header/NoAgentLogo.png"
                     }
                     className="w-18 h-14 sm:h-14 my-2 ml-3"
                     alt="Agent Logo"
@@ -394,12 +388,7 @@ export default function Header() {
                       label={
                         <>
                           <div className="flex flex-row justify-center items-baseline">
-                            <div>
-                              <CiGlobe
-                                fontSize={25}
-                                style={{ marginBottom: "-7px" }}
-                              />
-                            </div>
+                            <CiGlobe className="text-xl" />
                             <div className="text-md px-2">
                               {language === "eng"
                                 ? t("header.languages.arabic")
@@ -418,7 +407,7 @@ export default function Header() {
                       <div>
                         <Button
                           className="hidden md:flex bg-transparent text-text_white font-medium text-md px-2.5 cursor-pointer"
-                          onClick={() => navigate("/mashrouk-new-ui/sign-in")} // Use navigate here
+                          onClick={() => navigate("/sign-in")} // Use navigate here
                           label={t("header.sign_in_text")}
                           type="button"
                         />
@@ -453,11 +442,7 @@ export default function Header() {
                       <div>
                         <Button
                           className="cursor-pointer hidden md:flex text-text_steel_blue bg-background_white border border-gray-300 focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-100 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:border-gray-600 dark:focus:ring-gray-700"
-                          onClick={() =>
-                            navigate(
-                              "/mashrouk-new-ui/agent/create-new-account"
-                            )
-                          }
+                          onClick={() => navigate("/agent/create-new-account")}
                           label={t("header.create_text")}
                           type="button"
                         />
@@ -521,7 +506,7 @@ export default function Header() {
                             <>
                               <div>
                                 <img
-                                  src="./assets/header/navigator_icon.png"
+                                  src="/assets/header/navigator_icon.png"
                                   alt="navigator_icon"
                                   className="absolute top-[60px] w-[40px] h-[20px] hidden md:block lg:block"
                                 />

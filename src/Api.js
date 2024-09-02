@@ -1,3 +1,4 @@
+// api.js
 import axios from "axios";
 import { useHistory } from "react-router-dom";
 
@@ -9,7 +10,10 @@ const axiosInstance = axios.create({
 axiosInstance.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response && (error.response.status === 500 || error.response.status === 408)) {
+    if (
+      error.response &&
+      (error.response.status === 500 || error.response.status === 408)
+    ) {
       // Redirect to maintenance page
       window.location.href = "/under-maintenance";
     }

@@ -18,36 +18,35 @@ import PaymentMethod from "./PaymentMethod";
 // import axios from "axios";
 import { message } from "antd";
 import { useTranslation } from "react-i18next";
-import axiosInstance from '../../Api'
+import axiosInstance from "../../Api";
 
-export default function AirportRide(
-  {
-    subTab, setSubTab,
-    showSignUp, setShowSignUp,
-    showAlreadyRegistered,
-    setShowAlreadyRegistered,
-    showOTPScreen,
-    setShowOTPScreen,
-    hideCreateAccountButton,
-    setHideCreateAccountButton,
-    showPhone,
-    setShowPhone,
-    hidePhoneCreateAccountButton,
-    setHidePhoneCreateAccountButton,
-    showPhoneOTPScreen,
-    setShowPhoneOTPScreen,
-    showPaymentMethod,
-    setShowPaymentMethod,
-    recaptchaRef,
-    otp,
-    setOtp,
-    phoneOtp,
-    setPhoneOtp,
-    showPaybylinkQr,
-    setShowPaybylinkQr
-  }) {
-
-
+export default function AirportRide({
+  subTab,
+  setSubTab,
+  showSignUp,
+  setShowSignUp,
+  showAlreadyRegistered,
+  setShowAlreadyRegistered,
+  showOTPScreen,
+  setShowOTPScreen,
+  hideCreateAccountButton,
+  setHideCreateAccountButton,
+  showPhone,
+  setShowPhone,
+  hidePhoneCreateAccountButton,
+  setHidePhoneCreateAccountButton,
+  showPhoneOTPScreen,
+  setShowPhoneOTPScreen,
+  showPaymentMethod,
+  setShowPaymentMethod,
+  recaptchaRef,
+  otp,
+  setOtp,
+  phoneOtp,
+  setPhoneOtp,
+  showPaybylinkQr,
+  setShowPaybylinkQr,
+}) {
   const dispatch = useDispatch();
   const { cities } = useSelector((state) => state.cities);
   const { airports } = useSelector((state) => state.airports);
@@ -64,11 +63,10 @@ export default function AirportRide(
   // const [vehicleTypes, setVehicleTpes] = useState([])
 
   useEffect(() => {
-    setMap(zoneMap && zoneMap.length > 0 ? zoneMap : null)
+    setMap(zoneMap && zoneMap.length > 0 ? zoneMap : null);
   }, [zoneMap]);
 
-
-  const [location, setLocation] = useState("")
+  const [location, setLocation] = useState("");
   const [destination, setDestination] = useState("");
 
   // const [subTab, setSubTab] = useState(1);
@@ -78,7 +76,7 @@ export default function AirportRide(
   const [selectedPickup, setSelectedPickup] = useState(null);
   const [selectedDropoff, setSelectedDropoff] = useState(null);
   const [arrivalDates, setArrivalDates] = useState(null);
-  const [airportName, setAirportName] = useState('');
+  const [airportName, setAirportName] = useState("");
 
   const rideTypeOptions = [
     { value: t("hero.pickup_value_text"), label: t("hero.pickup_text") },
@@ -86,7 +84,7 @@ export default function AirportRide(
   ];
   const [formValues, setFormValues] = useState({
     rideType: "",
-    // t("hero.pickup_value_text"), 
+    // t("hero.pickup_value_text"),
     arrivalCity: "",
     airportName: "",
     terminalNumber: "",
@@ -98,7 +96,7 @@ export default function AirportRide(
   });
   const [onChangeFormValues, setOnChangeFormValues] = useState({
     rideType: "",
-    // t("hero.pickup_value_text"), 
+    // t("hero.pickup_value_text"),
     arrivalCity: "",
     airportName: "",
     terminalNumber: "",
@@ -114,22 +112,25 @@ export default function AirportRide(
   const [VehicleTypeWithService, setVehicleTypeWithService] = useState(null);
   useEffect(() => {
     dispatch(setLoading(true));
-    if (cityName) {
-      const getVechileTypes = async () => {
+    const getVechileTypes = async () => {
+      if (cityName) {
         try {
-          const response = await axiosInstance.get(`${API_BASE_URL}/api/method/airport_transport.api.bookings.get_vehicle_types?language=${language ? language : 'eng'}&service=Airport Trip&city=${cityName}`);
+          const response = await axiosInstance.get(
+            `${API_BASE_URL}/api/method/airport_transport.api.bookings.get_vehicle_types?language=${
+              language ? language : "en"
+            }&service=Airport Trip&city=${cityName}`
+          );
           if (response && response.status === 200) {
-            setVehicleTypeWithService(response.data)
+            setVehicleTypeWithService(response.data);
           }
         } catch (error) {
-          console.log('Error', error)
+          console.log("Error", error);
         }
       }
-      getVechileTypes();
-    }
+    };
+    getVechileTypes();
     dispatch(setLoading(false));
-
-  }, [cityName])
+  }, [cityName]);
 
   const [sharedRideValue, setSharedRideValue] = useState("");
 
@@ -153,25 +154,27 @@ export default function AirportRide(
 
   useEffect(() => {
     const getSharedRideValue = async () => {
-      dispatch(setLoading(true))
+      dispatch(setLoading(true));
       if (vehicleTypeName !== "") {
         try {
           const response = await axiosInstance.get(
-            `${API_BASE_URL}/api/method/airport_transport.api.bookings.get_ride_discount?vehicle_type=${vehicleTypeName}&language=${language ? language : 'eng'}`
+            `${API_BASE_URL}/api/method/airport_transport.api.bookings.get_ride_discount?vehicle_type=${vehicleTypeName}&language=${
+              language ? language : "eng"
+            }`
           );
           if (response && response.status === 200) {
-            setSharedRideValue(response.data.data)
+            setSharedRideValue(response.data.data);
             // console.log('qqq', response.data.data)
-            dispatch(setLoading(false))
+            dispatch(setLoading(false));
           }
         } catch (error) {
-          console.log('Error', error);
-          dispatch(setLoading(false))
+          console.log("Error", error);
+          dispatch(setLoading(false));
         }
       }
-      dispatch(setLoading(false))
-    }
-    getSharedRideValue()
+      dispatch(setLoading(false));
+    };
+    getSharedRideValue();
   }, [vehicleTypeName]);
 
   useEffect(() => {
@@ -190,53 +193,57 @@ export default function AirportRide(
   //   if (cities.data?.length > 0 && !cityName) {
   //     setFormValues((prevValues) => ({
   //       ...prevValues,
-  //       "arrivalCity": cities.data[0],
+  //       arrivalCity: cities.data[0],
   //     }));
   //     setOnChangeFormValues((prevValues) => ({
   //       ...prevValues,
-  //       "arrivalCity": cities.data[0],
+  //       arrivalCity: cities.data[0],
   //     }));
 
-  //     setCityName(cities.data[0])
+  //     setCityName(cities.data[0]);
   //   }
-  // }, [cities])
+  // }, [cities]);
 
   // useEffect(() => {
   //   if (airports.data?.length > 0) {
   //     setFormValues((prevValues) => ({
   //       ...prevValues,
-  //       "airportName": airports.data[0].airport,
+  //       airportName: airports.data[0].airport,
   //     }));
   //     setOnChangeFormValues((prevValues) => ({
   //       ...prevValues,
-  //       "airportName": airports.data[0].airport,
+  //       airportName: airports.data[0].airport,
   //     }));
 
   //     setFormValues((prevValues) => ({
   //       ...prevValues,
-  //       "terminalNumber": airports.data[0].terminals[0].terminal,
+  //       terminalNumber: airports.data[0].terminals[0].terminal,
   //     }));
   //     setOnChangeFormValues((prevValues) => ({
   //       ...prevValues,
-  //       "terminalNumber": airports.data[0].terminals[0].terminal,
+  //       terminalNumber: airports.data[0].terminals[0].terminal,
   //     }));
-  //     const terminals = airports.data[0].terminals.map((terminal) => terminal.terminal);
-  //     setTerminalOptions(terminals)
-  //     setSelectedPickup(airports.data[0].terminals[0].location)
-  //     setLocation(airports.data[0].terminals[0].location)
-
+  //     const terminals = airports.data[0].terminals.map(
+  //       (terminal) => terminal.terminal
+  //     );
+  //     setTerminalOptions(terminals);
+  //     setSelectedPickup(airports.data[0].terminals[0].location);
+  //     setLocation(airports.data[0].terminals[0].location);
   //   }
-  // }, [airports, cityName])
+  // }, [airports, cityName]);
 
   const steps = useMemo(() => {
     const baseSteps = [
       { id: 1, text: t("hero.stepper_steps.ride_detail_text") },
       { id: 2, text: t("hero.stepper_steps.vehicle_detail_text") },
-      { id: 3, text: t("hero.stepper_steps.additional_info_text") }
+      { id: 3, text: t("hero.stepper_steps.additional_info_text") },
     ];
 
     if (!isLoggedIn) {
-      baseSteps.push({ id: 4, text: t("hero.stepper_steps.account_info_text") });
+      baseSteps.push({
+        id: 4,
+        text: t("hero.stepper_steps.account_info_text"),
+      });
     }
 
     return baseSteps;
@@ -280,8 +287,6 @@ export default function AirportRide(
     dispatch(setLoading(false));
   };
 
-
-
   // console.log(airports)
   return (
     <>
@@ -318,7 +323,6 @@ export default function AirportRide(
               setShowPaybylinkQr={setShowPaybylinkQr}
               rideName="Airport Trip"
             />
-
           ) : showSignUp ? (
             <HomeEmailSignUp
               formValues={formValues}
@@ -359,14 +363,14 @@ export default function AirportRide(
 
                   if (isLoggedIn) {
                     dispatch(setLoading(false));
-                    setShowPaymentMethod(true)
+                    setShowPaymentMethod(true);
                   } else {
                     dispatch(setLoading(false));
-                    setSubTab(4)
+                    setSubTab(4);
                     setShowSignUp(true);
                   }
                 }
-                dispatch(setLoading(false))
+                dispatch(setLoading(false));
                 setSubmitting(false);
               }}
             >
@@ -509,10 +513,9 @@ export default function AirportRide(
                         <Button
                           className="bg-background_steel_blue w-full text-text_white hover:bg-gray-100 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 mt-3"
                           onClick={() => {
-                            handleNext(2, isStep1Valid, values)
+                            handleNext(2, isStep1Valid, values);
                             //  console.log('sss', values)
-                          }
-                          }
+                          }}
                           label={t("next_text")}
                           type="button"
                           disabled={!isStep1Valid}
@@ -530,14 +533,15 @@ export default function AirportRide(
                         </div>
 
                         <div className="border border-bg_light_gray p-2 mt-3">
-                          <p className="text-lg text-text_grey font-bold">{t("hero.shared_ride_text")}!!</p>
+                          <p className="text-lg text-text_grey font-bold">
+                            {t("hero.shared_ride_text")}!!
+                          </p>
                           <InputFieldFormik
                             // label={t("hero.shared_ride_text")}
                             name="sharedRide"
                             type="checkbox"
                             percentageValue={sharedRideValue}
                             onChange={({ fieldName, selectedValue }) => {
-
                               setFieldValue(fieldName, selectedValue);
                               setFormValues((prevValues) => ({
                                 ...prevValues,
@@ -547,9 +551,7 @@ export default function AirportRide(
                                 ...prevValues,
                                 [fieldName]: selectedValue,
                               }));
-                            }
-
-                            }
+                            }}
                             required
                           />
                         </div>
@@ -595,9 +597,9 @@ export default function AirportRide(
                           onChange={({ date, dateString }) => {
                             setOnChangeFormValues((prevValues) => ({
                               ...prevValues,
-                              ['arrivalDate']: dateString,
+                              ["arrivalDate"]: dateString,
                             }));
-                            setFieldValue('arrivalDate', dateString);
+                            setFieldValue("arrivalDate", dateString);
                           }}
                           required
                         />
@@ -616,15 +618,15 @@ export default function AirportRide(
                           }}
                           required
                         />
-                        <div className="mt-3 flex flex-row justify-between items-center">
+                        <div className="mt-3 flex md:flex-row justify-between items-center">
                           <Button
-                            className="bg-bg_btn_back w-full text-text_white hover:bg-gray-100 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2"
+                            className="bg-bg_btn_back w-1/2 text-text_white hover:bg-gray-100 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2"
                             onClick={() => handlePrevious(1, values)}
                             label={t("previous_text")}
                             type="button"
                           />
                           <Button
-                            className="bg-background_steel_blue w-full text-text_white hover:bg-gray-100 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2"
+                            className="bg-background_steel_blue w-1/2 text-text_white hover:bg-gray-100 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2"
                             onClick={() => {
                               // console.log('aaaa', values)
                               values.vehicleType = vehicleTypeName;
@@ -639,7 +641,6 @@ export default function AirportRide(
                     )}
                     {subTab === 3 && (
                       <>
-
                         <div className="my-4 flex flex-col md:flex-row justify-between items-start">
                           <div className="w-full md:w-1/2">
                             <Heading

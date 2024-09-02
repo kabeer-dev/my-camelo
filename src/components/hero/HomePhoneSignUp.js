@@ -9,8 +9,7 @@ import OtpInput from "react-otp-input";
 import PaymentMethod from "./PaymentMethod";
 import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
-import axiosInstance from '../../Api';
-
+import axiosInstance from "../../Api";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import Recaptcha from "../base/Recaptcha";
@@ -68,7 +67,7 @@ export default function HomePhoneSignUp({
         setPhoneNumber(values.phone);
         setShowPhoneOTPScreen(true);
         setHidePhoneCreateAccountButton(true);
-        setTimer(30)
+        setTimer(30);
         // recaptchaRef.current.reset();
         dispatch(setLoading(false));
       }
@@ -201,10 +200,10 @@ export default function HomePhoneSignUp({
 
   const handleResend = async () => {
     // Handle resend OTP logic
-    dispatch(setLoading(true))
+    dispatch(setLoading(true));
     try {
       const otpResponse = await axiosInstance.get(
-        `${API_BASE_URL}/api/method/airport_transport.api.user.send_confirmation_email?email=${email}`,
+        `${API_BASE_URL}/api/method/airport_transport.api.user.send_confirmation_email?email=${email}`
       );
       // Redirect to OTP verification screen
       if (otpResponse?.status === 200) {
@@ -215,7 +214,7 @@ export default function HomePhoneSignUp({
     } catch (error) {
       message.error(`${error?.response?.data?.msg}`);
     }
-    dispatch(setLoading(false))
+    dispatch(setLoading(false));
     // Implement OTP resend API call here
   };
 
@@ -229,9 +228,8 @@ export default function HomePhoneSignUp({
         >
           {({ values, setFieldValue }) => (
             <Form>
-              
-                <label htmlFor="phoneNumber">{t("hero.enter_phone_text")}</label>
-                <div dir="ltr">
+              <label htmlFor="phoneNumber">{t("hero.enter_phone_text")}</label>
+              <div dir="ltr">
                 <PhoneInput
                   label={t("hero.enter_phone_text")}
                   country="sa"
@@ -272,9 +270,9 @@ export default function HomePhoneSignUp({
               )}
 
               {!hidePhoneCreateAccountButton && (
-                <div className="text-center mt-6 flex md:flex-col md:flex-row justify-between items-center">
+                <div className="text-center mt-6 flex flex-row justify-between items-center">
                   <Button
-                    className="bg-bg_btn_back w-full text-text_white hover:bg-gray-100 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2"
+                    className="bg-bg_btn_back w-1/2 text-text_white hover:bg-gray-100 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2"
                     onClick={() => {
                       setShowPhone(false);
                       setHideCreateAccountButton(false);
@@ -285,7 +283,7 @@ export default function HomePhoneSignUp({
                     type="button"
                   />
                   <Button
-                    className="bg-background_steel_blue w-full text-text_white hover:bg-gray-100 font-medium rounded text-sm px-5 py-2.5 me-2 mb-2"
+                    className="bg-background_steel_blue w-1/2 text-text_white hover:bg-gray-100 font-medium rounded text-sm px-5 py-2.5 me-2 mb-2"
                     label={t("next_text")}
                     type="submit"
                   />
@@ -332,8 +330,8 @@ export default function HomePhoneSignUp({
                         `${t("hero.resend_otp_text")} - ${Math.floor(timer / 60)
                           .toString()
                           .padStart(2, "0")}:${(timer % 60)
-                            .toString()
-                            .padStart(2, "0")}`
+                          .toString()
+                          .padStart(2, "0")}`
                       )}
                     </div>
                   </div>
@@ -350,9 +348,9 @@ export default function HomePhoneSignUp({
                     </div>
                   )}
 
-                  <div className="my-3 flex md:flex-col md:flex-row justify-between items-center">
+                  <div className="my-3 flex flex-row justify-between items-center">
                     <Button
-                      className="bg-bg_btn_back w-full text-text_white hover:bg-gray-100 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2"
+                      className="bg-bg_btn_back  w-1/2 text-text_white hover:bg-gray-100 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2"
                       onClick={() => {
                         setShowPhoneOTPScreen(false);
                         setHidePhoneCreateAccountButton(false);
@@ -363,7 +361,7 @@ export default function HomePhoneSignUp({
                       type="button"
                     />
                     <Button
-                      className="bg-background_steel_blue w-full text-text_white hover:bg-gray-100 font-medium rounded text-sm px-5 py-2.5 me-2 mb-2"
+                      className="bg-background_steel_blue  w-1/2 text-text_white hover:bg-gray-100 font-medium rounded text-sm px-5 py-2.5 me-2 mb-2"
                       label={t("verify_text")}
                       type="button"
                       onClick={handleVerify}

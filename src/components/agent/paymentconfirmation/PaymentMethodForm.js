@@ -29,9 +29,9 @@ const PaymentMethodForm = () => {
     const [t, i18n] = useTranslation("global");
 
     const baseUrl = window.location.protocol + '//' + window.location.host
-    const successUrl = `${baseUrl}/mashrouk-new-ui/agent/payment-success`;
-    const failureUrl = `${baseUrl}/mashrouk-new-ui/agent/payment-failed`;
-    const paymentStatus = baseUrl + "/mashrouk-new-ui/agent/payment-status";
+    const successUrl = `${baseUrl}/agent/payment-success`;
+    const failureUrl = `${baseUrl}/agent/payment-failed`;
+    const paymentStatus = `${baseUrl}/agent/payment-status`;
 
     useEffect(() => {
         localStorage.setItem('payment', true);
@@ -39,7 +39,7 @@ const PaymentMethodForm = () => {
         if (checkoutId) {
             // Inject the paymentWidgets.js script
             const paymentWidgetScript = document.createElement('script');
-            paymentWidgetScript.src = `https://eu-test.oppwa.com/v1/paymentWidgets.js?checkoutId=${checkoutId}`;
+            paymentWidgetScript.src = `https://eu-prod.oppwa.com/v1/paymentWidgets.js?checkoutId=${checkoutId}`;
             paymentWidgetScript.async = true;
             document.body.appendChild(paymentWidgetScript);
 
@@ -98,7 +98,7 @@ const PaymentMethodForm = () => {
                                                 localStorage.setItem('hasRefreshed', 'true');
                                                 localStorage.setItem('showPaymentMethod', 'true');
                                                 localStorage.setItem('price', price);
-                                                navigate('/mashrouk-new-ui/agent', { state: { showPaymentMethod: true } })
+                                                navigate('/agent', { state: { showPaymentMethod: true } })
                                             }
                                             }
                                         /> */}

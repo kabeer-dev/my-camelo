@@ -39,7 +39,7 @@ export default function PaymentFailed() {
               <div className="grid grid-cols-1 gap-3">
                 <div className="mx-auto">
                   <img
-                    src="./assets/paymentconditions/paymentfailed.png"
+                    src="/assets/paymentconditions/paymentfailed.png"
                     alt="payment failed"
                   />
                 </div>
@@ -60,7 +60,7 @@ export default function PaymentFailed() {
                 <div className="md:col-start-2">
                   <button
                     type="button"
-                    onClick={() => navigate("/mashrouk-new-ui/agent")}
+                    onClick={() => navigate("/agent")}
                     class="bg-white w-full text-black border border-black hover:bg-gray-100 font-medium text-sm px-5 py-2.5 me-2 mb-2"
                   >
                     {t("back_home_text")}
@@ -69,7 +69,7 @@ export default function PaymentFailed() {
                 <div>
                   <button
                     type="button"
-                    onClick={() => navigate("/mashrouk-new-ui/agent/payment-confirmation")}
+                    onClick={() => navigate("/agent/payment-confirmation")}
                     class="bg-background_steel_blue w-full text-text_white hover:bg-gray-100 font-medium text-sm px-5 py-2.5 me-2 mb-2"
                   >
                     {t("try_again")}

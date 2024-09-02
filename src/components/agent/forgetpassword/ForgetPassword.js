@@ -40,7 +40,7 @@ export default function ForgetPassword() {
       );
       // Redirect to OTP verification screen
       if (response?.status === 200) {
-        navigate("/mashrouk-new-ui/agent/forget-password-otp", {state: {email: values.email}});
+        navigate("/agent/forget-password-otp", {state: {email: values.email}});
       }
     } catch (error) {
       message.error(`${error?.response?.data?.msg}`);
@@ -56,14 +56,14 @@ export default function ForgetPassword() {
       <div className="h-screen w-screen position relative" dir={language === 'ar' ? 'rtl' : "ltr"}>
         <div className="position absolute left-0 top-0">
           <img
-            src="./assets/signin/left_vector.png"
+            src="/assets/signin/left_vector.png"
             alt="left_vector"
             className="w-24 h-24 md:w-48 md:h-48"
           />
         </div>
         <div className="position absolute right-0 bottom-0">
           <img
-            src="./assets/signin/right_vector.png"
+            src="/assets/signin/right_vector.png"
             alt="right_vector"
             className="w-24 md:w-48 h-18 md:h-36"
           />
@@ -71,9 +71,9 @@ export default function ForgetPassword() {
 
         <div className="z-20 w-screen h-screen flex flex-row justify-center items-center">
           <div className="flex flex-col justify-center items-center">
-            <div className="mb-4 cursor-pointer" onClick={() => navigate("/mashrouk-new-ui/agent")}>
+            <div className="mb-4 cursor-pointer" onClick={() => navigate("/agent")}>
               <img
-                src="./assets/signin/logo.png"
+                src="/assets/signin/logo.png"
                 alt="Moshrouk Trips"
                 className="w-16 h-13"
               />

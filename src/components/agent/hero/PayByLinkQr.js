@@ -16,7 +16,6 @@ export default function PayByLinkQr({
   const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
   const email = useSelector((state) => state.auth.email);
   const base64Data = qrCode.replace("PNG,", "");
-
   const handleRedirect = () => {
     window.location.href = payByLinkPaymentLink; // Replace with the actual URL you want to redirect to
   };
@@ -35,18 +34,14 @@ export default function PayByLinkQr({
             </div>
 
             <div className="flex justify-center">
-              <img
-                src={`data:image/png;base64,${base64Data}`}
-                alt="QR Code"
-                style={{ color: "red" }}
-              />
+              <img src={`data:image/png;base64,${base64Data}`} alt="QR Code" />
             </div>
 
             <div className="grid grid-cols-2 gap-3 mt-5">
               <div>
                 <button
                   type="button"
-                  onClick={() => (window.location.href = "/mashrouk-new-ui/")}
+                  onClick={() => (window.location.href = "/")}
                   className="bg-white w-full text-black border border-black hover:bg-gray-100 font-medium text-sm px-5 py-3 me-2 mb-2"
                 >
                   {t("back_home_text")}
@@ -55,7 +50,7 @@ export default function PayByLinkQr({
               <div>
                 <button
                   type="button"
-                  onClick={() => navigate("/mashrouk-new-ui/my-bookings")}
+                  onClick={() => navigate("/my-bookings")}
                   className="bg-background_steel_blue w-full text-text_white hover:bg-gray-100 font-medium text-sm px-5 py-3 me-2 mb-2"
                 >
                   {t("header.user_dropdown.my_booking")}
