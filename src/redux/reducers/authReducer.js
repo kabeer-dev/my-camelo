@@ -10,14 +10,27 @@ import {
   SIGN_UP_REQUEST,
   SIGN_UP_SUCCESS,
   SIGN_UP_FAILURE,
+  LANGUAGE_CHANGE,
+  AGENT_CHANGE,
+  EMAIL_CHANGE
 } from "../actions/authActions";
 import secureLocalStorage from "react-secure-storage";
 
+const language = secureLocalStorage.getItem("language");
 const tokenDetails = secureLocalStorage.getItem("token");
+const usernameDetails = secureLocalStorage.getItem("username");
+const userEmail = secureLocalStorage.getItem("userEmail");
+const agent = secureLocalStorage.getItem("agent");
+const agentPhoto = secureLocalStorage.getItem("agentPhoto");
+
 const initialState = {
+  language: (language && language) || 'eng',
   isLoggedIn: (tokenDetails && true) || false,
   token: tokenDetails || null,
-  username: "",
+  username: usernameDetails || null,
+  email: userEmail || null,
+  agent: agent || false,
+  agentPhoto: agentPhoto || "",
   error: null,
 };
 
@@ -29,13 +42,22 @@ const authReducer = (state = initialState, action) => {
         error: null,
       };
     case SIGN_IN_SUCCESS:
-      const { token, username } = action.payload;
+      const { token, username, email, photo } = action.payload;
+      console.log('token', token)
       secureLocalStorage.setItem("token", token);
+      secureLocalStorage.setItem("username", username);
+      secureLocalStorage.setItem("userEmail", email);
+      {
+        action.payload.photo &&
+        secureLocalStorage.setItem("agentPhoto", action.payload.photo);
+      }
       return {
         ...state,
         isLoggedIn: true,
         token,
         username,
+        email,
+        agentPhoto: photo,
         error: null,
       };
     case SIGN_IN_FAILURE:
@@ -64,7 +86,7 @@ const authReducer = (state = initialState, action) => {
         isLoggedIn: false,
         error: action.payload,
       };
-      case SIGN_UP_REQUEST:
+    case SIGN_UP_REQUEST:
       return {
         ...state,
         error: null,
@@ -83,6 +105,33 @@ const authReducer = (state = initialState, action) => {
         ...state,
         isLoggedIn: false,
         error: action.payload,
+      };
+
+    case LANGUAGE_CHANGE:
+      const language = action.payload.language; // Correctly access language from payload
+      secureLocalStorage.setItem("language", language);
+      // console.log('kkk', language); // Corrected typo 'language'
+      return {
+        ...state,
+        language: language,
+      };
+
+    case AGENT_CHANGE:
+      const agent = action.payload.language; // Correctly access language from payload
+      secureLocalStorage.setItem("agent", true);
+      // console.log('kkk', language); // Corrected typo 'language'
+      return {
+        ...state,
+        agent: agent,
+      };
+
+    case EMAIL_CHANGE:
+      const gemail = action.payload.email; // Correctly access language from payload
+      secureLocalStorage.setItem("email", gemail);
+      // console.log('kkk', language); // Corrected typo 'language'
+      return {
+        ...state,
+        email: gemail,
       };
     default:
       return state;

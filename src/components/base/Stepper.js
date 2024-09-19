@@ -1,9 +1,11 @@
 import React from "react";
 import { Icon } from "@iconify/react";
+import { useSelector } from "react-redux";
 
 const Stepper = ({ steps, subTab, className }) => {
   const activeStepIndex = steps.findIndex((step) => step.id === subTab);
   const stepWidth = `${100 / steps.length}%`;
+  const language = useSelector((state) => state.auth.language);
 
   return (
     <ol className={className} style={{ borderColor: "lightgray" }}>
@@ -31,7 +33,7 @@ const Stepper = ({ steps, subTab, className }) => {
           </div>
           {index < steps.length - 1 && (
             <Icon
-              icon="iconamoon:arrow-right-2-light"
+              icon={`${language === 'eng' ? 'iconamoon:arrow-right-2-light' : 'iconamoon:arrow-left-2-light'}`}
               width="28px"
               height="28px"
               style={{ color: "#787878" }}

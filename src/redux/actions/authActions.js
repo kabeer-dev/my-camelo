@@ -9,9 +9,9 @@ export const signInRequest = (email, password, recaptchaToken, navigate) => ({
   payload: { email, password, recaptchaToken, navigate }
 });
 
-export const signInSuccess = (token, username) => ({
+export const signInSuccess = (token, username, email, photo) => ({
   type: SIGN_IN_SUCCESS,
-  payload: { token, username },
+  payload: { token, username, email, photo },
 });
 
 export const signInFailure = (error) => ({
@@ -56,3 +56,23 @@ export const signUpFailure = (error) => ({
   type: SIGN_UP_FAILURE,
   payload: error,
 });
+
+export const LANGUAGE_CHANGE = "LANGUAGE_CHANGE";
+export const languageChange = (language) => ({
+  type: LANGUAGE_CHANGE,
+  payload: { language },
+});
+
+export const AGENT_CHANGE = "AGENT_CHANGE";
+export const agentChange = (agent) => ({
+  type: agent,
+  payload: { agent },
+});
+
+export const EMAIL_CHANGE = "EMAIL_CHANGE";
+export const emailChange = (email) => ({
+  type: EMAIL_CHANGE,
+  payload: { email },
+});
+
+

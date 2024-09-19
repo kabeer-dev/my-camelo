@@ -1,18 +1,49 @@
-.loader-container {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background-color: rgba(0, 0, 0, 0);
-    z-index: 9999;
+#global-loader {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: rgb(0 0 0 / 40%);
+  z-index: 9999;
+}
+
+/* Image container ko relative position denge */
+.loader-image-container {
+  position: relative;
+  width: 300px; /* Isko loader image ke width ke barabar rakhna hai */
+  height: 300px; /* Isko loader image ke width ke barabar rakhna hai */
+}
+
+/* Loader image ko rotate karenge */
+.loader-img-setting {
+  width: 100%; /* Container ke full width ke barabar rakhna */
+  height: auto;
+  animation: rotate360 2s linear infinite;
+  position: absolute; /* Isko absolute rakhte hain ke yeh parent ke andar move kare */
+  top: 0;
+  left: 0;
+}
+
+/* Animation define karen */
+@keyframes rotate360 {
+  from {
+    transform: rotate(0deg);
   }
-  
-  .loader-video {
-    width: 100%;
-    height: 100%;
+  to {
+    transform: rotate(360deg);
   }
-  
+}
+
+/* App logo ko center me fixed rakhna */
+.AppLogo-setting {
+  width: 150px;
+  height: auto;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%); /* Center align karne ke liye */
+}

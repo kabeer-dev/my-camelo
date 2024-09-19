@@ -1,0 +1,82 @@
+.map-searchbox-setting {
+    box-sizing: border-box;
+    border: 1px solid transparent;
+    width: 240px;
+    height: 40px;
+    padding: 0 12px;
+    border-radius: 3px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+    font-size: 14px;
+    outline: none;
+    text-overflow: hidden;
+    position: relative;
+    left: 3%;
+    margin-left: 0px;
+    top: 65vh;
+    z-index: 2;
+  }
+  
+  @media only screen and (min-width: 200px) and (max-width: 299px) {
+    .map-searchbox-setting {
+      left: 3%;
+      margin-left: 0px;
+      top: 59vh;
+    }
+  }
+  
+  @media only screen and (min-width: 300px) and (max-width: 375px) {
+    .map-searchbox-setting {
+      left: 3%;
+      margin-left: 0px;
+      top: 9vh;
+    }
+  }
+  
+  @media only screen and (min-width: 376px) and (max-width: 400px) {
+    .map-searchbox-setting {
+      left: 3%;
+      margin-left: 0px;
+      top: 9vh;
+    }
+  }
+  
+  @media only screen and (min-width: 401px) and (max-width: 500px) {
+    .map-searchbox-setting {
+      left: 3%;
+      margin-left: 0px;
+      top: 9vh;
+    }
+  }
+  
+  @media only screen and (min-width: 501px) and (max-width: 600px) {
+    .map-searchbox-setting {
+      left: 2%;
+      margin-left: 0px;
+      top: 9vh;
+    }
+  }
+  
+  @media only screen and (min-width: 601px) and (max-width: 700px) {
+    .map-searchbox-setting {
+      left: 2%;
+      margin-left: 0px;
+      top: 9vh;
+    }
+  }
+  
+  @media only screen and (min-width: 701px) and (max-width: 800px) {
+    .map-searchbox-setting {
+      left: 1.5%;
+      margin-left: 0px;
+      top: 9vh;
+    }
+  }
+  
+  @media only screen and (min-width: 801px) and (max-width: 3200px) {
+    .map-searchbox-setting {
+      left: 50%;
+      margin-left: -120px;
+      top: 10px;
+    }
+  }
+  

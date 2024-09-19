@@ -7,12 +7,15 @@ import InputFieldFormik from "../base/InputFieldFormik";
 import Button from "../base/Button";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import AuthFooter from "../base/AuthFooter";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { signUpRequest } from "../../redux/actions/authActions";
 import { setLoading } from "../../redux/actions/loaderAction";
-import axios from "axios";
+// import axios from "axios";
 import { message } from "antd";
 import Recaptcha from "../base/Recaptcha";
+import moment from "moment";
+import { useTranslation } from "react-i18next";
+import axiosInstance from "../../Api";
 
 export default function UserRegistration() {
   const navigate = useNavigate();
@@ -20,7 +23,9 @@ export default function UserRegistration() {
   const location = useLocation();
   const email = location.state?.email;
   const phone = location.state?.phone;
-  console.log('aaaaa', phone)
+  const language = useSelector((state) => state.auth.language);
+  const recaptchaRef = React.createRef();
+
   const API_BASE_URL = process.env.REACT_APP_BASE_URL_AMK_TEST;
   const [activeStepId, setActiveStepId] = useState(1);
   const [recaptchaToken, setRecaptchaToken] = useState(null);
@@ -31,25 +36,30 @@ export default function UserRegistration() {
     symbol: false,
   });
 
+  const [t, i18n] = useTranslation("global");
+
   const steps = useMemo(
     () => [
-      { id: 1, text: "Contato" },
-      { id: 2, text: "Contato" },
-      { id: 3, text: "Contato" },
+      { id: 1, text: t("my_profile.user_info_text") },
+      { id: 2, text: t("my_profile.city_info_text") },
+      { id: 3, text: t("my_profile.security_info_text") },
     ],
     []
   );
 
   // vlidation function to check user is greather then 16 years
-  const dateOfBirthValidation = function(value) {
+  const dobValidation = function (value) {
     const birthDate = new Date(value); // value should be in 'YYYY-MM-DD' format
-    console.log('aaa', birthDate)
+    // console.log("aaa", birthDate);
     const today = new Date();
     // Calculate age
     let age = today.getFullYear() - birthDate.getFullYear();
     const monthDifference = today.getMonth() - birthDate.getMonth();
-    
-    if (monthDifference < 0 || (monthDifference === 0 && today.getDate() < birthDate.getDate())) {
+
+    if (
+      monthDifference < 0 ||
+      (monthDifference === 0 && today.getDate() < birthDate.getDate())
+    ) {
       age--;
     }
     // Check if age is less than 16
@@ -60,30 +70,30 @@ export default function UserRegistration() {
   };
 
   const validationSchema = Yup.object().shape({
-    firstName: Yup.string().required("First Name is required"),
-    lastName: Yup.string().required("Last Name is required"),
-    gender: Yup.string().required("Gender is required"),
-    nationality: Yup.string().required("Nationality is required"),
-    dateOfBirth:  Yup.string().required("Date of Birth is required"),
-    phoneNumber: Yup.string()
-      .matches(/^[0-9]+$/, "Phone Number must be only digits")
-      .required("Phone Number is required"),
-    city: Yup.string().required("City is required"),
-    state: Yup.string().required("State is required"),
-    postalCode: Yup.string()
-      .matches(/^[0-9]+$/, "Postal Code must be only digits")
-      .required("Postal Code is required"),
-    streetAddress: Yup.string().required("Street Address is required"),
+    rider_name: Yup.string().required(t("errors.rider_name_error")),
+    lastName: Yup.string().required(t("errors.last_name_error")),
+    gender: Yup.string().required(t("errors.gender_error")),
+    nationality: Yup.string().required(t("errors.nationality_errr")),
+    dob: Yup.string().required(t("errors.dob_error")),
+    phone: Yup.string()
+      .matches(/^[0-9]+$/, t("errors.phone_digit_error"))
+      .required(t("errors.phone_error")),
+    city: Yup.string().required(t("errors.city_error")),
+    state: Yup.string().required(t("errors.state_error")),
+    postcode: Yup.string()
+      .matches(/^[0-9]+$/, t("errors.postal_must_error"))
+      .required(t("errors.postal_error")),
+    street: Yup.string().required(t("errors.street_error")),
     password: Yup.string()
-      .required("Password is required")
-      .min(8, "Password must be at least 8 characters")
-      .max(20, "Password cannot be more than 20 characters")
-      .matches(/[A-Z]/, "Password must have at least 1 uppercase letter")
-      .matches(/[a-z]/, "Password must have at least 1 lowercase letter")
-      .matches(/[@$!%*?&#]/, "Password must have at least 1 symbol"),
+      .required(t("errors.password_error"))
+      .min(8, t("errors.password_min_error"))
+      .max(20, t("errors.password_max_error"))
+      .matches(/[A-Z]/, t("errors.password_uppercase_error"))
+      .matches(/[a-z]/, t("errors.password_lowercase_error"))
+      .matches(/[@$!%*?&#]/, t("errors.password_symbol_error")),
     confirmPassword: Yup.string()
-      .oneOf([Yup.ref("password"), null], "Passwords must match")
-      .required("Confirm Password is required"),
+      .oneOf([Yup.ref("password"), null], t("errors.confirm_password_error2"))
+      .required(t("errors.confirm_password_error")),
   });
 
   // State for options fetched from APIs
@@ -93,8 +103,12 @@ export default function UserRegistration() {
   // Fetch genderOptions and countriesOptions from APIs
   useEffect(() => {
     // Fetch gender options
-    axios
-      .get(`${API_BASE_URL}/api/method/airport_transport.api.user.get_gender`)
+    axiosInstance
+      .get(
+        `${API_BASE_URL}/api/method/airport_transport.api.user.get_gender?language=${
+          language ? language : "eng"
+        }`
+      )
       .then((response) => {
         const genderData = response.data.data; // Extract the gender data
         const genderOptions = genderData.map((gender) => ({
@@ -107,12 +121,15 @@ export default function UserRegistration() {
         message.error(
           error?.response?.data?.msg || "Error fetching gender options"
         );
+        console.log("Error", error);
       });
 
     // Fetch country options
-    axios
+    axiosInstance
       .get(
-        `${API_BASE_URL}/api/method/airport_transport.api.user.get_nationality`
+        `${API_BASE_URL}/api/method/airport_transport.api.user.get_nationality?language=${
+          language ? language : "eng"
+        }`
       )
       .then((response) => {
         const countryData = response.data.data; // Extract the country data
@@ -144,40 +161,52 @@ export default function UserRegistration() {
   };
 
   const onSubmit = (values, { setSubmitting }) => {
+    if (recaptchaToken == null) {
+      dispatch(setLoading(false));
+      return message.error(t("recaptchaRequired"));
+    }
+    values.dob = moment(values.dob).format("YYYY-MM-DD");
     values.email = email;
-    values.phoneNumber = phone;
+    values.phone = phone;
     dispatch(signUpRequest(values, recaptchaToken, navigate));
     setLoading(true);
     setSubmitting(false);
+    recaptchaRef.current.reset();
   };
 
   return (
     <>
-      <div className="h-screen w-screen position relative">
-        <div className="position absolute left-0 top-0">
+      <div
+        className="h-screen w-screen position relative"
+        dir={language === "ar" ? "rtl" : "ltr"}
+      >
+        <div className="-z-10 position absolute left-0 top-0">
           <img
-            src="/assets/signin/left_vector.png"
+            src="./assets/signin/left_vector.png"
             alt="left_vector"
             className="w-20 h-20 md:w-48 md:h-48"
           />
         </div>
-        <div className="position absolute right-0 bottom-0">
+        <div className="-z-10 position absolute right-0 bottom-0">
           <img
-            src="/assets/signin/right_vector.png"
+            src="./assets/signin/right_vector.png"
             alt="right_vector"
             className="w-16 md:w-48 h-12 md:h-36"
           />
         </div>
-        <div className="z-20 w-screen h-screen flex flex-row justify-center items-center">
+        <div className="w-screen h-screen overflow-auto">
           <div className="flex flex-col justify-center items-center">
-            <div className="mb-2 cursor-pointer" onClick={() => navigate("/")}>
+            <div
+              className="mt-4 mb-2 cursor-pointer"
+              onClick={() => navigate("/mashrouk-new-ui/")}
+            >
               <img
-                src="/assets/signin/logo.png"
+                src="./assets/signin/logo.png"
                 alt="Moshrouk Trips"
                 className="w-16 h-13"
               />
             </div>
-            <div className="block w-72 md:w-auto p-3 bg-white border border-gray-200 rounded-lg shadow hover:bg-gray-100 dark:bg-gray-800 dark:border-gray-700 dark:hover:bg-gray-700">
+            <div className="bg-text_white  mt-2 block w-72 md:w-auto p-3 bg-white border border-gray-200 rounded-lg shadow hover:bg-gray-100 dark:bg-gray-800 dark:border-gray-700 dark:hover:bg-gray-700">
               <div className="w-auto text-left p-1">
                 <div>
                   <Stepper
@@ -191,45 +220,46 @@ export default function UserRegistration() {
 
                 <Formik
                   initialValues={{
-                    firstName: "",
+                    rider_name: "",
                     lastName: "",
                     gender: "",
                     nationality: "",
-                    dateOfBirth: "",
-                    phoneNumber: "",
+                    dob: "",
+                    phone: "",
                     city: "",
                     state: "",
-                    postalCode: "",
-                    streetAddress: "",
+                    postcode: "",
+                    street: "",
                     password: "",
                     confirmPassword: "",
+                    language: language === "ar" ? language : "",
                   }}
                   validationSchema={validationSchema}
                   onSubmit={onSubmit}
                 >
                   {({ values, errors, setFieldValue, validateForm }) => {
                     const isStep1Valid =
-                      values.firstName &&
+                      values.rider_name &&
                       values.lastName &&
                       values.gender &&
                       values.nationality &&
-                      values.dateOfBirth 
-                      // values.phoneNumber;
+                      values.dob;
+                    // values.phone;
                     const isStep2Valid =
                       values.city &&
                       values.state &&
-                      values.postalCode &&
-                      values.streetAddress;
+                      values.postcode &&
+                      values.street;
 
                     return (
                       <Form className="mx-auto w-full">
                         {activeStepId === 1 && (
                           <>
-                            <div className="flex flex-row justify-between items-center">
-                              <div className="w-1/2 mr-1">
+                            <div className="flex flex-col  md:flex-row justify-between items-center">
+                              <div className="w-full md:w-1/2 mr-0 md:mr-1">
                                 <InputFieldFormik
-                                  label="First Name"
-                                  name="firstName"
+                                  label={t("my_profile.first_name_text")}
+                                  name="rider_name"
                                   type="text"
                                   onChange={(valueObj) => {
                                     const { fieldName, selectedValue } =
@@ -239,9 +269,9 @@ export default function UserRegistration() {
                                   required
                                 />
                               </div>
-                              <div className="w-1/2 ml-1">
+                              <div className="w-full md:w-1/2 ml-0 md:ml-1">
                                 <InputFieldFormik
-                                  label="Last Name"
+                                  label={t("my_profile.last_name_text")}
                                   name="lastName"
                                   type="text"
                                   onChange={(valueObj) => {
@@ -256,9 +286,10 @@ export default function UserRegistration() {
 
                             <div>
                               <InputFieldFormik
-                                label="Gender"
+                                label={t("my_profile.gender_text")}
                                 name="gender"
                                 type="select"
+                                value={values.gender}
                                 options={genderOptions}
                                 onChange={(valueObj) => {
                                   const { fieldName, selectedValue } = valueObj;
@@ -270,9 +301,10 @@ export default function UserRegistration() {
 
                             <div>
                               <InputFieldFormik
-                                label="Nationality"
+                                label={t("my_profile.nationality_text")}
                                 name="nationality"
                                 type="select"
+                                value={values.nationality}
                                 options={countriesOptions}
                                 onChange={(valueObj) => {
                                   const { fieldName, selectedValue } = valueObj;
@@ -284,21 +316,21 @@ export default function UserRegistration() {
 
                             <div>
                               <InputFieldFormik
-                                label="Date of birth"
-                                name="dateOfBirth"
-                                type="dateOfBirth"
-                                value={values.dateOfBirth ? values.dateOfBirth : null}
+                                label={t("my_profile.date_birth_text")}
+                                name="dob"
+                                type="dob"
+                                value={values.dob ? values.dob : null}
                                 onChange={(date, dateString) => {
                                   // const { fieldName, selectedValue } = valueObj;
-                                  setFieldValue('dateOfBirth', dateString);
+                                  setFieldValue("dob", dateString);
                                 }}
                                 required
                               />
                             </div>
 
-                            <div>
+                            <div dir="ltr">
                               <InputFieldFormik
-                                label="Email"
+                                label={t("my_profile.email_text")}
                                 name="email"
                                 type="readOnly"
                                 value={email}
@@ -310,9 +342,9 @@ export default function UserRegistration() {
                                 // required
                               />
                             </div>
-                            <div>
+                            <div dir="ltr">
                               <InputFieldFormik
-                                label="Phone"
+                                label={t("my_profile.phone_number_text")}
                                 name="phone"
                                 type="readOnly"
                                 value={phone}
@@ -325,36 +357,25 @@ export default function UserRegistration() {
                               />
                             </div>
 
-                            {/* <div>
-                              <InputFieldFormik
-                                label="Phone Number"
-                                name="phoneNumber"
-                                type="text"
-                                onChange={(valueObj) => {
-                                  const { fieldName, selectedValue } = valueObj;
-                                  setFieldValue(fieldName, selectedValue);
-                                }}
-                                required
-                              />
-                            </div> */}
-
                             <div className="w-full mt-3">
                               <Button
                                 className="bg-background_steel_blue w-full text-text_white hover:bg-gray-100 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2"
                                 onClick={() => {
                                   validateForm().then(() => {
                                     if (isStep1Valid) {
-                                      const isSixteenYears = dateOfBirthValidation(values.dateOfBirth);
-                                      if(isSixteenYears){
+                                      const isSixteenYears = dobValidation(
+                                        values.dob
+                                      );
+                                      if (isSixteenYears) {
+                                        values.phone = phone;
                                         setActiveStepId(2);
-                                      }else{
-                                        message.error('Age should be more than 16 years');
+                                      } else {
+                                        message.error(t("errors.age_16_error"));
                                       }
-                                      
                                     }
                                   });
                                 }}
-                                label="Next"
+                                label={t("next_text")}
                                 type="button"
                                 disabled={!isStep1Valid}
                               />
@@ -364,10 +385,11 @@ export default function UserRegistration() {
 
                         {activeStepId === 2 && (
                           <>
-                            <div className="flex flex-row justify-between items-center">
-                              <div className="w-1/2 mr-1">
+                            <div className="flex flex-col  md:flex-row justify-between items-center">
+                              <div className="w-full md:w-1/2 mr-0 md:mr-1">
                                 <InputFieldFormik
-                                  label="City"
+                                  label={t("my_profile.city_text")}
+                                  placeholder={t("my_profile.city_text")}
                                   name="city"
                                   type="text"
                                   onChange={(valueObj) => {
@@ -378,9 +400,10 @@ export default function UserRegistration() {
                                   required
                                 />
                               </div>
-                              <div className="w-1/2 ml-1">
+                              <div className="w-full md:w-1/2 ml-0 md:ml-1">
                                 <InputFieldFormik
-                                  label="State"
+                                  label={t("my_profile.state_text")}
+                                  placeholder={t("my_profile.state_text")}
                                   name="state"
                                   type="text"
                                   onChange={(valueObj) => {
@@ -395,8 +418,9 @@ export default function UserRegistration() {
 
                             <div>
                               <InputFieldFormik
-                                label="Postal Code"
-                                name="postalCode"
+                                label={t("my_profile.postal_text")}
+                                placeholder={t("my_profile.postal_text")}
+                                name="postcode"
                                 type="text"
                                 onChange={(valueObj) => {
                                   const { fieldName, selectedValue } = valueObj;
@@ -408,8 +432,11 @@ export default function UserRegistration() {
 
                             <div>
                               <InputFieldFormik
-                                label="Street Address"
-                                name="streetAddress"
+                                label={t("my_profile.street_address_text")}
+                                placeholder={t(
+                                  "my_profile.street_address_text"
+                                )}
+                                name="street"
                                 type="text"
                                 onChange={(valueObj) => {
                                   const { fieldName, selectedValue } = valueObj;
@@ -419,13 +446,13 @@ export default function UserRegistration() {
                               />
                             </div>
 
-                            <div className="w-full mt-3 flex flex-row justify-between items-center">
+                            <div className="w-full mt-3 flex flex-col  md:flex-row justify-between items-center">
                               <Button
                                 className="bg-bg_btn_back w-1/2 text-text_white hover:bg-gray-100 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2"
                                 onClick={() => {
                                   setActiveStepId(1);
                                 }}
-                                label="Previous"
+                                label={t("previous_text")}
                                 type="button"
                               />
                               <Button
@@ -437,7 +464,7 @@ export default function UserRegistration() {
                                     }
                                   });
                                 }}
-                                label="Next"
+                                label={t("next_text")}
                                 type="button"
                                 disabled={!isStep2Valid}
                               />
@@ -447,9 +474,10 @@ export default function UserRegistration() {
 
                         {activeStepId === 3 && (
                           <>
-                            <div>
+                            <div dir="ltr">
                               <InputFieldFormik
-                                label="Password"
+                                label={t("my_profile.password_text")}
+                                placeholder={t("my_profile.password_text")}
                                 name="password"
                                 type="password"
                                 onChange={(valueObj) => {
@@ -461,9 +489,10 @@ export default function UserRegistration() {
                               />
                             </div>
 
-                            <div>
+                            <div dir="ltr">
                               <InputFieldFormik
-                                label="Confirm Password"
+                                label={t("my_profile.confirm_password")}
+                                placeholder={t("my_profile.confirm_password")}
                                 name="confirmPassword"
                                 type="password"
                                 onChange={(valueObj) => {
@@ -488,8 +517,7 @@ export default function UserRegistration() {
                                   height="24px"
                                 />
                                 <div className="text-sm ml-2">
-                                  Your password must contain between 8 and 20
-                                  characters
+                                  {t("my_profile.password_8_20_text")}
                                 </div>
                               </div>
 
@@ -506,8 +534,7 @@ export default function UserRegistration() {
                                   height="24px"
                                 />
                                 <div className="text-sm ml-2">
-                                  Your password must have at least 1 uppercase
-                                  letter
+                                  {t("my_profile.password_uppercase_text")}
                                 </div>
                               </div>
 
@@ -524,8 +551,7 @@ export default function UserRegistration() {
                                   height="24px"
                                 />
                                 <div className="text-sm ml-2">
-                                  Your password must have at least 1 lowercase
-                                  letter
+                                  {t("my_profile.password_lowercase_text")}
                                 </div>
                               </div>
 
@@ -542,7 +568,7 @@ export default function UserRegistration() {
                                   height="24px"
                                 />
                                 <div className="text-sm ml-2">
-                                  Your password must have at least 1 symbol
+                                  {t("my_profile.password_symbol_text")}
                                 </div>
                               </div>
                             </div>
@@ -555,18 +581,18 @@ export default function UserRegistration() {
                               />
                             </div>
 
-                            <div className="w-full mt-3 flex flex-row justify-between items-center">
+                            <div className="w-full mt-3 flex flex-col  md:flex-row justify-between items-center">
                               <Button
                                 className="bg-bg_btn_back w-1/2 text-text_white hover:bg-gray-100 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2"
                                 onClick={() => {
                                   setActiveStepId(2);
                                 }}
-                                label="Previous"
+                                label={t("previous_text")}
                                 type="button"
                               />
                               <Button
                                 className="bg-background_steel_blue w-1/2 text-text_white hover:bg-gray-100 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2"
-                                label="Submit"
+                                label={t("submit_text")}
                                 type="submit"
                               />
                             </div>

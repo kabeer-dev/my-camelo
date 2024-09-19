@@ -1,0 +1,13 @@
+# Redirect all traffic to index.html within the mashrouk-new-ui subdirectory
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteBase /mashrouk-new-ui/
+
+  # If a directory or a file exists, use it directly
+  RewriteCond %{REQUEST_FILENAME} -f [OR]
+  RewriteCond %{REQUEST_FILENAME} -d
+  RewriteRule ^ - [L]
+
+  # If the requested URL is not an existing file/directory, redirect all requests to index.html
+  RewriteRule ^ /mashrouk-new-ui/index.html [L]
+</IfModule>

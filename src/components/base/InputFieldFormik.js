@@ -2,15 +2,19 @@ import React, { useState } from "react";
 import { Field, ErrorMessage, useField } from "formik";
 import PropTypes from "prop-types";
 import { Select, TimePicker, Input } from "antd";
-import DatePicker from 'react-datepicker';
-import 'react-datepicker/dist/react-datepicker.css';
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 import dayjs from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat";
 import "../base/InputFieldSetting.css";
 import moment from "moment/moment";
-import { FaCcVisa, FaCcMastercard } from 'react-icons/fa';
 import { Icon } from "@iconify/react";
-import creditCardType from 'credit-card-type';
+import creditCardType from "credit-card-type";
+import { useTranslation } from "react-i18next";
+import { useSelector } from "react-redux";
+import TextArea from "antd/es/input/TextArea";
+import { useEffect } from "react";
+import axios from "axios";
 
 dayjs.extend(customParseFormat);
 
@@ -18,15 +22,20 @@ const InputFieldFormik = ({
   type,
   name,
   label,
-  options,
+  options = [],
   value,
-  onChange,
-  arrivalDates,
-  setArrivalDates,
-  percentageValue
+  onChange = () => {},
+  arrivalDates = null,
+  setArrivalDates = () => {},
+  percentageValue,
+  placeholder,
 }) => {
+  const API_BASE_URL = process.env.REACT_APP_BASE_URL_AMK_TEST;
   const [timeError, setTimeError] = useState("");
   const [, , helpers] = useField(name);
+
+  const [t, i18n] = useTranslation("global");
+  const language = useSelector((state) => state.auth.language);
 
   const currentDate = new Date().toLocaleDateString("en-CA");
 
@@ -43,35 +52,51 @@ const InputFieldFormik = ({
 
   const handleKeyPress = (event) => {
     if (
-      (name === "phoneNumber" || name === "postalCode") &&
+      (name === "phone" || name === "mobile_number" || name === "postcode") &&
       !/[0-9]/.test(event.key)
     ) {
       event.preventDefault();
     }
   };
-  // console.log("child me arrivalDates me kiya ha??", arrivalDates);
-  // console.log("child me currentDate me kiya ha??", currentDate);
+
+  const [hours, setHours] = useState(0);
+  useEffect(() => {
+    const geRestrictedtHours = async () => {
+      try {
+        const response = await axios.get(
+          `${API_BASE_URL}/api/method/airport_transport.api.bookings.get_settings`
+        );
+        setHours(Math.ceil(response.data.data.booking_allowed_time / 60));
+      } catch (error) {
+        console.error("Error fetching service status", error);
+      }
+    };
+    geRestrictedtHours();
+  }, [API_BASE_URL]);
 
   const handleTimeChange = (time, timeString) => {
-    console.log('Selected Time:', timeString);
+    if (arrivalDates) {
+      if (arrivalDates === currentDate) {
+        const currentTime = dayjs();
+        const selectedTime = dayjs(timeString, "HH:mm");
 
-    // Check if the selected date is the current date
-    if (arrivalDates === currentDate) {
-      const currentTime = moment(); // Get the current time
-      const selectedTime = moment(timeString, "h:mm A"); // Parse the selected time
-
-      // Check if the selected time is at least 2 hours later than the current time
-      if (selectedTime.isBefore(currentTime.add(2, "hour"))) {
-        setTimeError("You cannot select a time earlier than two hours from now.");
-        return;
+        if (selectedTime.isBefore(currentTime.add(hours, "hour"))) {
+          setTimeError(
+            `${t("errors.hour_2_error")} ${hours} ${
+              language === "ar" ? "ساعات" : "hours"
+            }`
+          );
+          helpers.setValue("");
+          return;
+        }
       }
-    }
 
-    // If the selected date is not the current date or the time selection is valid
-    setTimeError(""); // Clear any previous error
-    onChange?.({ fieldName: name, selectedValue: timeString }); // Trigger onChange callback with 12-hour format time
-    helpers.setValue(timeString); // Set the value using formik helpers in 12-hour format
-    // setValue(time); // Set the state value for the TimePicker
+      setTimeError("");
+      onChange?.({ fieldName: name, selectedValue: timeString });
+      helpers.setValue(timeString);
+    } else {
+      setTimeError(t("errors.date_first_error"));
+    }
   };
 
   const renderErrorMessage = (msg) => (
@@ -90,16 +115,15 @@ const InputFieldFormik = ({
     className: "text-gray-900 text-sm block w-full",
   };
 
-  //for card
-  const [cardType, setCardType] = useState('');
-  const [cardFormetedValue, setCardFormetedValue] = useState('');
+  const [cardType, setCardType] = useState("");
+  const [cardFormetedValue, setCardFormetedValue] = useState("");
   const handleCardNumberChange = (e) => {
-    let value = e.target.value.replace(/\D/g, '').slice(0, 16); // Remove non-digits and limit to 16 digits
-    const formattedValue = value.replace(/(.{4})/g, '$1 ').trim(); // Add spaces after every 4 digits
+    let value = e.target.value.replace(/\D/g, "").slice(0, 16);
+    const formattedValue = value.replace(/(.{4})/g, "$1 ").trim();
     const detectedCardType = creditCardType(value)[0]?.type;
 
     setCardType(detectedCardType);
-    setCardFormetedValue(formattedValue)
+    setCardFormetedValue(formattedValue);
     e.target.value = formattedValue;
     if (formattedValue < 18) {
       setCardType("");
@@ -110,7 +134,7 @@ const InputFieldFormik = ({
     <div>
       <label
         htmlFor={name}
-        className="block mb-2 mt-2 lg:mt-1  text-sm font-medium text-gray-900 dark:text-white"
+        className="block mb-2 mt-2 lg:mt-1 text-sm font-medium text-gray-900 dark:text-white rtl:text-right"
       >
         {label}
       </label>
@@ -118,13 +142,20 @@ const InputFieldFormik = ({
       {type === "select" && (
         <>
           <Select
+            direction={language === "ar" ? "rtl" : "ltr"}
             size="large"
+            style={{ height: "45px" }}
             showSearch
-            placeholder={`Select ${label}`}
+            // placeholder={`${language === "ar" ? "يختار" : "Select"} ${label}`}
             optionFilterProp="children"
             onChange={handleSelectChange}
             options={options}
-            value={value}
+            // value={value}
+            value={
+              value
+                ? value
+                : `${language === "ar" ? "يختار" : "Select"} ${label}`
+            }
             filterOption={(input, option) =>
               (option?.label ?? "").toLowerCase().includes(input.toLowerCase())
             }
@@ -136,7 +167,12 @@ const InputFieldFormik = ({
       {type === "checkbox" && (
         <div className="mb-3 flex flex-row justify-between items-center">
           <div>
-            <div className="text-sm">{`Select Shared ride to get discount ${percentageValue}%`}</div>
+            <div className="text-sm text-text_grey">
+              <span>{`${t("hero.select_shared_ride_text")}`} </span>
+              <span className="text-text_steel_blue font-bold">
+                {language === "eng" ? "discount" : "خصم"} {percentageValue}%
+              </span>
+            </div>
           </div>
           <div>
             <Field
@@ -150,21 +186,17 @@ const InputFieldFormik = ({
         </div>
       )}
 
-      {type === "dateOfBirth" && (
+      {type === "dob" && (
         <>
-          {/* <DatePicker
-            size="large"
-            onChange={(date, dateString) => helpers.setValue(dateString)}
-            disabledDate={pastDateSelect}
-            {...commonProps}
-          /> */}
           <DatePicker
             selected={value ? new Date(value) : null}
             onChange={(date, dateString) => helpers.setValue(date)}
             dateFormat="yyyy/MM/dd"
             maxDate={new Date()}
             className={`react-datepicker text-gray-900 text-sm block w-full bg-white text-gray-600 rounded-md p-2 border border-gray-200 h-10`}
-            placeholderText="Select Date"
+            placeholderText={`${
+              language === "ar" ? "حدد التاريخ" : "Select Date"
+            } `}
             wrapperClassName="w-full"
           />
           <ErrorMessage name={name} render={renderErrorMessage} />
@@ -176,40 +208,32 @@ const InputFieldFormik = ({
           <DatePicker
             selected={value ? new Date(value) : null}
             onChange={(date, dateString) => {
-              setArrivalDates(date);
+              setArrivalDates(date.toLocaleDateString("en-CA"));
               helpers.setValue(date);
             }}
             dateFormat="yyyy/MM/dd"
             minDate={new Date()}
             className={`react-datepicker text-gray-900 text-sm block w-full bg-white text-gray-600 rounded-md p-2 border border-gray-200 h-10`}
-            placeholderText="Select Date"
+            placeholderText={`${
+              language === "ar" ? "حدد التاريخ" : "Select Date"
+            } `}
             wrapperClassName="w-full"
           />
           <ErrorMessage name={name} render={renderErrorMessage} />
         </>
-        // <>
-        //   <DatePicker
-        //     size="large"
-        //     onChange={(date, dateString) => {
-        //       setArrivalDates(dateString);
-        //       helpers.setValue(dateString);
-        //     }}
-        //     // onClick={()=> onChange(name, null)}
-        //     // selected={value ? moment(value) : null}
-        //     value={value ? moment(value) : null}
-        //     // setValue={value}
-        //     defaultOpenValue={dayjs() || value}
-        //     disabledDate={futureDateSelect}
-        //     {...commonProps}
-        //   />
-        //   <ErrorMessage name={name} render={renderErrorMessage} />
-        // </>
       )}
 
       {type === "password" && (
         <div className="relative">
           <Field name={name}>
-            {({ field }) => <Input.Password {...field} {...commonProps} />}
+            {({ field }) => (
+              <Input.Password
+                placeholder={placeholder}
+                style={{ height: "45px" }}
+                {...field}
+                {...commonProps}
+              />
+            )}
           </Field>
         </div>
       )}
@@ -217,30 +241,16 @@ const InputFieldFormik = ({
       {type === "arrivalTime" && (
         <>
           <TimePicker
+            placeholder={`${language === "ar" ? "حدد الوقت" : "Select Time"} `}
             size="large"
-            onChange={(date, dateString) => {
-              const selectedTime = date ? date.format("HH:mm:ss") : null;
-              console.log('aaaa', selectedTime)
-              if (arrivalDates === currentDate) {
-                const currentTime = moment(); // Get the current time
-                // Check if the selected time is at least 2 hours later than the current time
-                if (selectedTime.isBefore(currentTime.add(2, "hour"))) {
-                  setTimeError("You cannot select a time earlier than two hours from now.");
-                  return;
-                }
-              }
-          
-              // If the selected date is not the current date or the time selection is valid
-              setTimeError(""); // Clear any previous error
-              onChange?.({ fieldName: name, selectedValue: selectedTime }); // Trigger onChange callback with 12-hour format time
-              helpers.setValue(selectedTime);
-              
-              setArrivalDates(selectedTime);
-            }}
-            // value={value ? moment(value, "HH:mm:ss") : null}
-            defaultOpenValue={moment("00:00:00", "HH:mm:ss")}
-            format="h:mm A"
+            style={{ height: "45px" }}
+            onChange={handleTimeChange}
+            value={value ? moment(value, "HH:mm") : null}
+            defaultOpenValue={
+              value ? dayjs(value, "HH:mm") : dayjs("00:00", "HH:mm")
+            }
             {...commonProps}
+            format="HH:mm"
           />
           {timeError && renderErrorMessage(timeError)}
           <ErrorMessage name={name} render={renderErrorMessage} />
@@ -248,10 +258,46 @@ const InputFieldFormik = ({
       )}
 
       {["text", "email", "number", "tel"].includes(type) && (
-        <Field name={name}>
+        <Field direction={language === "ar" ? "rtl" : "ltr"} name={name}>
           {({ field }) => (
             <Input
+              placeholder={placeholder}
               size="large"
+              style={{ height: "45px" }}
+              {...field}
+              type={type}
+              onKeyPress={handleKeyPress}
+              {...commonProps}
+            />
+          )}
+        </Field>
+      )}
+
+      {["pick-up", "drop-off"].includes(type) && (
+        <Field direction={language === "ar" ? "rtl" : "ltr"} name={name}>
+          {({ field }) => (
+            <Input
+              placeholder={placeholder}
+              size="large"
+              style={{ height: "45px" }}
+              {...field}
+              type={type}
+              onKeyPress={handleKeyPress}
+              {...commonProps}
+              value={value ? value : ""}
+              onChange={(value) => helpers.setValue(value.value)}
+            />
+          )}
+        </Field>
+      )}
+
+      {["description"].includes(type) && (
+        <Field direction={language === "ar" ? "rtl" : "ltr"} name={name}>
+          {({ field }) => (
+            <TextArea
+              placeholder={placeholder}
+              size="large"
+              style={{ height: "45px" }}
               {...field}
               type={type}
               onKeyPress={handleKeyPress}
@@ -266,7 +312,9 @@ const InputFieldFormik = ({
           {({ field }) => (
             <div className="relative flex items-center">
               <Input
+                placeholder={placeholder}
                 size="large"
+                style={{ height: "45px" }}
                 {...field}
                 onKeyPress={handleKeyPress}
                 onChange={(e) => {
@@ -275,11 +323,13 @@ const InputFieldFormik = ({
                 }}
                 {...commonProps}
                 value={cardFormetedValue}
-                className="w-full pr-10" // Tailwind CSS for padding right to make space for the logo
+                className="w-full pr-10"
               />
               <div className="absolute inset-y-0 right-3 flex items-center pointer-events-none">
-                {cardType === 'visa' && <Icon icon="logos:visa" />}
-                {cardType === 'mastercard' && <Icon icon="logos:mastercard" className="text-2xl" />}
+                {cardType === "visa" && <Icon icon="logos:visa" />}
+                {cardType === "mastercard" && (
+                  <Icon icon="logos:mastercard" className="text-2xl" />
+                )}
               </div>
             </div>
           )}
@@ -290,8 +340,8 @@ const InputFieldFormik = ({
         <Field name={name}>
           {({ field }) => (
             <Input
+              style={{ height: "45px" }}
               {...field}
-              // type={type}
               value={value}
               onKeyPress={handleKeyPress}
               {...commonProps}
@@ -319,13 +369,6 @@ InputFieldFormik.propTypes = {
   onChange: PropTypes.func,
   arrivalDates: PropTypes.string,
   setArrivalDates: PropTypes.func,
-};
-
-InputFieldFormik.defaultProps = {
-  options: [],
-  onChange: () => { },
-  arrivalDates: null,
-  setArrivalDates: () => { },
 };
 
 export default InputFieldFormik;

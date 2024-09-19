@@ -4,10 +4,13 @@ import Paragraph from "../base/Paragraph";
 import ServiceCard from "./ServiceCard";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchServicesListRequest } from "../../redux/actions/servicesListActions";
+import { useTranslation } from "react-i18next";
 
 export default function ServiceSection() {
   const dispatch = useDispatch();
   const { servicesList } = useSelector((state) => state.servicesList);
+  const language = useSelector((state) => state.auth.language);
+  const [t, i18n] = useTranslation("global")
 
   useEffect(() => {
     dispatch(fetchServicesListRequest());
@@ -37,19 +40,17 @@ export default function ServiceSection() {
 
   return (
     <>
-      <div className="px-6 pt-10 pb-5 md:px-12 md:pt-20 md:pb-10">
+      <div className="px-6 pt-10 pb-5 md:px-12 md:pt-20 md:pb-10" dir={language === 'ar' ? 'rtl' : 'ltr'}>
         <div className="mt-2 md:mt-3 mb-4 md:mb-7 flex flex-col md:flex-row justify-between items-start">
           <div className="w-full md:w-1/2">
             <Heading
-              title={"Our Services"}
+              title={t("services.heading")}
               className={"text-2xl md:text-5xl text-text_steel_blue"}
             />
           </div>
           <div className="w-full md:w-1/2">
             <Paragraph
-              title={
-                "Join us and learn about our service in digital transformation and discover the unlimited possibilities that await you."
-              }
+              title={t("services.paragraph")}
               className={"text-normal md:text-lg text-[#454545]"}
             />
           </div>

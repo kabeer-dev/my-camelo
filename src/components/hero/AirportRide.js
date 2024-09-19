@@ -1,58 +1,73 @@
-import React, { useState, useEffect, useMemo } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { Formik, Form } from "formik";
-import * as Yup from "yup";
-import Stepper from "../base/Stepper";
-import Button from "../base/Button";
-import Heading from "../base/Heading";
-import MapModal from "../base/MapModal";
-import InputFieldFormik from "../base/InputFieldFormik";
-import { fetchCitiesRequest } from "../../redux/actions/cityActions";
-import { fetchAirportRequest } from "../../redux/actions/airportActions";
-import { fetchVehicleTypesRequest } from "../../redux/actions/vehicleTypeAction";
-import { getZoneRequest } from "../../redux/actions/zoneActions";
-import HomeEmailSignUp from "./HomeEmailSignUp";
-import VehicleTypeModal from "../base/VehicleTypeModal";
-import { setLoading } from "../../redux/actions/loaderAction";
-import PaymentMethod from "./PaymentMethod";
-import axios from "axios";
+import React, {useState, useEffect, useMemo} from 'react';
+import {useDispatch, useSelector} from 'react-redux';
+import {Formik, Form} from 'formik';
+import * as Yup from 'yup';
+import Stepper from '../base/Stepper';
+import Button from '../base/Button';
+import Heading from '../base/Heading';
+import MapModal from '../base/MapModal';
+import InputFieldFormik from '../base/InputFieldFormik';
+import {fetchCitiesRequest} from '../../redux/actions/cityActions';
+import {fetchAirportRequest} from '../../redux/actions/airportActions';
+import {fetchVehicleTypesRequest} from '../../redux/actions/vehicleTypeAction';
+import {getZoneRequest} from '../../redux/actions/zoneActions';
+import HomeEmailSignUp from './HomeEmailSignUp';
+import VehicleTypeModal from '../base/VehicleTypeModal';
+import {setLoading} from '../../redux/actions/loaderAction';
+import PaymentMethod from './PaymentMethod';
+// import axios from "axios";
+import {message} from 'antd';
+import {useTranslation} from 'react-i18next';
+import axiosInstance from '../../Api';
 
-export default function AirportRide(
-  {
-    subTab, setSubTab,
-    showSignUp, setShowSignUp,
-    showAlreadyRegistered,
-    setShowAlreadyRegistered,
-    showOTPScreen,
-    setShowOTPScreen,
-    hideCreateAccountButton,
-    setHideCreateAccountButton,
-    showPhone,
-    setShowPhone,
-    hidePhoneCreateAccountButton,
-    setHidePhoneCreateAccountButton,
-    showPhoneOTPScreen,
-    setShowPhoneOTPScreen,
-    showPaymentMethod,
-    setShowPaymentMethod,
-    recaptchaRef,
-    otp,
-    setOtp,
-    phoneOtp,
-    setPhoneOtp
-  }) {
+export default function AirportRide({
+  subTab,
+  setSubTab,
+  showSignUp,
+  setShowSignUp,
+  showAlreadyRegistered,
+  setShowAlreadyRegistered,
+  showOTPScreen,
+  setShowOTPScreen,
+  hideCreateAccountButton,
+  setHideCreateAccountButton,
+  showPhone,
+  setShowPhone,
+  hidePhoneCreateAccountButton,
+  setHidePhoneCreateAccountButton,
+  showPhoneOTPScreen,
+  setShowPhoneOTPScreen,
+  showPaymentMethod,
+  setShowPaymentMethod,
+  recaptchaRef,
+  otp,
+  setOtp,
+  phoneOtp,
+  setPhoneOtp,
+  showPaybylinkQr,
+  setShowPaybylinkQr,
+}) {
   const dispatch = useDispatch();
-  const { cities } = useSelector((state) => state.cities);
-  const { airports } = useSelector((state) => state.airports);
-  const { vehicleTypes } = useSelector((state) => state.vehicleTypes);
-  const services = "Airport Trip";
+  const {cities} = useSelector((state) => state.cities);
+  const {airports} = useSelector((state) => state.airports);
+  // const { vehicleTypes } = useSelector((state) => state.vehicleTypes);
+  const services = 'Airport Trip';
   const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
+  const language = useSelector((state) => state.auth.language);
 
   const zoneMap = useSelector((state) => state?.zone?.zone);
   const [map, setMap] = useState(null);
+  const [map2, setMap2] = useState(null);
+
+  const [t, i18n] = useTranslation('global');
+  // const [vehicleTypes, setVehicleTpes] = useState([])
+
   useEffect(() => {
-    setMap(zoneMap && zoneMap.length > 0 ? zoneMap[0].map : null)
-  }, [zoneMap])
+    setMap(zoneMap && zoneMap.length > 0 ? zoneMap : null);
+  }, [zoneMap]);
+
+  const [location, setLocation] = useState('');
+  const [destination, setDestination] = useState('');
 
   // const [subTab, setSubTab] = useState(1);
   const [cityName, setCityName] = useState();
@@ -61,70 +76,110 @@ export default function AirportRide(
   const [selectedPickup, setSelectedPickup] = useState(null);
   const [selectedDropoff, setSelectedDropoff] = useState(null);
   const [arrivalDates, setArrivalDates] = useState(null);
+  const [airportName, setAirportName] = useState('');
+
+  const rideTypeOptions = [
+    {value: t('hero.pickup_value_text'), label: t('hero.pickup_text')},
+    {value: t('hero.dropoff_value_text'), label: t('hero.dropoff_text')},
+  ];
   const [formValues, setFormValues] = useState({
-    rideType: "",
-    arrivalCity: "",
-    airportName: "",
-    terminalNumber: "",
-    vehicleType: "",
-    seatNumber: "",
-    arrivalDate: "",
-    arrivalTime: "",
+    rideType: '',
+    // t("hero.pickup_value_text"),
+    arrivalCity: '',
+    airportName: '',
+    terminalNumber: '',
+    vehicleType: '',
+    seatNumber: '',
+    arrivalDate: '',
+    arrivalTime: '',
     sharedRide: false,
   });
   const [onChangeFormValues, setOnChangeFormValues] = useState({
-    rideType: "",
-    arrivalCity: "",
-    airportName: "",
-    terminalNumber: "",
-    vehicleType: "",
-    seatNumber: "",
-    arrivalDate: "",
-    arrivalTime: "",
+    rideType: '',
+    // t("hero.pickup_value_text"),
+    arrivalCity: '',
+    airportName: '',
+    terminalNumber: '',
+    vehicleType: '',
+    seatNumber: '',
+    arrivalDate: '',
+    arrivalTime: '',
     sharedRide: false,
   });
-
+  const [vehicleTypeName, setVehicleTypeName] = useState('');
   const API_BASE_URL = process.env.REACT_APP_BASE_URL_AMK_TEST;
-  const [sharedRideValue, setSharedRideValue] = useState("");
+
+  const [VehicleTypeWithService, setVehicleTypeWithService] = useState(null);
   useEffect(() => {
-    const getSharedRideValue = async () => {
-      dispatch(setLoading(true))
-      if(formValues.vehicleType !== ""){
+    dispatch(setLoading(true));
+    if (cityName) {
+      const getVechileTypes = async () => {
         try {
-          const response = await axios.get(
-            `${API_BASE_URL}/api/method/airport_transport.api.bookings.get_ride_discount?vehicle_type=${formValues.vehicleType}&language=${'en'}`
+          const response = await axiosInstance.get(
+            `${API_BASE_URL}/api/method/airport_transport.api.bookings.get_vehicle_types?language=${
+              language ? language : 'eng'
+            }&service=Airport Trip&city=${cityName}`
           );
-          if(response && response.status === 200){
-            setSharedRideValue(response.data.data)
-            dispatch(setLoading(false))
+          if (response && response.status === 200) {
+            setVehicleTypeWithService(response.data);
           }
         } catch (error) {
           console.log('Error', error);
-          dispatch(setLoading(false))
         }
-      }
-      dispatch(setLoading(false))
+      };
+      getVechileTypes();
     }
-    getSharedRideValue()
-  }, [formValues]);
+    dispatch(setLoading(false));
+  }, [cityName]);
 
-  const [vehicleTypeName, setVehicleTypeName] = useState("");
+  const [sharedRideValue, setSharedRideValue] = useState('');
+
   // console.log('vehicleTypes', vehicleTypes)
   useEffect(() => {
-    if (vehicleTypeName !== "") {
-      const selectedVehicle = vehicleTypes.data.find(
+    if (vehicleTypeName !== '') {
+      const selectedVehicle = VehicleTypeWithService?.data.find(
         (vehicle) => vehicle.name === vehicleTypeName
       );
       setSeatNumberOptions(
         selectedVehicle
-          ? Array.from({ length: selectedVehicle.seats }, (_, i) => `${i + 1}`)
+          ? Array.from({length: selectedVehicle.seats}, (_, i) => `${i + 1}`)
           : []
       );
       setOnChangeFormValues((prevValues) => ({
         ...prevValues,
-        ["vehicleType"]: vehicleTypeName,
+        ['vehicleType']: vehicleTypeName,
       }));
     }
+  }, [vehicleTypeName]);
+
+  const [showSharedRideValue, setShowSharedRideValue] = useState(false);
+  useEffect(() => {
+    const getSharedRideValue = async () => {
+      dispatch(setLoading(true));
+      if (vehicleTypeName !== '') {
+        try {
+          const response = await axiosInstance.get(
+            `${API_BASE_URL}/api/method/airport_transport.api.bookings.get_ride_discount?vehicle_type=${vehicleTypeName}&language=${
+              language ? language : 'eng'
+            }`
+          );
+          if (response && response.status === 200) {
+            console.log('response.data.data me kiya ha?', response.data.data);
+            if (response.data.data > 0) {
+              setShowSharedRideValue(true);
+            }
+            setSharedRideValue(response.data.data);
+            // console.log('qqq', response.data.data)
+            dispatch(setLoading(false));
+          }
+        } catch (error) {
+          console.log('Error', error);
+          dispatch(setLoading(false));
+        }
+      }
+      dispatch(setLoading(false));
+    };
+    getSharedRideValue();
   }, [vehicleTypeName]);
 
   useEffect(() => {
@@ -139,25 +194,74 @@ export default function AirportRide(
     }
   }, [dispatch, cityName]);
 
-  const steps = useMemo(
-    () => [
-      { id: 1, text: "Ride Details" },
-      { id: 2, text: "Vehicle Details" },
-      { id: 3, text: "Additional Info" },
-      { id: 4, text: "Account Info" },
-    ],
-    []
-  );
+  // useEffect(() => {
+  //   if (cities.data?.length > 0 && !cityName) {
+  //     setFormValues((prevValues) => ({
+  //       ...prevValues,
+  //       arrivalCity: cities.data[0],
+  //     }));
+  //     setOnChangeFormValues((prevValues) => ({
+  //       ...prevValues,
+  //       arrivalCity: cities.data[0],
+  //     }));
+
+  //     setCityName(cities.data[0]);
+  //   }
+  // }, [cities]);
+
+  // useEffect(() => {
+  //   if (airports.data?.length > 0) {
+  //     setFormValues((prevValues) => ({
+  //       ...prevValues,
+  //       airportName: airports.data[0].airport,
+  //     }));
+  //     setOnChangeFormValues((prevValues) => ({
+  //       ...prevValues,
+  //       airportName: airports.data[0].airport,
+  //     }));
+
+  //     setFormValues((prevValues) => ({
+  //       ...prevValues,
+  //       terminalNumber: airports.data[0].terminals[0].terminal,
+  //     }));
+  //     setOnChangeFormValues((prevValues) => ({
+  //       ...prevValues,
+  //       terminalNumber: airports.data[0].terminals[0].terminal,
+  //     }));
+  //     const terminals = airports.data[0].terminals.map(
+  //       (terminal) => terminal.terminal
+  //     );
+  //     setTerminalOptions(terminals);
+  //     setSelectedPickup(airports.data[0].terminals[0].location);
+  //     setLocation(airports.data[0].terminals[0].location);
+  //   }
+  // }, [airports, cityName]);
+
+  const steps = useMemo(() => {
+    const baseSteps = [
+      {id: 1, text: t('hero.stepper_steps.ride_detail_text')},
+      {id: 2, text: t('hero.stepper_steps.vehicle_detail_text')},
+      {id: 3, text: t('hero.stepper_steps.additional_info_text')},
+    ];
+
+    if (!isLoggedIn) {
+      baseSteps.push({
+        id: 4,
+        text: t('hero.stepper_steps.account_info_text'),
+      });
+    }
+
+    return baseSteps;
+  }, [isLoggedIn, t]);
 
   const validationSchema = Yup.object().shape({
-    rideType: Yup.string().required("Ride type is required"),
-    arrivalCity: Yup.string().required("Arrival City is required"),
-    airportName: Yup.string().required("Airport Name is required"),
-    terminalNumber: Yup.string().required("Terminal Number is required"),
-    vehicleType: Yup.string().required("Vehicle Type is required"),
-    seatNumber: Yup.string().required("Seat Number is required"),
-    arrivalDate: Yup.string().required("Arrival Date is required"),
-    arrivalTime: Yup.string().required("Arrival Time is required"),
+    rideType: Yup.string().required('Ride type is required'),
+    arrivalCity: Yup.string().required('Arrival City is required'),
+    airportName: Yup.string().required('Airport Name is required'),
+    terminalNumber: Yup.string().required('Terminal Number is required'),
+    vehicleType: Yup.string().required('Vehicle Type is required'),
+    arrivalDate: Yup.string().required('Arrival Date is required'),
+    arrivalTime: Yup.string().required('Arrival Time is required'),
     sharedRide: Yup.bool(),
   });
 
@@ -169,17 +273,12 @@ export default function AirportRide(
       ? selectedAirport.terminals.map((terminal) => terminal.terminal)
       : [];
     setTerminalOptions(terminals);
-    setFieldValue("terminalNumber", ""); // Reset terminal number when airport changes
+    setFieldValue('terminalNumber', ''); // Reset terminal number when airport changes
   };
 
-  const generateOptions = (items, valueKey = "value", labelKey = "label") =>
-    items?.map((item) => ({ value: item[valueKey], label: item[labelKey] })) ||
+  const generateOptions = (items, valueKey = 'value', labelKey = 'label') =>
+    items?.map((item) => ({value: item[valueKey], label: item[labelKey]})) ||
     [];
-
-  const rideTypeOptions = [
-    { value: "pickup", label: "Pick Up" },
-    { value: "dropoff", label: "Drop Off" },
-  ];
 
   const handleMapSubmit = (pickup, dropoff) => {
     setSelectedPickup(pickup);
@@ -201,14 +300,36 @@ export default function AirportRide(
             steps={steps}
             subTab={subTab}
             className={
-              "flex items-center w-full text-sm font-medium text-center py-4 border-b text-gray-500 sm:text-base justify-between"
+              'flex items-center w-full text-sm font-medium text-center py-4 border-b text-gray-500 sm:text-base justify-between'
             }
           />
         )}
 
         <div className="p-2 md:p-4">
-          {showSignUp ? (
+          {showPaymentMethod ? (
+            <PaymentMethod
+              formValues={formValues}
+              selectedPickup={selectedPickup}
+              selectedDropoff={selectedDropoff}
+              location={location}
+              destination={destination}
+              sharedRideValue={sharedRideValue}
+              setSubTab={setSubTab}
+              setShowSignUp={setShowSignUp}
+              setShowAlreadyRegistered={setShowAlreadyRegistered}
+              setShowOTPScreen={setShowOTPScreen}
+              setHideCreateAccountButton={setHideCreateAccountButton}
+              setShowPhone={setShowPhone}
+              setHidePhoneCreateAccountButton={setHidePhoneCreateAccountButton}
+              setShowPhoneOTPScreen={setShowPhoneOTPScreen}
+              setShowPaymentMethod={setShowPaymentMethod}
+              showPaybylinkQr={showPaybylinkQr}
+              setShowPaybylinkQr={setShowPaybylinkQr}
+              rideName="Airport Trip"
+            />
+          ) : showSignUp ? (
             <HomeEmailSignUp
+              formValues={formValues}
               setSubTab={setSubTab}
               setShowSignUp={setShowSignUp}
               showAlreadyRegistered={showAlreadyRegistered}
@@ -230,42 +351,45 @@ export default function AirportRide(
               setOtp={setOtp}
               phoneOtp={phoneOtp}
               setPhoneOtp={setPhoneOtp}
+              showPaybylinkQr={showPaybylinkQr}
+              setShowPaybylinkQr={setShowPaybylinkQr}
             />
-          ) : showPaymentMethod ? (
-            <PaymentMethod />
           ) : (
             <Formik
               initialValues={formValues}
               validationSchema={validationSchema}
               enableReinitialize={true}
-              onSubmit={(values, { setSubmitting }) => {
-                // if (!isLoggedIn) {
-                setSubTab(4)
-                setShowSignUp(true);
-                // } else {
-                //   // const submitValues = {
-                //   //   ...values,
-                //   //   pickupLocation: selectedPickup,
-                //   //   dropoffLocation: selectedDropoff,
-                //   // };
-                //   // console.log("Submitted values:", submitValues);
-                //   setShowPaymentMethod(true);
-                // }
+              onSubmit={async (values, {setSubmitting}) => {
+                if (!location || !destination) {
+                  message.error(t('hero.errors.map_required'));
+                } else {
+                  dispatch(setLoading(true));
+
+                  if (isLoggedIn) {
+                    dispatch(setLoading(false));
+                    setShowPaymentMethod(true);
+                  } else {
+                    dispatch(setLoading(false));
+                    setSubTab(4);
+                    setShowSignUp(true);
+                  }
+                }
+                dispatch(setLoading(false));
                 setSubmitting(false);
               }}
             >
-              {({ values, setFieldValue, validateForm }) => {
+              {({values, setFieldValue, validateForm}) => {
                 const isStep1Valid = [
-                  "rideType",
-                  "arrivalCity",
-                  "airportName",
-                  "terminalNumber",
+                  'rideType',
+                  'arrivalCity',
+                  'airportName',
+                  'terminalNumber',
                 ].every((field) => values[field]);
                 const isStep2Valid = [
                   // "vehicleType",
-                  "seatNumber",
-                  "arrivalDate",
-                  "arrivalTime",
+                  // formValues.sharedRide ? "seatNumber" : '',
+                  'arrivalDate',
+                  'arrivalTime',
                 ].every((field) => values[field]);
 
                 const handleNext = (step, isValid, values) => {
@@ -284,15 +408,19 @@ export default function AirportRide(
                     {subTab === 1 && (
                       <>
                         <InputFieldFormik
-                          label="Ride Type"
+                          label={t('hero.ride_type_text')}
                           name="rideType"
                           type="select"
                           value={
                             formValues.rideType || onChangeFormValues.rideType
                           }
                           options={rideTypeOptions}
-                          onChange={({ fieldName, selectedValue }) => {
+                          onChange={({fieldName, selectedValue}) => {
                             setFieldValue(fieldName, selectedValue);
+                            setFormValues((prevValues) => ({
+                              ...prevValues,
+                              [fieldName]: selectedValue,
+                            }));
                             setOnChangeFormValues((prevValues) => ({
                               ...prevValues,
                               [fieldName]: selectedValue,
@@ -301,7 +429,7 @@ export default function AirportRide(
                           required
                         />
                         <InputFieldFormik
-                          label="Arrival City"
+                          label={t('hero.arrival_city_text')}
                           name="arrivalCity"
                           type="select"
                           value={
@@ -316,12 +444,16 @@ export default function AirportRide(
                               label: city,
                             }))
                           }
-                          onChange={({ fieldName, selectedValue }) => {
+                          onChange={({fieldName, selectedValue}) => {
                             setFieldValue(fieldName, selectedValue);
                             setCityName(selectedValue);
-                            setFieldValue("airportName", "");
-                            setFieldValue("terminalNumber", "");
+                            setFieldValue('airportName', '');
+                            setFieldValue('terminalNumber', '');
                             setTerminalOptions([]);
+                            setFormValues((prevValues) => ({
+                              ...prevValues,
+                              [fieldName]: selectedValue,
+                            }));
                             setOnChangeFormValues((prevValues) => ({
                               ...prevValues,
                               [fieldName]: selectedValue,
@@ -330,7 +462,7 @@ export default function AirportRide(
                           required
                         />
                         <InputFieldFormik
-                          label="Airport Name"
+                          label={t('hero.airport_name_text')}
                           name="airportName"
                           type="select"
                           value={
@@ -339,12 +471,16 @@ export default function AirportRide(
                           }
                           options={generateOptions(
                             airports.data,
-                            "airport",
-                            "airport"
+                            'airport',
+                            'airport'
                           )}
-                          onChange={({ fieldName, selectedValue }) => {
+                          onChange={({fieldName, selectedValue}) => {
                             setFieldValue(fieldName, selectedValue);
                             handleAirportChange(selectedValue, setFieldValue);
+                            setFormValues((prevValues) => ({
+                              ...prevValues,
+                              [fieldName]: selectedValue,
+                            }));
                             setOnChangeFormValues((prevValues) => ({
                               ...prevValues,
                               [fieldName]: selectedValue,
@@ -353,7 +489,7 @@ export default function AirportRide(
                           required
                         />
                         <InputFieldFormik
-                          label="Terminal Number"
+                          label={t('hero.terminal_number_text')}
                           name="terminalNumber"
                           type="select"
                           value={
@@ -364,8 +500,12 @@ export default function AirportRide(
                             value: terminal,
                             label: terminal,
                           }))}
-                          onChange={({ fieldName, selectedValue }) => {
+                          onChange={({fieldName, selectedValue}) => {
                             setFieldValue(fieldName, selectedValue);
+                            setFormValues((prevValues) => ({
+                              ...prevValues,
+                              [fieldName]: selectedValue,
+                            }));
                             setOnChangeFormValues((prevValues) => ({
                               ...prevValues,
                               [fieldName]: selectedValue,
@@ -376,10 +516,51 @@ export default function AirportRide(
 
                         <Button
                           className="bg-background_steel_blue w-full text-text_white hover:bg-gray-100 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 mt-3"
-                          onClick={() => handleNext(2, isStep1Valid, values)}
-                          label="Next"
+                          onClick={() => {
+                            dispatch(setLoading(true));
+                            const requiredFields = [
+                              'rideType',
+                              'arrivalCity',
+                              'airportName',
+                              'terminalNumber',
+                            ];
+                            // Error messages for both English and Arabic
+                            const errorMessages = {
+                              rideType:
+                                language === 'ar'
+                                  ? 'نوع الرحلة مطلوب'
+                                  : 'Ride type is required',
+                              arrivalCity:
+                                language === 'ar'
+                                  ? 'مدينة الوصول مطلوب'
+                                  : 'Arrival city is required',
+                              airportName:
+                                language === 'ar'
+                                  ? 'اسم المطار مطلوب'
+                                  : 'Airport name is required',
+                              terminalNumber:
+                                language === 'ar'
+                                  ? 'رقم المحطة مطلوب'
+                                  : 'Terminal number is required',
+                            };
+                            const isStep1Valid = requiredFields.every(
+                              (field) => values[field]
+                            );
+                            if (!isStep1Valid) {
+                              requiredFields.forEach((field) => {
+                                if (!values[field]) {
+                                  // Display the appropriate error message based on the language
+                                  message.error(errorMessages[field]);
+                                }
+                              });
+                            } else {
+                              handleNext(2, isStep1Valid, values);
+                            }
+                            dispatch(setLoading(false));
+                          }}
+                          label={t('next_text')}
                           type="button"
-                          disabled={!isStep1Valid}
+                          // disabled={!isStep1Valid}
                         />
                       </>
                     )}
@@ -387,37 +568,71 @@ export default function AirportRide(
                       <>
                         <div>
                           <VehicleTypeModal
+                            VehicleTypeWithService={VehicleTypeWithService}
                             vehicleTypeName={vehicleTypeName}
                             setVehicleTypeName={setVehicleTypeName}
                           />
                         </div>
 
+                        {showSharedRideValue && (
+                          <div className="border border-bg_light_gray p-2 mt-3">
+                            <p className="text-lg text-text_grey font-bold">
+                              {t('hero.shared_ride_text')}!!
+                            </p>
+                            <InputFieldFormik
+                              // label={t("hero.shared_ride_text")}
+                              name="sharedRide"
+                              type="checkbox"
+                              percentageValue={sharedRideValue}
+                              onChange={({fieldName, selectedValue}) => {
+                                setFieldValue(fieldName, selectedValue);
+                                setFormValues((prevValues) => ({
+                                  ...prevValues,
+                                  [fieldName]: selectedValue,
+                                }));
+                                setOnChangeFormValues((prevValues) => ({
+                                  ...prevValues,
+                                  [fieldName]: selectedValue,
+                                }));
+                              }}
+                              required
+                            />
+                          </div>
+                        )}
+
+                        {formValues.sharedRide && (
+                          <InputFieldFormik
+                            label={t('hero.seat_number_text')}
+                            name="seatNumber"
+                            type="select"
+                            value={
+                              formValues.seatNumber ||
+                              onChangeFormValues.seatNumber
+                            }
+                            options={seatNumberOptions.map((seatNumber) => ({
+                              value: seatNumber,
+                              label: seatNumber,
+                            }))}
+                            onChange={({fieldName, selectedValue}) => {
+                              setFieldValue(fieldName, selectedValue);
+                              setOnChangeFormValues((prevValues) => ({
+                                ...prevValues,
+                                [fieldName]: selectedValue,
+                              }));
+                              setFormValues((prevValues) => ({
+                                ...prevValues,
+                                [fieldName]: selectedValue,
+                              }));
+                            }}
+                            required
+                          />
+                        )}
+
                         <InputFieldFormik
-                          label="Seat Number"
-                          name="seatNumber"
-                          type="select"
-                          value={
-                            formValues.seatNumber ||
-                            onChangeFormValues.seatNumber
-                          }
-                          options={seatNumberOptions.map((seatNumber) => ({
-                            value: seatNumber,
-                            label: seatNumber,
-                          }))}
-                          onChange={({ fieldName, selectedValue }) => {
-                            setFieldValue(fieldName, selectedValue);
-                            setOnChangeFormValues((prevValues) => ({
-                              ...prevValues,
-                              [fieldName]: selectedValue,
-                            }));
-                          }}
-                          required
-                        />
-                        <InputFieldFormik
-                          label="Arrival Date"
+                          label={t('hero.arrival_date_text')}
                           name="arrivalDate"
                           type="arrivalDate"
-                          value={values.arrivalDate || ""}
+                          value={values.arrivalDate || ''}
                           arrivalDates={arrivalDates}
                           setArrivalDates={setArrivalDates}
                           // onChange={({ fieldName, selectedValue }) => {
@@ -427,7 +642,7 @@ export default function AirportRide(
                           //     [fieldName]: selectedValue,
                           //   }));
                           // }}
-                          onChange={({ date, dateString }) => {
+                          onChange={({date, dateString}) => {
                             setOnChangeFormValues((prevValues) => ({
                               ...prevValues,
                               ['arrivalDate']: dateString,
@@ -437,12 +652,12 @@ export default function AirportRide(
                           required
                         />
                         <InputFieldFormik
-                          label="Arrival Time"
+                          label={t('hero.arrival_time_text')}
                           name="arrivalTime"
                           type="arrivalTime"
-                          value={values.arrivalTime || ""}
+                          value={values.arrivalTime || ''}
                           arrivalDates={arrivalDates}
-                          onChange={({ fieldName, selectedValue }) => {
+                          onChange={({fieldName, selectedValue}) => {
                             setFieldValue(fieldName, selectedValue);
                             setOnChangeFormValues((prevValues) => ({
                               ...prevValues,
@@ -451,63 +666,102 @@ export default function AirportRide(
                           }}
                           required
                         />
-                        <div className="mt-3 flex flex-col md:flex-row justify-between items-center">
+                        <div className="mt-3 flex flex-row justify-between items-center">
                           <Button
                             className="bg-bg_btn_back w-full text-text_white hover:bg-gray-100 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2"
                             onClick={() => handlePrevious(1, values)}
-                            label="Previous"
+                            label={t('previous_text')}
                             type="button"
                           />
                           <Button
                             className="bg-background_steel_blue w-full text-text_white hover:bg-gray-100 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2"
                             onClick={() => {
-                              console.log('aaaa', values)
-                              values.vehicleType = vehicleTypeName;
-                              handleNext(3, isStep2Valid, values);
+                              dispatch(setLoading(true));
+                              if (vehicleTypeName) {
+                                values.vehicleType = vehicleTypeName;
+                              }
+                              // Error messages for both English and Arabic
+                              const errorMessages = {
+                                vehicleType:
+                                  language === 'ar'
+                                    ? 'نوع المركبة مطلوب'
+                                    : 'Vehicle type is required',
+                                seatNumber:
+                                  language === 'ar'
+                                    ? 'رقم المقعد مطلوب'
+                                    : 'Seat number is required',
+                                arrivalDate:
+                                  language === 'ar'
+                                    ? 'تاريخ الوصول مطلوب'
+                                    : 'Arrival date is required',
+                                arrivalTime:
+                                  language === 'ar'
+                                    ? 'وقت الوصول مطلوب'
+                                    : 'Arrival time is required',
+                              };
+                              const requiredFields = [
+                                'vehicleType',
+                                formValues.sharedRide && 'seatNumber',
+                                'arrivalDate',
+                                'arrivalTime',
+                              ].filter(Boolean);
+
+                              const isStep2Valid = requiredFields.every(
+                                (field) => values[field]
+                              );
+                              if (!isStep2Valid) {
+                                requiredFields.forEach((field) => {
+                                  if (!values[field]) {
+                                    // Display the appropriate error message based on the language
+                                    message.error(errorMessages[field]);
+                                  }
+                                });
+                              } else {
+                                handleNext(3, isStep2Valid, values);
+                              }
+                              dispatch(setLoading(false));
                             }}
-                            label="Next"
+                            label={t('next_text')}
                             type="button"
-                            disabled={!isStep2Valid}
+                            // disabled={!isStep2Valid}
                           />
                         </div>
                       </>
                     )}
                     {subTab === 3 && (
                       <>
-                        <InputFieldFormik
-                          label="Shared Ride"
-                          name="sharedRide"
-                          type="checkbox"
-                          percentageValue={sharedRideValue}
-                          onChange={({ fieldName, selectedValue }) =>
-                            setFieldValue(fieldName, selectedValue)
-                          }
-                          required
-                        />
                         <div className="my-4 flex flex-col md:flex-row justify-between items-start">
                           <div className="w-full md:w-1/2">
                             <Heading
-                              title="Set Your Destination"
+                              title={t('hero.set_destination_text')}
                               className="text-xl text-text_black"
                             />
                           </div>
                           <div className="w-full md:w-1/2">
                             <MapModal
+                              rideName="airportRide"
+                              formValues={formValues}
                               onSubmitDestination={handleMapSubmit}
-                              dammamZoneCoords={map}
+                              zoneCoords={map}
+                              // zoneCoords2={map2}
+                              cityName={values.arrivalCity}
+                              location={location}
+                              setLocation={setLocation}
+                              destination={destination}
+                              setDestination={setDestination}
                             />
                           </div>
                         </div>
-                        <div className="mt-3 flex flex-col md:flex-row justify-between items-center">
+                        <div className="mt-3 flex md:flex-row justify-between items-center">
                           <Button
-                            className="bg-bg_btn_back w-full text-text_white hover:bg-gray-100 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2"
+                            className="bg-bg_btn_back w-1/2 text-text_white hover:bg-gray-100 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2"
                             onClick={() => handlePrevious(2, values)}
-                            label="Previous"
+                            label={t('previous_text')}
                             type="button"
                           />
                           <Button
-                            className="bg-background_steel_blue w-full text-text_white hover:bg-gray-100 font-medium rounded-lg text-sm px-5 py-2.5 mb-2"
-                            label="Submit"
+                            className="bg-background_steel_blue w-1/2 text-text_white hover:bg-gray-100 font-medium rounded-lg text-sm px-5 py-2.5 mb-2"
+                            label={t('submit_text')}
                             type="submit"
                           />
                         </div>
